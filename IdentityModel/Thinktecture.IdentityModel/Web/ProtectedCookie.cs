@@ -16,7 +16,7 @@ namespace Thinktecture.IdentityModel.Web
     public class ProtectedCookie
     {
         private List<CookieTransform> _transforms;
-        private ChunkedCookieHandler _handler = new ChunkedCookieHandler();
+        private static ChunkedCookieHandler _handler = new ChunkedCookieHandler();
 
         // DPAPI protection (single server)
         public ProtectedCookie()
@@ -89,7 +89,7 @@ namespace Thinktecture.IdentityModel.Web
             return DecodeCookieValue(bytes);
         }
 
-        public void Delete(string name)
+        public static void Delete(string name)
         {
             _handler.Delete(name);
         }
