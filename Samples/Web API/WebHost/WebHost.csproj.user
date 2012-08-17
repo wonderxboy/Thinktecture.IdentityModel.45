@@ -37,7 +37,7 @@
           <IISAppRootUrl>http://localhost:1281/</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>True</UseCustomServer>
-          <CustomServerUrl>https://adfs.leastprivilege.vm/webapisecurity</CustomServerUrl>
+          <CustomServerUrl>https://roadie/webapisecurity</CustomServerUrl>
         </WebProjectProperties>
       </FlavorProperties>
     </VisualStudio>

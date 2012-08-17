@@ -8,8 +8,8 @@
     <ProjectGuid>{FE888F38-D64D-4DC3-BDB0-4ACE7427EC13}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BasicAuthenticationClient</RootNamespace>
-    <AssemblyName>BasicAuthenticationClient</AssemblyName>
+    <RootNamespace>AccessKeyClient</RootNamespace>
+    <AssemblyName>AccessKeyClient</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>

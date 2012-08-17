@@ -2,8 +2,8 @@
 {
     public static class Constants
     {
-        public const string WebHost = "adfs.leastprivilege.vm";
-        public const string SelfHost = "adfs.leastprivilege.vm:9000";
+        public const string WebHost = "roadie";
+        public const string SelfHost = "roadie:9000";
         public const string IdSrv = "identity.thinktecture.com/idsrvsample";
         public const string ACS = "ttacssample.accesscontrol.windows.net";
         public const string ADFS = "adfs.leastprivilege.vm";
