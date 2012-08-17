@@ -29,25 +29,7 @@ namespace Thinktecture.IdentityModel.Authorization.WebApi
             _authZType = authorizationManagerType;
         }
 
-        public override void OnAuthorization(HttpActionContext actionContext)
-        {
-            if (actionContext == null)
-            {
-                throw new ArgumentNullException("actionContext");
-            }
-
-            if (SkipAuthorization(actionContext))
-            {
-                return;
-            }
-
-            if (!IsAuthorized(actionContext))
-            {
-                HandleUnauthorizedRequest(actionContext);
-            }
-        }
-
-        protected virtual bool IsAuthorized(HttpActionContext actionContext)
+        protected override bool IsAuthorized(HttpActionContext actionContext)
         {
             bool globalResult = false;
 
@@ -98,12 +80,6 @@ namespace Thinktecture.IdentityModel.Authorization.WebApi
                     _authZ = Activator.CreateInstance(_authZType) as IAuthorizationManager;
                 }
             }
-        }
-
-        private static bool SkipAuthorization(HttpActionContext actionContext)
-        {
-            return actionContext.ActionDescriptor.GetCustomAttributes<AllowAnonymousAttribute>().Any()
-                   || actionContext.ControllerContext.ControllerDescriptor.GetCustomAttributes<AllowAnonymousAttribute>().Any();
         }
     }
 }
