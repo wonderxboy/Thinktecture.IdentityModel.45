@@ -39,7 +39,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.IdentityModel, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.IdentityModel" />
@@ -60,9 +59,9 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\IdentityModel\Thinktecture.IdentityModel\Thinktecture.IdentityModel.csproj">
+    <ProjectReference Include="..\..\..\..\IdentityModel\Thinktecture.IdentityModel\Thinktecture.IdentityModel.45.csproj">
       <Project>{ac9a74df-4aab-43c8-b0ed-b7602721e545}</Project>
-      <Name>Thinktecture.IdentityModel</Name>
+      <Name>Thinktecture.IdentityModel.45</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Common\Common.csproj">
       <Project>{ab72fab9-3817-401a-9a31-cc285806073d}</Project>
