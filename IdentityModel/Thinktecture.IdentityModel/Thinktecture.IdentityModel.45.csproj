@@ -248,10 +248,12 @@
     <Compile Include="Tokens\Http\AuthenticationOptionMapping.cs" />
     <Compile Include="Tokens\Http\AuthenticationOptions.cs" />
     <Compile Include="Tokens\Http\ClaimsTransformationHandler.cs" />
+    <Compile Include="Tokens\Http\ClientCertificateIssuerNameRegistry.cs" />
+    <Compile Include="Tokens\Http\ClientCertificateMode.cs" />
     <Compile Include="Tokens\Http\HttpAuthentication.cs" />
     <Compile Include="Tokens\Http\AuthenticationConfiguration.cs" />
     <Compile Include="Clients\WrapClient.cs" />
-    <Compile Include="Tokens\Http\HttpClientCertificateSecurityTokenHandler.cs" />
+    <Compile Include="Tokens\Http\ClientCertificateHandler.cs" />
     <Compile Include="Tokens\Http\SessionTokenConfiguration.cs" />
     <Compile Include="Authorization\WebApi\ApiAuthorizeAttribute.cs" />
     <Compile Include="Authorization\DefaultPolicy.cs" />
