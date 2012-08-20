@@ -23,7 +23,11 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             var principal = _transfomer.Authenticate(request.RequestUri.AbsoluteUri, ClaimsPrincipal.Current);
 
             Thread.CurrentPrincipal = principal;
-            HttpContext.Current.User = principal;
+
+            if (HttpContext.Current != null)
+            {
+                HttpContext.Current.User = principal;
+            }
 
             return base.SendAsync(request, cancellationToken);
         }
