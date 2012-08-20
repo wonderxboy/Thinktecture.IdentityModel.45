@@ -149,7 +149,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             });
         }
 
-        public void AddClientCertificate(ClientCertificateSecurityMode mode, params string[] values)
+        public void AddClientCertificate(ClientCertificateMode mode, params string[] values)
         {
             var handler = new ClientCertificateHandler(mode, values);
 
