@@ -91,6 +91,22 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                     }
                 }
             }
+
+            // check for client certificate
+            if (Configuration.HasClientCertificateMapping)
+            {
+                var cert = request.GetClientCertificate();
+
+                if (cert != null)
+                {
+                    var principal = AuthenticateClientCertificate(cert);
+
+                    if (principal.Identity.IsAuthenticated)
+                    {
+                        return Transform(resourceName, principal);
+                    }
+                }
+            }
             
             // do claim transformation (if enabled), and return.
             return Transform(resourceName, Principal.Anonymous);
@@ -177,24 +193,6 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
             return Principal.Anonymous;
         }
-
-        //public virtual ClaimsPrincipal AuthenticateQueryStrings(Dictionary<string, string> queryString)
-        //{
-        //    SecurityTokenHandlerCollection handlers;
-
-        //    if (queryString != null)
-        //    {
-        //        foreach (var param in queryString)
-        //        {
-        //            if (Configuration.TryGetQueryStringMapping(param.Key, out handlers))
-        //            {
-        //                return InvokeHandler(handlers, param.Value);
-        //            }
-        //        }
-        //    }
-
-        //    return Principal.Anonymous;
-        //}
 
         public virtual ClaimsPrincipal AuthenticateQueryStrings(Uri uri)
         {
