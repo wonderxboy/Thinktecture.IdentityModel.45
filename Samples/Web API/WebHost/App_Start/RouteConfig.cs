@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
+﻿using Resources.Security;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
+using Thinktecture.IdentityModel.Tokens.Http;
 
 namespace WebApiSecurity
 {
@@ -20,6 +17,15 @@ namespace WebApiSecurity
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
+            );
+            
+            // default API route with claims transformation
+            routes.MapHttpRoute(
+                name: "DefaultApiWithTransformation",
+                routeTemplate: "api2/identity",
+                defaults: new { controller = "Identity" } ,
+                constraints: null,
+                handler: new ClaimsTransformationHandler(new ConsultantsClaimsTransformer(), GlobalConfiguration.Configuration)
             );
 
             // default MVC route

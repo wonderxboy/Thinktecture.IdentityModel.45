@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Services;
-using System.Linq;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Security.Claims;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
+using System.Web.Http;
+using System.Web.Http.Dispatcher;
 
 namespace Thinktecture.IdentityModel.Tokens.Http
 {
@@ -14,19 +12,19 @@ namespace Thinktecture.IdentityModel.Tokens.Http
     {
         ClaimsAuthenticationManager _transfomer;
 
-        public ClaimsTransformationHandler()
-        {
-            _transfomer = FederatedAuthentication.FederationConfiguration.IdentityConfiguration.ClaimsAuthenticationManager;
-        }
-
-        public ClaimsTransformationHandler(ClaimsAuthenticationManager transformer)
+        public ClaimsTransformationHandler(ClaimsAuthenticationManager transformer, HttpConfiguration configuration)
         {
             _transfomer = transformer;
+            InnerHandler = new HttpControllerDispatcher(configuration);
         }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            Thread.CurrentPrincipal = _transfomer.Authenticate(request.RequestUri.AbsoluteUri, ClaimsPrincipal.Current);
+            var principal = _transfomer.Authenticate(request.RequestUri.AbsoluteUri, ClaimsPrincipal.Current);
+
+            Thread.CurrentPrincipal = principal;
+            HttpContext.Current.User = principal;
+
             return base.SendAsync(request, cancellationToken);
         }
     }
