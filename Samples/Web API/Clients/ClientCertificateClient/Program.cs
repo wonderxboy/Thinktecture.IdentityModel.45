@@ -25,10 +25,14 @@ namespace ClientCertificateClient
                 {
                     "Calling Service\n".ConsoleYellow();
 
-                    
-
                     var handler = new WebRequestHandler();
-                    handler.SetClientCertificate(X509.CurrentUser.My.SubjectDistinguishedName.Find("CN=Client").First());
+                    handler.ClientCertificates.Add(
+                        X509.
+                        CurrentUser.
+                        My.
+                        SubjectDistinguishedName.
+                        Find("CN=Client").First());
+
                     var client = new HttpClient(handler) { BaseAddress = _baseAddress };
                     
                     var response = client.GetAsync("identity").Result;
@@ -40,17 +44,6 @@ namespace ClientCertificateClient
 
                 Console.ReadLine();
             }
-
-        }
-
-    }
-
-    public static class Extensions
-    {
-        public static void SetClientCertificate(this WebRequestHandler handler, X509Certificate2 certificate)
-        {
-            handler.ClientCertificateOptions = ClientCertificateOption.Manual;
-            handler.ClientCertificates.Add(certificate);
         }
     }
 }
