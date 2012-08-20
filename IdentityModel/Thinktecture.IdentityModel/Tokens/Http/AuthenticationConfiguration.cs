@@ -149,6 +149,17 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             });
         }
 
+        public void AddClientCertificate(ClientCertificateSecurityMode mode, params string[] values)
+        {
+            var handler = new ClientCertificateHandler(mode, values);
+
+            AddMapping(new AuthenticationOptionMapping
+            {
+                TokenHandler = new SecurityTokenHandlerCollection { handler },
+                Options = AuthenticationOptions.ForClientCertificate()
+            });
+        }
+
         public void AddSaml2(SecurityTokenHandlerConfiguration configuration, AuthenticationOptions options)
         {
             var handler = new HttpSaml2SecurityTokenHandler();

@@ -175,6 +175,7 @@
     <Reference Include="System.IdentityModel">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.IdentityModel.Selectors" />
     <Reference Include="System.identitymodel.services" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -250,6 +251,7 @@
     <Compile Include="Tokens\Http\HttpAuthentication.cs" />
     <Compile Include="Tokens\Http\AuthenticationConfiguration.cs" />
     <Compile Include="Clients\WrapClient.cs" />
+    <Compile Include="Tokens\Http\HttpClientCertificateSecurityTokenHandler.cs" />
     <Compile Include="Tokens\Http\SessionTokenConfiguration.cs" />
     <Compile Include="Authorization\WebApi\ApiAuthorizeAttribute.cs" />
     <Compile Include="Authorization\DefaultPolicy.cs" />

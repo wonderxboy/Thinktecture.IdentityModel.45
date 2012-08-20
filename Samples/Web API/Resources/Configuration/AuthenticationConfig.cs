@@ -89,6 +89,12 @@ namespace Resources.Configuration
             }, AuthenticationOptions.ForQueryString("key"));
             #endregion
 
+            #region Client Certificate
+            config.AddClientCertificate(
+                ClientCertificateSecurityMode.ChainValidationWithIssuerSubjectName, 
+                "CN=PortableCA");
+            #endregion
+
             return config;
         }
     }
