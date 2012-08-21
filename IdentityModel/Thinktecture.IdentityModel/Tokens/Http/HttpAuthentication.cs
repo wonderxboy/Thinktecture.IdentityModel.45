@@ -3,24 +3,16 @@
  * see license.txt
  */
 
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Globalization;
-using System.IdentityModel.Services;
-using System.IdentityModel.Services.Tokens;
 using System.IdentityModel.Tokens;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
-using System.Web.Http.Routing;
-using Newtonsoft.Json.Linq;
-using Thinktecture.IdentityModel;
 using Thinktecture.IdentityModel.Extensions;
 
 namespace Thinktecture.IdentityModel.Tokens.Http
@@ -107,7 +99,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                     }
                 }
             }
-            
+
             // do claim transformation (if enabled), and return.
             return Transform(resourceName, Principal.Anonymous);
         }
@@ -203,7 +195,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
         {
             SecurityTokenHandlerCollection handlers;
             var token = new X509SecurityToken(certificate);
-            
+
             if (Configuration.TryGetClientCertificateMapping(out handlers))
             {
                 var identity = handlers.First().ValidateToken(token);
@@ -212,7 +204,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
             return Principal.Anonymous;
         }
-        
+
         public virtual ClaimsPrincipal Transform(string resource, ClaimsPrincipal incomingPrincipal)
         {
             if (Configuration.ClaimsAuthenticationManager != null)
@@ -238,7 +230,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             {
                 return true;
             }
-            
+
             return false;
         }
 

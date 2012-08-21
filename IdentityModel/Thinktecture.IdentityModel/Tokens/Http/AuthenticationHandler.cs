@@ -60,6 +60,10 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             {
                 return SendUnauthorizedResponse();
             }
+            catch (SecurityTokenException)
+            {
+                return SendUnauthorizedResponse();
+            }
 
             return base.SendAsync(request, cancellationToken).ContinueWith(
                 (task) =>

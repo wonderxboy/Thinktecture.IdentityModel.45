@@ -1,4 +1,9 @@
-﻿namespace Thinktecture.IdentityModel.Tokens.Http
+﻿/*
+ * Copyright (c) Dominick Baier.  All rights reserved.
+ * see license.txt
+ */
+
+namespace Thinktecture.IdentityModel.Tokens.Http
 {
     public enum ClientCertificateMode
     {
