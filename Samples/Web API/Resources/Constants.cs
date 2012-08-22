@@ -19,6 +19,7 @@
         public const string Realm = "https://samples.thinktecture.com/webapisecurity/";
         
         public const string WebHostBaseAddress = "https://" + WebHost + "/webapisecurity/api/";
+        public const string WebHostPerRouteBaseAddress = "https://" + WebHost + "/webapisecurity/api3/";
         public const string SelfHostBaseAddress = "https://" + SelfHost + "/webapisecurity/api/";
     }
 }
