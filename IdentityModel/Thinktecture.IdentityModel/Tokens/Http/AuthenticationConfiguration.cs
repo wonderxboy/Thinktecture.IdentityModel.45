@@ -23,6 +23,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         public List<AuthenticationOptionMapping> Mappings { get; set; }
         public string DefaultAuthenticationScheme { get; set; }
+        public bool SendAuthenticateResponseHeader { get; set; }
         public ClaimsAuthenticationManager ClaimsAuthenticationManager { get; set; }
         public bool InheritHostClientIdentity { get; set; }
         public bool EnableSessionToken { get; set; }
@@ -59,6 +60,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
         {
             Mappings = new List<AuthenticationOptionMapping>();
             DefaultAuthenticationScheme = "unspecified";
+            SendAuthenticateResponseHeader = true;
             InheritHostClientIdentity = false;
 
             EnableSessionToken = false;
