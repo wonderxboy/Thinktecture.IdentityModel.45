@@ -92,7 +92,7 @@ namespace Resources.Configuration
             #region Client Certificate
             config.AddClientCertificate(
                 ClientCertificateMode.ChainValidationWithIssuerSubjectName, 
-                "CN=PortableCA2");
+                "CN=PortableCA");
             #endregion
 
             return config;
