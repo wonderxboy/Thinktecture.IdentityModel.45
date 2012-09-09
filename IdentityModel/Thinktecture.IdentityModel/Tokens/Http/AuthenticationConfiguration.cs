@@ -23,7 +23,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         public List<AuthenticationOptionMapping> Mappings { get; set; }
         public string DefaultAuthenticationScheme { get; set; }
-        public bool SendAuthenticateResponseHeader { get; set; }
+        public bool SendWwwAuthenticateResponseHeader { get; set; }
         public ClaimsAuthenticationManager ClaimsAuthenticationManager { get; set; }
         public bool InheritHostClientIdentity { get; set; }
         public bool SetNoRedirectMarker { get; set; }
@@ -61,7 +61,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
         {
             Mappings = new List<AuthenticationOptionMapping>();
             DefaultAuthenticationScheme = "unspecified";
-            SendAuthenticateResponseHeader = true;
+            SendWwwAuthenticateResponseHeader = true;
             SetNoRedirectMarker = false;
             InheritHostClientIdentity = false;
 

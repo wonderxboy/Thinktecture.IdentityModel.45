@@ -117,7 +117,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         protected virtual void SetAuthenticateHeader(HttpResponseMessage response)
         {
-            if (_authN.Configuration.SendAuthenticateResponseHeader)
+            if (_authN.Configuration.SendWwwAuthenticateResponseHeader)
             {
                 response.Headers.WwwAuthenticate.Add(new AuthenticationHeaderValue(_authN.Configuration.DefaultAuthenticationScheme));
             }
