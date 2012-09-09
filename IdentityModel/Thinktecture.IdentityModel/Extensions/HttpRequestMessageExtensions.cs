@@ -11,19 +11,21 @@ namespace Thinktecture.IdentityModel.Extensions
 {
     public static class HttpRequestMessageExtensions
     {
-        public static HttpRequestMessage ToHttpRequestMessage(this HttpRequestBase httpRequest)
+        public static HttpRequestMessage ToHttpRequestMessage(this HttpRequestBase httpRequest, bool includeContent = true)
         {
-            HttpMethod httpMethod = GetHttpMethod(httpRequest.HttpMethod);
-            Uri url = httpRequest.Url;
+            var httpMethod = GetHttpMethod(httpRequest.HttpMethod);
+            var url = httpRequest.Url;
             
-            HttpRequestMessage httpRequestMessage = new HttpRequestMessage(httpMethod, url)
+            var httpRequestMessage = new HttpRequestMessage(httpMethod, url);
+            
+            if (includeContent)
             {
-                Content = new StreamContent(httpRequest.InputStream)
-            };
-
+                httpRequestMessage.Content = new StreamContent(httpRequest.InputStream);
+            }
+            
             foreach (string str in httpRequest.Headers)
             {
-                string[] values = httpRequest.Headers.GetValues(str);
+                var values = httpRequest.Headers.GetValues(str);
                 AddHeaderToHttpRequestMessage(httpRequestMessage, str, values);
             }
             
