@@ -61,7 +61,10 @@ namespace Thinktecture.IdentityModel.Tokens
 
             if (descriptor.Subject != null)
             {
-                jwt.Claims = descriptor.Subject.Claims.ToList();
+                foreach (var claim in descriptor.Subject.Claims)
+                {
+                    jwt.Claims.Add(claim.Type, claim.Value);
+                }
             }
 
             return jwt;
@@ -229,7 +232,7 @@ namespace Thinktecture.IdentityModel.Tokens
         {
             foreach (var claim in jwt.Claims)
             {
-                writer.WritePropertyName(claim.Type);
+                writer.WritePropertyName(claim.Key);
                 writer.WriteValue(claim.Value);
             }
         }
@@ -337,7 +340,7 @@ namespace Thinktecture.IdentityModel.Tokens
                         jwt.Principal = item.Value.ToString();
                         break;
                     default:
-                        jwt.Claims.Add(new Claim(item.Key, item.Value.ToString()));
+                        jwt.Claims.Add(item.Key, item.Value.ToString());
                         break;
                 }
             }
@@ -429,9 +432,27 @@ namespace Thinktecture.IdentityModel.Tokens
 
         protected virtual ClaimsIdentity CreateClaimsIdentity(JsonWebToken jwt)
         {
-            var claims = new List<Claim>(
-                from c in jwt.Claims
-                select new Claim(c.Type, c.Value, c.ValueType, jwt.Issuer));
+            var claims = new List<Claim>();
+
+            foreach (var item in jwt.Claims)
+            {
+                if (item.Value.Contains(','))
+                {
+                    var items = item.Value.Split(',');
+                    foreach (var part in items)
+                    {
+                        claims.Add(new Claim(item.Key, part, ClaimValueTypes.String, jwt.Issuer));
+                    }
+                }
+                else
+                {
+                    claims.Add(new Claim(item.Key, item.Value, ClaimValueTypes.String, jwt.Issuer));
+                }
+            }
+
+            //var claims = new List<Claim>(
+            //    from c in jwt.Claims
+            //    select new Claim(c.Type, c.Value, c.ValueType, jwt.Issuer));
 
             if (!string.IsNullOrWhiteSpace(jwt.Principal))
             {

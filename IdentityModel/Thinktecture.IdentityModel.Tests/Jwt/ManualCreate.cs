@@ -6,6 +6,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Thinktecture.IdentityModel.Constants;
 using Thinktecture.IdentityModel.Tests.Helper;
 using Thinktecture.IdentityModel.Tokens;
+using System.IdentityModel.Tokens;
+using System.Linq;
 
 namespace Thinktecture.IdentityModel.Tests.Jwt
 {
@@ -26,10 +28,10 @@ namespace Thinktecture.IdentityModel.Tests.Jwt
                 Issuer = "dominick",
                 ExpirationTime = 500000,
 
-                Claims = new List<Claim>
+                Claims = new Dictionary<string, string>
                 {
-                    new Claim(ClaimTypes.Name, "dominick"),
-                    new Claim(ClaimTypes.Email, "dominick.baier@thinktecture.com")
+                    { ClaimTypes.Name, "dominick" },
+                    { ClaimTypes.Email, "dominick.baier@thinktecture.com" }
                 }
             };
 
@@ -60,10 +62,10 @@ namespace Thinktecture.IdentityModel.Tests.Jwt
                 Issuer = "dominick",
                 ExpirationTime = 500000,
 
-                Claims = new List<Claim>
+                Claims = new Dictionary<string, string>
                 {
-                    new Claim(ClaimTypes.Name, "dominick"),
-                    new Claim(ClaimTypes.Email, "dominick.baier@thinktecture.com")
+                    { ClaimTypes.Name, "dominick" },
+                    { ClaimTypes.Email, "dominick.baier@thinktecture.com" }
                 }
             };
 
@@ -87,10 +89,10 @@ namespace Thinktecture.IdentityModel.Tests.Jwt
                 Issuer = "dominick",
                 ExpirationTime = 500000,
 
-                Claims = new List<Claim>
+                Claims = new Dictionary<string, string>
                 {
-                    new Claim(ClaimTypes.Name, "dominick"),
-                    new Claim(ClaimTypes.Email, "dominick.baier@thinktecture.com")
+                    { ClaimTypes.Name, "dominick" },
+                    { ClaimTypes.Email, "dominick.baier@thinktecture.com" }
                 }
             };
 
@@ -125,10 +127,10 @@ namespace Thinktecture.IdentityModel.Tests.Jwt
                 Issuer = "dominick",
                 ExpirationTime = 500000,
 
-                Claims = new List<Claim>
+                Claims = new Dictionary<string, string>
                 {
-                    new Claim(ClaimTypes.Name, "dominick"),
-                    new Claim(ClaimTypes.Email, "dominick.baier@thinktecture.com")
+                    { ClaimTypes.Name, "dominick" },
+                    { ClaimTypes.Email, "dominick.baier@thinktecture.com" }
                 }
             };
 
@@ -163,10 +165,10 @@ namespace Thinktecture.IdentityModel.Tests.Jwt
                 Issuer = "dominick",
                 ExpirationTime = 500000,
 
-                Claims = new List<Claim>
+                Claims = new Dictionary<string, string>
                 {
-                    new Claim(ClaimTypes.Name, "dominick"),
-                    new Claim(ClaimTypes.Email, "dominick.baier@thinktecture.com")
+                    { ClaimTypes.Name, "dominick" },
+                    { ClaimTypes.Email, "dominick.baier@thinktecture.com" }
                 }
             };
 
@@ -202,10 +204,10 @@ namespace Thinktecture.IdentityModel.Tests.Jwt
                 Issuer = "dominick",
                 ExpirationTime = 500000,
 
-                Claims = new List<Claim>
+                Claims = new Dictionary<string, string>
                 {
-                    new Claim(ClaimTypes.Name, "dominick"),
-                    new Claim(ClaimTypes.Email, "dominick.baier@thinktecture.com")
+                    { ClaimTypes.Name, "dominick" },
+                    { ClaimTypes.Email, "dominick.baier@thinktecture.com" }
                 }
             };
 
@@ -229,15 +231,133 @@ namespace Thinktecture.IdentityModel.Tests.Jwt
                 Issuer = "dominick",
                 ExpirationTime = 500000,
 
-                Claims = new List<Claim>
+                Claims = new Dictionary<string, string>
                 {
-                    new Claim(ClaimTypes.Name, "dominick"),
-                    new Claim(ClaimTypes.Email, "dominick.baier@thinktecture.com")
+                    { ClaimTypes.Name, "dominick" },
+                    { ClaimTypes.Email, "dominick.baier@thinktecture.com" }
                 }
             };
 
             var handler = new JsonWebTokenHandler();
             var token = handler.WriteToken(jwt);
+        }
+
+        [TestMethod]
+        public void ManualWriteRoundtripSingleClaimTypes()
+        {
+            var signinKey = SymmetricKeyGenerator.Create(32);
+
+            var jwt = new JsonWebToken
+            {
+                Header = new JwtHeader
+                {
+                    SignatureAlgorithm = JwtConstants.SignatureAlgorithms.HMACSHA256,
+                    SigningCredentials = new HmacSigningCredentials(signinKey)
+                },
+
+                Audience = new Uri("http://foo.com"),
+                Issuer = "dominick",
+                ExpirationTime = 50000000000,
+            };
+
+            jwt.AddClaim(ClaimTypes.Name, "dominick");
+            jwt.AddClaim(ClaimTypes.Email, "dominick.baier@thinktecture.com");
+
+
+            var handler = new JsonWebTokenHandler();
+            var token = handler.WriteToken(jwt);
+            Trace.WriteLine(token);
+
+            // token should not be empty
+            Assert.IsTrue(!string.IsNullOrWhiteSpace(token));
+
+            // token with signature needs to be 3 parts
+            var parts = token.Split('.');
+            Assert.IsTrue(parts.Length == 3, "JWT should have excactly 3 parts");
+
+            // signature must be 256 bits
+            var sig = Base64Url.Decode(parts[2]);
+            Assert.IsTrue(sig.Length == 32, "Signature is not 32 bits");
+
+            var jwtToken = handler.ReadToken(token);
+
+
+            var config = new SecurityTokenHandlerConfiguration();
+            var registry = new WebTokenIssuerNameRegistry();
+            registry.AddTrustedIssuer("dominick", "dominick");
+            config.IssuerNameRegistry = registry;
+
+            var issuerResolver = new WebTokenIssuerTokenResolver();
+            issuerResolver.AddSigningKey("dominick", Convert.ToBase64String(signinKey));
+            config.IssuerTokenResolver = issuerResolver;
+
+            config.AudienceRestriction.AllowedAudienceUris.Add(new Uri("http://foo.com"));
+
+            handler.Configuration = config;
+            var identity = handler.ValidateToken(jwtToken).First();
+
+            Assert.IsTrue(identity.Claims.Count() == 2);
+            Assert.IsTrue(identity.Claims.First().Issuer == "dominick");
+        }
+
+        [TestMethod]
+        public void ManualWriteRoundtripDuplicateClaimTypes()
+        {
+            var signinKey = SymmetricKeyGenerator.Create(32);
+
+            var jwt = new JsonWebToken
+            {
+                Header = new JwtHeader
+                {
+                    SignatureAlgorithm = JwtConstants.SignatureAlgorithms.HMACSHA256,
+                    SigningCredentials = new HmacSigningCredentials(signinKey)
+                },
+
+                Audience = new Uri("http://foo.com"),
+                Issuer = "dominick",
+                ExpirationTime = 50000000000,
+            };
+
+            jwt.AddClaim(ClaimTypes.Name, "dominick");
+            jwt.AddClaim(ClaimTypes.Email, "dominick.baier@thinktecture.com");
+            jwt.AddClaim(ClaimTypes.Role, "bar");
+            jwt.AddClaim(ClaimTypes.Role, "foo");
+
+
+            var handler = new JsonWebTokenHandler();
+            var token = handler.WriteToken(jwt);
+            Trace.WriteLine(token);
+
+            // token should not be empty
+            Assert.IsTrue(!string.IsNullOrWhiteSpace(token));
+
+            // token with signature needs to be 3 parts
+            var parts = token.Split('.');
+            Assert.IsTrue(parts.Length == 3, "JWT should have excactly 3 parts");
+
+            // signature must be 256 bits
+            var sig = Base64Url.Decode(parts[2]);
+            Assert.IsTrue(sig.Length == 32, "Signature is not 32 bits");
+
+            var jwtToken = handler.ReadToken(token);
+
+
+            var config = new SecurityTokenHandlerConfiguration();
+            var registry = new WebTokenIssuerNameRegistry();
+            registry.AddTrustedIssuer("dominick", "dominick");
+            config.IssuerNameRegistry = registry;
+
+            var issuerResolver = new WebTokenIssuerTokenResolver();
+            issuerResolver.AddSigningKey("dominick", Convert.ToBase64String(signinKey));
+            config.IssuerTokenResolver = issuerResolver;
+
+            config.AudienceRestriction.AllowedAudienceUris.Add(new Uri("http://foo.com"));
+
+            handler.Configuration = config;
+            var identity = handler.ValidateToken(jwtToken).First();
+
+            Assert.IsTrue(identity.Claims.Count() == 4);
+            Assert.IsTrue(identity.Claims.First().Issuer == "dominick");
         }
     }
 }

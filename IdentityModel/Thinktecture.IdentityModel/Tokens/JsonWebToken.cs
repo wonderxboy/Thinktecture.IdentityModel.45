@@ -83,12 +83,35 @@ namespace Thinktecture.IdentityModel.Tokens
         public string UnsignedToken { get; set; }
         public string Signature { get; set; }
 
-        public List<Claim> Claims { get; set; }
+        //public List<Claim> Claims { get; set; }
+        public Dictionary<string, string> Claims;
+
 
         public JsonWebToken()
         {
             Header = new JwtHeader();
-            Claims = new List<Claim>();
+            Claims = new Dictionary<string, string>();
+            
+            //Claims = new List<Claim>();
+        }
+
+        public void AddClaim(string type, string value)
+        {
+            // todo: check for reserved claim types
+
+            if (Claims.ContainsKey(type))
+            {
+                // append to existing claim type
+                var existing = Claims[type];
+                var newValue = string.Format("{0},{1}", existing, value.Trim());
+
+                Claims.Remove(type);
+                Claims.Add(type, newValue);
+            }
+            else
+            {
+                Claims.Add(type, value);
+            }
         }
     }
 }
