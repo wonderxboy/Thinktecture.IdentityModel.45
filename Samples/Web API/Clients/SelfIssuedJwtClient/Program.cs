@@ -53,10 +53,10 @@ namespace JsonWebTokenClient
                 Issuer = "http://selfissued.test",
                 Audience = new Uri(Constants.Realm),
 
-                Claims = new List<Sys.Claim>
+                Claims = new Dictionary<string, string>
                 {
-                    new Sys.Claim(Sys.ClaimTypes.Name, "bob"),
-                    new Sys.Claim(Sys.ClaimTypes.Email, "bob@thinktecture.com")
+                    { Sys.ClaimTypes.Name, "bob" },
+                    { Sys.ClaimTypes.Email, "bob@thinktecture.com" }
                 }
             };
 
