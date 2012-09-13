@@ -131,7 +131,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                 {
                     HttpContext.Current.Items[Internal.NoRedirectLabel] = true;
                 }
-                else if (request.Properties["MS_HttpContext"] != null)
+                else if (request.Properties.ContainsKey("MS_HttpContext") && request.Properties["MS_HttpContext"] != null)
                 {
                     var context = request.Properties["MS_HttpContext"] as HttpContextWrapper;
                     context.Items[Internal.NoRedirectLabel] = true;
