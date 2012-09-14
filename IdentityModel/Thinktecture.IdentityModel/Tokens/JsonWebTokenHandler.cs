@@ -210,7 +210,7 @@ namespace Thinktecture.IdentityModel.Tokens
             if (jwt.Audience != null)
             {
                 writer.WritePropertyName(JwtConstants.Claims.Audience);
-                writer.WriteValue(jwt.Audience);
+                writer.WriteValue(jwt.Audience.AbsoluteUri);
             }
 
             // prn
