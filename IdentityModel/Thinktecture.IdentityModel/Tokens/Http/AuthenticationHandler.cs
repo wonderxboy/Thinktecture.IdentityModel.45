@@ -35,6 +35,12 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             }
         }
 
+        public AuthenticationHandler(AuthenticationConfiguration configuration, HttpMessageHandler innerHandler)
+        {
+            _authN = new HttpAuthentication(configuration);
+            InnerHandler = innerHandler;
+        }
+
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             if (_authN.Configuration.InheritHostClientIdentity == false)
