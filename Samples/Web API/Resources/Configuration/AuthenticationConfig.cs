@@ -25,7 +25,7 @@ namespace Resources.Configuration
             };
 
             #region BasicAuthentication
-            config.AddBasicAuthentication((userName, password) => userName == password);
+            config.AddBasicAuthentication((userName, password) => userName == password, retainPassword: false);
             #endregion
 
             #region SimpleWebToken

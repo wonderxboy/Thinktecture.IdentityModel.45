@@ -110,6 +110,11 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                 AuthenticationInstantClaim.Now
             };
 
+            if (RetainPassword)
+            {
+                claims.Add(new Claim("password", unToken.Password));
+            }
+
             var identity = new ClaimsIdentity(claims, "Basic");
 
             if (Configuration.SaveBootstrapContext)
