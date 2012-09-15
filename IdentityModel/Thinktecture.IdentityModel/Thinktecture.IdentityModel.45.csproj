@@ -230,6 +230,7 @@
     <Compile Include="Http\Cors\WebApi\WebApiCorsConfiguration.cs" />
     <Compile Include="Http\Cors\WebApi\WebApiHttpRequest.cs" />
     <Compile Include="Http\Cors\WebApi\WebApiHttpResponse.cs" />
+    <Compile Include="Diagnostics\Area.cs" />
     <Compile Include="Principal.cs" />
     <Compile Include="Clients\AccessControlService\IdentityProviderDiscoveryClient.cs" />
     <Compile Include="Clients\AccessControlService\IdentityProviderInformation.cs" />
@@ -264,6 +265,7 @@
     <Compile Include="Authorization\WebApi\HttpConfigurationExtensions.cs" />
     <Compile Include="Authorization\WebApi\IAuthorizationManager.cs" />
     <Compile Include="Authorization\WebApi\PerControllerAuthorization.cs" />
+    <Compile Include="Diagnostics\Tracing.cs" />
     <Compile Include="Web\ProtectionMode.cs" />
     <Compile Include="WSTrust\CertificateWSTrustBindings.cs" />
     <Compile Include="WSTrust\IssuedTokenWSTrustBinding.cs" />

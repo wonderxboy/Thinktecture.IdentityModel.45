@@ -18,6 +18,8 @@ using System.Web.Http.Dispatcher;
 using System.Web.Http.Hosting;
 using Thinktecture.IdentityModel;
 using Thinktecture.IdentityModel.Constants;
+using Thinktecture.IdentityModel.Diagnostics;
+using System.Linq;
 
 namespace Thinktecture.IdentityModel.Tokens.Http
 {
@@ -43,27 +45,34 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            Tracing.Start(Area.HttpAuthentication);
+
             if (_authN.Configuration.InheritHostClientIdentity == false)
             {
+                //Tracing.Information(Area.HttpAuthentication, "Setting anonymous principal");
                 SetPrincipal(Principal.Anonymous);
             }
 
             try
             {
                 // try to authenticate
-                // returns an anonymous principal if no credential was found
+                // returns an anonymous principal if no credential was 
                 var principal = _authN.Authenticate(request);
 
                 if (principal == null)
                 {
+                    Tracing.Error(Area.HttpAuthentication, "Authentication returned null principal.");
                     throw new InvalidOperationException("No principal set");
                 }
 
                 if (principal.Identity.IsAuthenticated)
                 {
+                    Tracing.Information(Area.HttpAuthentication, "Authentication successful.");
+
                     // check for token request - if yes send token back and return
                     if (_authN.IsSessionTokenRequest(request))
                     {
+                        Tracing.Information(Area.HttpAuthentication, "Request for session token.");
                         return SendSessionTokenResponse(principal);
                     }
 
@@ -71,12 +80,14 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                     SetPrincipal(principal);
                 }
             }
-            catch (SecurityTokenValidationException)
+            catch (SecurityTokenValidationException ex)
             {
+                Tracing.Error(Area.HttpAuthentication, "Error validating the token: " + ex.ToString());
                 return SendUnauthorizedResponse(request);
             }
-            catch (SecurityTokenException)
+            catch (SecurityTokenException ex)
             {
+                Tracing.Error(Area.HttpAuthentication, "Error validating the token: " + ex.ToString());
                 return SendUnauthorizedResponse(request);
             }
 
@@ -125,6 +136,8 @@ namespace Thinktecture.IdentityModel.Tokens.Http
         {
             if (_authN.Configuration.SendWwwAuthenticateResponseHeader)
             {
+                Tracing.Verbose(Area.HttpAuthentication, "Setting Www-Authenticate header with scheme: " + _authN.Configuration.DefaultAuthenticationScheme);
+
                 response.Headers.WwwAuthenticate.Add(new AuthenticationHeaderValue(_authN.Configuration.DefaultAuthenticationScheme));
             }
         }
@@ -133,6 +146,8 @@ namespace Thinktecture.IdentityModel.Tokens.Http
         {
             if (_authN.Configuration.SetNoRedirectMarker)
             {
+                Tracing.Verbose(Area.HttpAuthentication, "Setting NoRedirect marker");
+
                 if (HttpContext.Current != null)
                 {
                     HttpContext.Current.Items[Internal.NoRedirectLabel] = true;
@@ -147,6 +162,26 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         protected virtual void SetPrincipal(ClaimsPrincipal principal)
         {
+            if (principal.Identity.IsAuthenticated)
+            {
+                string name = "unknown";
+
+                if (!string.IsNullOrWhiteSpace(principal.Identity.Name))
+                {
+                    name = principal.Identity.Name;
+                }
+                else if (principal.Claims.First() != null)
+                {
+                    name = principal.Claims.First().Value;
+                }
+
+                Tracing.Information(Area.HttpAuthentication, "Authentication successful for: " + name);
+            }
+            else
+            {
+                Tracing.Information(Area.HttpAuthentication, "Setting anonymous principal.");
+            }
+
             Thread.CurrentPrincipal = principal;
 
             if (HttpContext.Current != null)

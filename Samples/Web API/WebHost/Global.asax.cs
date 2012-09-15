@@ -22,10 +22,5 @@ namespace WebApiSecurity
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
-
-        protected void Application_EndRequest(object sender, EventArgs e)
-        {
-            var context = HttpContext.Current;
-        }
     }
 }
