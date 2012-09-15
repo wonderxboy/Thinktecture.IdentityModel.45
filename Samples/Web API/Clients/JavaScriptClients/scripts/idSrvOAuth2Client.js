@@ -1,6 +1,6 @@
 ﻿var stsEndpoint = 'https://identity.thinktecture.com/idsrvsample/issue/oauth2',
     scope = 'https://samples.thinktecture.com/webapisecurity/',
-    serviceEndpoint = 'https://adfs.leastprivilege.vm/webapisecurity/api/identity',
+    serviceEndpoint = 'https://roadie/webapisecurity/api/identity',
     authN,
     token;
 

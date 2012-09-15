@@ -1,5 +1,5 @@
-﻿var tokenEndpoint = 'https://adfs.leastprivilege.vm/webapisecurity/api/token',
-    serviceEndpoint = 'https://adfs.leastprivilege.vm/webapisecurity/api/identity',
+﻿var tokenEndpoint = 'https://roadie/webapisecurity/api/token',
+    serviceEndpoint = 'https://roadie/webapisecurity/api/identity',
     authN,
     isExpired;
 
