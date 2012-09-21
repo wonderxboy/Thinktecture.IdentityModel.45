@@ -241,13 +241,13 @@
     <Content Include="Views\User\Delegation.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\IdentityModel\Thinktecture.IdentityModel\Thinktecture.IdentityModel.csproj">
-      <Project>{ac9a74df-4aab-43c8-b0ed-b7602721e545}</Project>
-      <Name>Thinktecture.IdentityModel</Name>
-    </ProjectReference>
+    <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="packages.config" />
+    <ProjectReference Include="..\..\..\IdentityModel\Thinktecture.IdentityModel\Thinktecture.IdentityModel.45.csproj">
+      <Project>{ac9a74df-4aab-43c8-b0ed-b7602721e545}</Project>
+      <Name>Thinktecture.IdentityModel.45</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
