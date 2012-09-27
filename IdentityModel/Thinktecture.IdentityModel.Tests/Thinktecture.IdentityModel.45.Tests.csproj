@@ -74,6 +74,7 @@
     <Compile Include="HttpAuthentication\Configuration.cs" />
     <Compile Include="HttpAuthentication\General.cs" />
     <Compile Include="HttpAuthentication\SAML2.cs" />
+    <Compile Include="Jwt\HandlerCreate.cs" />
     <Compile Include="Jwt\ManualCreate.cs" />
     <Compile Include="Jwt\SpecTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
