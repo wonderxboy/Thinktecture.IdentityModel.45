@@ -44,6 +44,14 @@ namespace Resources.Configuration
                 options: AuthenticationOptions.ForAuthorizationHeader("JWT"));
             #endregion
 
+            #region JsonWebToken Windows Store Client
+            config.AddJsonWebToken(
+                issuer: "http://identityserver45.thinktecture.com/trust/changethis",
+                audience: "https://test/rp/",
+                signingKey: "3ihK5qGVhp8ptIk9+TDucXQW4Aaengg3d5m6gU8nzc8=",
+                options: AuthenticationOptions.ForAuthorizationHeader("Win8"));
+            #endregion
+
             #region IdentityServer SAML
             var idsrvRegistry = new ConfigurationBasedIssuerNameRegistry();
             idsrvRegistry.AddTrustedIssuer(Constants.IdSrvSamlSigningKeyThumbprint, "Thinktecture IdSrv");
