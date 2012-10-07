@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Web;
 using System.Web.Mvc;
+using WebApiInAppWindows.Controllers.Api;
+using WebApiInAppWindows.Security;
 
 namespace WebApiInAppWindows.Controllers
 {
@@ -23,11 +26,32 @@ namespace WebApiInAppWindows.Controllers
         }
 
         [Authorize]
-        public ActionResult Identity()
+        public ActionResult IdentityMvc()
+        {
+            var claims = new IdentityController().Get();
+
+            ViewBag.PrincipalType = ClaimsPrincipal.Current.GetType().FullName;
+            ViewBag.IdentityType = ClaimsPrincipal.Current.Identity.GetType().FullName;
+
+            return View(claims);
+        }
+
+        [Authorize]
+        public ActionResult IdentityApi()
         {
             ViewBag.Message = "client identity.";
 
             return View();
+        }
+
+        private void UseApi()
+        {
+            // custom principal implementation style
+            var p = User as CustomClaimsPrincipal;
+            var op = p.IsOperator;
+
+            // extension method style
+            op = ClaimsPrincipal.Current.IsOperator();
         }
     }
 }
