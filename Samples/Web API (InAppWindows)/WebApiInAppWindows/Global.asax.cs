@@ -27,12 +27,13 @@ namespace WebApiInAppWindows
             BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
 
-        protected void Application_PostAuthenticateRequest(object sender, EventArgs e)
-        {
-            var principal = new CustomClaimsPrincipal(ClaimsPrincipal.Current);
+        // one possible way to wrap the principal
+        //protected void Application_PostAuthenticateRequest(object sender, EventArgs e)
+        //{
+        //    var principal = new CustomClaimsPrincipal(ClaimsPrincipal.Current);
 
-            HttpContext.Current.User = principal;
-            Thread.CurrentPrincipal = principal;
-        }
+        //    HttpContext.Current.User = principal;
+        //    Thread.CurrentPrincipal = principal;
+        //}
     }
 }

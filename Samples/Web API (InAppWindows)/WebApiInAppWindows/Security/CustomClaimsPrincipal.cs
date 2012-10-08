@@ -13,6 +13,14 @@ namespace WebApiInAppWindows.Security
             : base(principal)
         { }
 
+        public static new CustomClaimsPrincipal Current
+        {
+            get
+            {
+                return new CustomClaimsPrincipal(ClaimsPrincipal.Current);
+            }
+        }
+
         public bool IsOperator
         {
             get

@@ -44,14 +44,16 @@ namespace WebApiInAppWindows.Controllers
             return View();
         }
 
-        private void UseApi()
+        public ActionResult UseApi()
         {
             // custom principal implementation style
-            var p = User as CustomClaimsPrincipal;
+            var p = CustomClaimsPrincipal.Current;
             var op = p.IsOperator;
 
             // extension method style
             op = ClaimsPrincipal.Current.IsOperator();
+
+            return new ContentResult { Content = op.ToString() };
         }
     }
 }
