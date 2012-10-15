@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web;
 using Thinktecture.IdentityModel.Constants;
 
@@ -24,7 +19,7 @@ namespace Thinktecture.IdentityModel.Web
 
         public static void TrySet()
         {
-            SetNoRedirectMarkerOnContext(true, overrideValue: false);
+            SetNoRedirectMarkerOnContext(value: true, overrideValue: false);
         }
 
         public static void TrySet(HttpRequestMessage request)
@@ -34,7 +29,7 @@ namespace Thinktecture.IdentityModel.Web
 
         public static void UnSet()
         {
-            SetNoRedirectMarkerOnContext(false, overrideValue: true);
+            SetNoRedirectMarkerOnContext(value: false, overrideValue: true);
         }
 
         public static void UnSet(HttpRequestMessage request)
@@ -65,7 +60,7 @@ namespace Thinktecture.IdentityModel.Web
             return null;
         }
 
-        private static bool SetNoRedirectMarkerOnContext(bool value, bool overrideValue = false)
+        private static bool SetNoRedirectMarkerOnContext(bool value, bool overrideValue)
         {
             if (HttpContext.Current != null)
             {
@@ -76,9 +71,9 @@ namespace Thinktecture.IdentityModel.Web
             return false;
         }
 
-        private static void SetNoRedirectMarkerOnContextOrMessage(HttpRequestMessage request, bool value, bool overrideValue = false)
+        private static void SetNoRedirectMarkerOnContextOrMessage(HttpRequestMessage request, bool value, bool overrideValue)
         {
-            if (!SetNoRedirectMarkerOnContext(overrideValue))
+            if (!SetNoRedirectMarkerOnContext(value, overrideValue))
             {
                 if (request.Properties.ContainsKey("MS_HttpContext") && request.Properties["MS_HttpContext"] != null)
                 {
@@ -88,25 +83,25 @@ namespace Thinktecture.IdentityModel.Web
             }
         }
 
-        private static void SetNoRedirectMarkerOnItemsCollection(IDictionary items, bool value, bool overrideValue = false)
+        private static void SetNoRedirectMarkerOnItemsCollection(IDictionary items, bool value, bool overrideValue)
         {
             if (items == null)
             {
                 return;
             }
 
-            var marker = items[Internal.NoRedirectLabel];
-
             if (overrideValue)
             {
-                marker = value;
+                items[Internal.NoRedirectLabel] = value;
                 return;
             }
             else
             {
+                var marker = items[Internal.NoRedirectLabel];
+
                 if (marker == null)
                 {
-                    marker = value;
+                    items[Internal.NoRedirectLabel] = value;
                 }
             }
         }
