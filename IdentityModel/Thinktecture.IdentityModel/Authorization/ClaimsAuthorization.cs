@@ -27,11 +27,6 @@ namespace Thinktecture.IdentityModel.Authorization
         /// </summary>
         public const string ResourceType = "http://application/claims/authorization/resource";
 
-        /// <summary>
-        /// Additional resource claim type
-        /// </summary>
-        public const string AdditionalResourceType = "http://application/claims/authorization/additionalresource";
-
         public static bool EnforceAuthorizationManagerImplementation { get; set; }
 
         /// <summary>
@@ -56,49 +51,20 @@ namespace Thinktecture.IdentityModel.Authorization
         /// <param name="resource">The resource.</param>
         /// <param name="action">The action.</param>
         /// <returns>true when authorized, otherwise false</returns>
-        public static bool CheckAccess(string action, string resource)
+        public static bool CheckAccess(string action, params string[] resources)
         {
-            Contract.Requires(!String.IsNullOrEmpty(resource));
             Contract.Requires(!String.IsNullOrEmpty(action));
 
 
-            return CheckAccess(ClaimsPrincipal.Current, action, resource);
+            return CheckAccess(ClaimsPrincipal.Current, action, resources);
         }
 
-        public static bool CheckAccess(string action, string resource, params string[] additionalResources)
-        {
-            return CheckAccess(
-                ClaimsPrincipal.Current,
-                action,
-                resource,
-                additionalResources);
-        }
-
-        /// <summary>
-        /// Checks the authorization policy.
-        /// </summary>
-        /// <param name="principal">The principal.</param>
-        /// <param name="action">The action.</param>
-        /// <param name="resource">The resource.</param>
-        /// <returns>true when authorized, otherwise false</returns>
-        public static bool CheckAccess(ClaimsPrincipal principal, string action, string resource)
-        {
-            Contract.Requires(!String.IsNullOrEmpty(resource));
-            Contract.Requires(!String.IsNullOrEmpty(action));
-            Contract.Requires(principal != null);
-
-
-            var context = new AuthorizationContext(principal, resource, action);
-            return CheckAccess(context);
-        }
-
-        public static bool CheckAccess(ClaimsPrincipal principal, string action, string resource, params string[] additionalResources)
+        public static bool CheckAccess(ClaimsPrincipal principal, string action, params string[] resources)
         {
             var context = CreateAuthorizationContext(
                 principal,
                 action,
-                resource,
-                additionalResources);
+                resources);
 
             return CheckAccess(context);
         }
@@ -141,21 +107,18 @@ namespace Thinktecture.IdentityModel.Authorization
             return AuthorizationManager.CheckAccess(context);
         }
 
-        public static AuthorizationContext CreateAuthorizationContext(ClaimsPrincipal principal, string action, string resource, params string[] additionalResources)
+        public static AuthorizationContext CreateAuthorizationContext(ClaimsPrincipal principal, string action, params string[] resources)
         {
             var actionClaims = new Collection<Claim>
             {
                 new Claim(ActionType, action)
             };
 
-            var resourceClaims = new Collection<Claim>
-            {
-                new Claim(ResourceType, resource)
-            };
+            var resourceClaims = new Collection<Claim>();
 
-            if (additionalResources != null && additionalResources.Length > 0)
+            if (resources != null && resources.Length > 0)
             {
-                additionalResources.ToList().ForEach(ar => resourceClaims.Add(new Claim(AdditionalResourceType, ar)));
+                resources.ToList().ForEach(ar => resourceClaims.Add(new Claim(ResourceType, ar)));
             }
 
             return new AuthorizationContext(

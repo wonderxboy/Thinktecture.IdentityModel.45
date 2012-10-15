@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
+﻿using System.Web.Http;
 using Thinktecture.IdentityModel.Authorization;
-using Thinktecture.IdentityModel.Authorization.WebApi;
 
 namespace ClaimsBasedAuthorization.Controllers.Api
 {
@@ -18,7 +12,7 @@ namespace ClaimsBasedAuthorization.Controllers.Api
 
         public string Get(int id)
         {
-            var result = ClaimsAuthorization.CheckAccess("GetCustomer", id.ToString());
+            var result = ClaimsAuthorization.CheckAccess("Get", "Customer", id.ToString());
 
             return "OK " + id.ToString();
         }

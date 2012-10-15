@@ -10,23 +10,22 @@ namespace Thinktecture.IdentityModel.Authorization.WebApi
     {
         private string _resource;
         private string _action;
-        private string[] _additionalResources;
+        private string[] _resources;
 
         public ClaimsAuthorizeAttribute()
         { }
 
-        public ClaimsAuthorizeAttribute(string action, string resource, params string[] additionalResources)
+        public ClaimsAuthorizeAttribute(string action, params string[] resources)
         {
             _action = action; 
-            _resource = resource;
-            _additionalResources = additionalResources;
+            _resources = resources;
         }
 
         protected override bool IsAuthorized(HttpActionContext actionContext)
         {
-            if (!string.IsNullOrWhiteSpace(_action) && !string.IsNullOrWhiteSpace(_resource))
+            if (!string.IsNullOrWhiteSpace(_action))
             {
-                return ClaimsAuthorization.CheckAccess(_action, _resource, _additionalResources);
+                return ClaimsAuthorization.CheckAccess(_action, _resources);
             }
             else
             {
