@@ -7,7 +7,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.IdentityModel.Services;
-using System.Security;
+using System.Linq;
 using System.Security.Claims;
 
 namespace Thinktecture.IdentityModel.Authorization
@@ -17,6 +17,21 @@ namespace Thinktecture.IdentityModel.Authorization
     /// </summary>
     public static class ClaimsAuthorization
     {
+        /// <summary>
+        /// Default action claim type.
+        /// </summary>
+        public const string ActionType = "http://application/claims/authorization/action";
+
+        /// <summary>
+        /// Default resource claim type
+        /// </summary>
+        public const string ResourceType = "http://application/claims/authorization/resource";
+
+        /// <summary>
+        /// Additional resource claim type
+        /// </summary>
+        public const string AdditionalResourceType = "http://application/claims/authorization/additionalresource";
+
         /// <summary>
         /// Gets the registered authorization manager.
         /// </summary>
@@ -34,23 +49,32 @@ namespace Thinktecture.IdentityModel.Authorization
         /// <param name="resource">The resource.</param>
         /// <param name="action">The action.</param>
         /// <returns>true when authorized, otherwise false</returns>
-        public static bool CheckAccess(string resource, string action)
+        public static bool CheckAccess(string action, string resource)
         {
             Contract.Requires(!String.IsNullOrEmpty(resource));
             Contract.Requires(!String.IsNullOrEmpty(action));
 
 
-            return CheckAccess(resource, action, ClaimsPrincipal.Current);
+            return CheckAccess(ClaimsPrincipal.Current, action, resource);
+        }
+
+        public static bool CheckAccess(string action, string resource, params string[] additionalResources)
+        {
+            return CheckAccess(
+                ClaimsPrincipal.Current,
+                action,
+                resource,
+                additionalResources);
         }
 
         /// <summary>
         /// Checks the authorization policy.
         /// </summary>
-        /// <param name="resource">The resource.</param>
-        /// <param name="action">The action.</param>
         /// <param name="principal">The principal.</param>
+        /// <param name="action">The action.</param>
+        /// <param name="resource">The resource.</param>
         /// <returns>true when authorized, otherwise false</returns>
-        public static bool CheckAccess(string resource, string action, ClaimsPrincipal principal)
+        public static bool CheckAccess(ClaimsPrincipal principal, string action, string resource)
         {
             Contract.Requires(!String.IsNullOrEmpty(resource));
             Contract.Requires(!String.IsNullOrEmpty(action));
@@ -60,6 +84,17 @@ namespace Thinktecture.IdentityModel.Authorization
             var context = new AuthorizationContext(principal, resource, action);
 
             return AuthorizationManager.CheckAccess(context);
+        }
+
+        public static bool CheckAccess(ClaimsPrincipal principal, string action, string resource, params string[] additionalResources)
+        {
+            var context = CreateAuthorizationContext(
+                principal,
+                action,
+                resource,
+                additionalResources);
+
+            return ClaimsAuthorization.CheckAccess(context);
         }
 
         /// <summary>
@@ -91,72 +126,27 @@ namespace Thinktecture.IdentityModel.Authorization
             return AuthorizationManager.CheckAccess(context);
         }
 
-        /// <summary>
-        /// Checks the authorization policy. Will throw a SecurityException when check fails.
-        /// </summary>
-        /// <param name="resource">The resource.</param>
-        /// <param name="action">The action.</param>
-        public static void DemandAccess(string resource, string action)
+        public static AuthorizationContext CreateAuthorizationContext(ClaimsPrincipal principal, string action, string resource, params string[] additionalResources)
         {
-            Contract.Requires(!String.IsNullOrEmpty(resource));
-            Contract.Requires(!String.IsNullOrEmpty(action));
-
-
-            if (!CheckAccess(resource, action))
+            var actionClaims = new Collection<Claim>
             {
-                throw new SecurityException(string.Format("Demand for action: {0} for resource {1} failed", action, resource));
-            }
-        }
+                new Claim(ActionType, action)
+            };
 
-        /// <summary>
-        /// Checks the authorization policy. Will throw a SecurityException when check fails.
-        /// </summary>
-        /// <param name="resource">The resource.</param>
-        /// <param name="action">The action.</param>
-        /// <param name="principal">The principal.</param>
-        public static void DemandAccess(string resource, string action, ClaimsPrincipal principal)
-        {
-            Contract.Requires(!String.IsNullOrEmpty(resource));
-            Contract.Requires(!String.IsNullOrEmpty(action));
-            Contract.Requires(principal != null);
-
-            
-            if (!CheckAccess(resource, action, principal))
+            var resourceClaims = new Collection<Claim>
             {
-                throw new SecurityException(string.Format("Demand for action: {0} for resource {1} failed", action, resource));
-            }
-        }
+                new Claim(ResourceType, resource)
+            };
 
-        /// <summary>
-        /// Checks the authorization policy. Will throw a SecurityException when check fails.
-        /// </summary>
-        /// <param name="resources">The resources.</param>
-        /// <param name="actions">The actions.</param>
-        public static void DemandAccess(Collection<Claim> actions, Collection<Claim> resources)
-        {
-            Contract.Requires(resources != null);
-            Contract.Requires(actions != null);
-
-
-            if (!CheckAccess(resources, actions))
+            if (additionalResources != null && additionalResources.Length > 0)
             {
-                throw new SecurityException("Demand for actions on resources failed");
+                additionalResources.ToList().ForEach(ar => resourceClaims.Add(new Claim(AdditionalResourceType, ar)));
             }
-        }
 
-        /// <summary>
-        /// Checks the authorization policy. Will throw a SecurityException when check fails.
-        /// </summary>
-        /// <param name="context">The context.</param>
-        public static void DemandAccess(AuthorizationContext context)
-        {
-            Contract.Requires(context != null);
-
-
-            if (!CheckAccess(context))
-            {
-                throw new SecurityException("Demand for claims authorization failed");
-            }
+            return new AuthorizationContext(
+                principal,
+                resourceClaims,
+                actionClaims);
         }
     }
 }
