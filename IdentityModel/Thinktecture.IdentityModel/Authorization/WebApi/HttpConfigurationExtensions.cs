@@ -4,6 +4,7 @@
  */
 
 using System.Web.Http;
+using System.Web.Http.Filters;
 
 namespace Thinktecture.IdentityModel.Authorization.WebApi
 {
@@ -12,6 +13,11 @@ namespace Thinktecture.IdentityModel.Authorization.WebApi
         public static void SetAuthorizationManager(this HttpConfiguration configuration, IAuthorizationManager manager)
         {
             configuration.Properties[ApiAuthorizeAttribute.PropertyName] = manager;
+        }
+
+        public static void SetAuthorizationFilter(this HttpConfiguration configuration, IAuthorizationFilter filter)
+        {
+            configuration.Filters.Add(filter);
         }
     }
 }
