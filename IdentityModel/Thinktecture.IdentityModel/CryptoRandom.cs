@@ -28,6 +28,14 @@ namespace Thinktecture.IdentityModel
             return bytes;
         }
 
+        public static string CreateRandomKeyString(int length)
+        {
+            var bytes = new byte[length];
+            new RNGCryptoServiceProvider().GetBytes(bytes);
+
+            return Convert.ToBase64String(bytes);
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CryptoRandom"/> class.
         /// </summary>
