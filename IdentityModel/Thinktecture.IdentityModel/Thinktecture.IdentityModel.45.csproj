@@ -204,6 +204,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Authorization\WebApi\ApiClaimsAuthorizeAttribute.cs" />
     <Compile Include="Base64Url.cs" />
     <Compile Include="Constants\Internal.cs" />
     <Compile Include="Http\Cors\CorsAccessRequest.cs" />
@@ -266,6 +267,7 @@
     <Compile Include="Authorization\WebApi\IAuthorizationManager.cs" />
     <Compile Include="Authorization\WebApi\PerControllerAuthorization.cs" />
     <Compile Include="Diagnostics\Tracing.cs" />
+    <Compile Include="Tokens\MetadataBasedIssuerNameRegistry.cs" />
     <Compile Include="Web\ProtectionMode.cs" />
     <Compile Include="WSTrust\CertificateWSTrustBindings.cs" />
     <Compile Include="WSTrust\IssuedTokenWSTrustBinding.cs" />
