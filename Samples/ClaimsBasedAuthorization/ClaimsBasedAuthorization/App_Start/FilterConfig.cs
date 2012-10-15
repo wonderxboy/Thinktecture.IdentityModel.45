@@ -1,5 +1,6 @@
 ﻿using System.Web;
 using System.Web.Mvc;
+using Thinktecture.IdentityModel.Authorization.Mvc;
 
 namespace ClaimsBasedAuthorization
 {
@@ -8,6 +9,7 @@ namespace ClaimsBasedAuthorization
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
             filters.Add(new HandleErrorAttribute());
+            filters.Add(new ClaimsAuthorizeAttribute());
         }
     }
 }

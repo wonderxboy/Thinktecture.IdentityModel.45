@@ -17,7 +17,7 @@ namespace ClaimsBasedAuthorization
             );
 
             // add global authorization filter
-            config.Filters.Add(new ApiClaimsAuthorizeAttribute());
+            config.Filters.Add(new ClaimsAuthorizeAttribute());
         }
     }
 }

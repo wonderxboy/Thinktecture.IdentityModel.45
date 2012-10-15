@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
+using Thinktecture.IdentityModel.Authorization.Mvc;
 
 namespace ClaimsBasedAuthorization.Controllers
 {
@@ -15,6 +12,7 @@ namespace ClaimsBasedAuthorization.Controllers
             return View();
         }
 
+        [ClaimsAuthorize("View", "About")]
         public ActionResult About()
         {
             ViewBag.Message = "Your app description page.";
@@ -22,6 +20,7 @@ namespace ClaimsBasedAuthorization.Controllers
             return View();
         }
 
+        [ClaimsAuthorize("View", "StreetAddress", "TelephoneNumber")]
         public ActionResult Contact()
         {
             ViewBag.Message = "Your contact page.";
