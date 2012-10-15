@@ -21,6 +21,7 @@ using Thinktecture.IdentityModel.Constants;
 using Thinktecture.IdentityModel.Diagnostics;
 using System.Linq;
 using System.Collections;
+using Thinktecture.IdentityModel.Web;
 
 namespace Thinktecture.IdentityModel.Tokens.Http
 {
@@ -42,39 +43,6 @@ namespace Thinktecture.IdentityModel.Tokens.Http
         {
             _authN = new HttpAuthentication(configuration);
             InnerHandler = innerHandler;
-        }
-
-        public static void SuppressRedirect()
-        {
-            SetNoRedirectMarker(true);
-        }
-
-        public static void AllowRedirect()
-        {
-            SetNoRedirectMarker(false);
-        }
-
-        public static bool? GetRedirectMarker()
-        {
-            var context = HttpContext.Current;
-            if (context == null)
-            {
-                return null;
-            }
-
-            var item = context.Items[Internal.NoRedirectLabel];
-            if (item == null)
-            {
-                return null;
-            }
-
-            bool label;
-            if (bool.TryParse(item.ToString(), out label))
-            {
-                return label;
-            }
-
-            return null;
         }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -122,6 +90,11 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             catch (SecurityTokenException ex)
             {
                 Tracing.Error(Area.HttpAuthentication, "Error validating the token: " + ex.ToString());
+                return SendUnauthorizedResponse(request);
+            }
+            catch (Exception ex)
+            {
+                Tracing.Error(Area.HttpAuthentication, "Exception while validating the token: " + ex.ToString());
                 return SendUnauthorizedResponse(request);
             }
 
@@ -182,46 +155,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             {
                 Tracing.Verbose(Area.HttpAuthentication, "Setting NoRedirect marker");
 
-                if (HttpContext.Current != null)
-                {
-                    SetNoRedirectMarkerOnItemsCollection(HttpContext.Current.Items, true);
-                }
-                else if (request.Properties.ContainsKey("MS_HttpContext") && request.Properties["MS_HttpContext"] != null)
-                {
-                    var context = request.Properties["MS_HttpContext"] as HttpContextWrapper;
-                    SetNoRedirectMarkerOnItemsCollection(context.Items, true);
-                }
-            }
-        }
-
-        protected static void SetNoRedirectMarker(bool value)
-        {
-            if (HttpContext.Current != null)
-            {
-                SetNoRedirectMarkerOnItemsCollection(HttpContext.Current.Items, value, overrideValue: true);
-            }
-        }
-
-        protected static void SetNoRedirectMarkerOnItemsCollection(IDictionary items, bool value, bool overrideValue = false)
-        {
-            if (items == null)
-            {
-                return;
-            }
-
-            var marker = items[Internal.NoRedirectLabel];
-
-            if (overrideValue)
-            {
-                marker = value;
-                return;
-            }
-            else
-            {
-                if (marker == null)
-                {
-                    marker = value;
-                }
+                NoRedirectMarker.TrySet(request);
             }
         }
 
