@@ -11,6 +11,8 @@ namespace Thinktecture.IdentityModel.Authorization.Mvc
         private string _action;
         private string[] _additionalResources;
 
+        private const string _label = "Thinktecture.IdentityModel.Authorization.Mvc.ClaimsAuthorizeAttribute";
+
         public ClaimsAuthorizeAttribute()
         { }
 
@@ -23,7 +25,7 @@ namespace Thinktecture.IdentityModel.Authorization.Mvc
 
         public override void OnAuthorization(System.Web.Mvc.AuthorizationContext filterContext)
         {
-            filterContext.HttpContext.Items["ttidm:filterContext"] = filterContext;
+            filterContext.HttpContext.Items[_label] = filterContext;
             base.OnAuthorization(filterContext); 
         }
 
@@ -35,7 +37,7 @@ namespace Thinktecture.IdentityModel.Authorization.Mvc
             }
             else
             {
-                var filterContext = httpContext.Items["ttidm:filterContext"] as System.Web.Mvc.AuthorizationContext;
+                var filterContext = httpContext.Items[_label] as System.Web.Mvc.AuthorizationContext;
                 return CheckAccess(filterContext);
             }
         }

@@ -32,6 +32,8 @@ namespace Thinktecture.IdentityModel.Authorization
         /// </summary>
         public const string AdditionalResourceType = "http://application/claims/authorization/additionalresource";
 
+        public static bool EnforceAuthorizationManagerImplementation { get; set; }
+
         /// <summary>
         /// Gets the registered authorization manager.
         /// </summary>
@@ -41,6 +43,11 @@ namespace Thinktecture.IdentityModel.Authorization
             {
                 return FederatedAuthentication.FederationConfiguration.IdentityConfiguration.ClaimsAuthorizationManager;
             }
+        }
+
+        static ClaimsAuthorization()
+        {
+            EnforceAuthorizationManagerImplementation = true;
         }
 
         /// <summary>
@@ -82,8 +89,7 @@ namespace Thinktecture.IdentityModel.Authorization
 
 
             var context = new AuthorizationContext(principal, resource, action);
-
-            return AuthorizationManager.CheckAccess(context);
+            return CheckAccess(context);
         }
 
         public static bool CheckAccess(ClaimsPrincipal principal, string action, string resource, params string[] additionalResources)
@@ -94,7 +100,7 @@ namespace Thinktecture.IdentityModel.Authorization
                 resource,
                 additionalResources);
 
-            return ClaimsAuthorization.CheckAccess(context);
+            return CheckAccess(context);
         }
 
         /// <summary>
@@ -122,6 +128,15 @@ namespace Thinktecture.IdentityModel.Authorization
         {
             Contract.Requires(context != null);
 
+
+            if (EnforceAuthorizationManagerImplementation)
+            {
+                var authZtype = AuthorizationManager.GetType().FullName;
+                if (authZtype.Equals("System.Security.Claims.ClaimsAuthorizationManager"))
+                {
+                    throw new InvalidOperationException("No ClaimsAuthorizationManager implementation configured.");
+                }
+            }
 
             return AuthorizationManager.CheckAccess(context);
         }
