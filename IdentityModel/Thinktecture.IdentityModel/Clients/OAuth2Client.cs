@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Thinktecture.IdentityModel.Constants;
+using Thinktecture.IdentityModel.Tokens.Http;
 
 namespace Thinktecture.IdentityModel.Clients
 {
@@ -21,6 +22,12 @@ namespace Thinktecture.IdentityModel.Clients
         public OAuth2Client(Uri address)
         {
             _client = new HttpClient { BaseAddress = address };
+        }
+
+        public OAuth2Client(Uri address, string clientId, string clientSecret)
+            : this(address)
+        {
+            _client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(clientId, clientSecret);
         }
 
         public AccessTokenResponse RequestAccessTokenUserName(string userName, string password, string scope)
