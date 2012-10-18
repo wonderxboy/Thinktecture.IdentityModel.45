@@ -77,6 +77,7 @@
     <Compile Include="Jwt\HandlerCreate.cs" />
     <Compile Include="Jwt\ManualCreate.cs" />
     <Compile Include="Jwt\SpecTests.cs" />
+    <Compile Include="Misc\PrincipalTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -93,6 +94,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
