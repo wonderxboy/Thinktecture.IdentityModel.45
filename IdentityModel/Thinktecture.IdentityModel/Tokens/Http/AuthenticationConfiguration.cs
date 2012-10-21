@@ -175,6 +175,19 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             });
         }
 
+        public void AddSaml11(SecurityTokenHandlerConfiguration configuration, AuthenticationOptions options)
+        {
+            var handler = new HttpSamlSecurityTokenHandler();
+            handler.Configuration = configuration;
+
+            AddMapping(new AuthenticationOptionMapping
+            {
+                TokenHandler = new SecurityTokenHandlerCollection { handler },
+                Options = options
+            });
+        }
+
+
         private void AddMapping(AuthenticationOptionMapping mapping)
         {
             var hit = from m in Mappings
