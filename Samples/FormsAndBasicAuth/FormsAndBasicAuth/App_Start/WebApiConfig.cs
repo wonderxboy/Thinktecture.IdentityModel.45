@@ -17,13 +17,11 @@ namespace FormsAndBasicAuth
                 defaults: new { id = RouteParameter.Optional }
             );
 
-            // configure basic auth
-            var authConfig = new AuthenticationConfiguration
-            {
-                DefaultAuthenticationScheme = "Basic"
-            };
+            var authConfig = new AuthenticationConfiguration();
 
+            // setup authentication against membership
             authConfig.AddBasicAuthentication((userName, password) => Membership.ValidateUser(userName, password));
+            
             config.MessageHandlers.Add(new AuthenticationHandler(authConfig));
         }
     }
