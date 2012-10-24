@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.IdentityModel.Services;
 using System.Web.Http;
 using System.Web.Security;
 using Thinktecture.IdentityModel.Tokens.Http;
@@ -17,7 +15,11 @@ namespace FormsAndBasicAuth
                 defaults: new { id = RouteParameter.Optional }
             );
 
-            var authConfig = new AuthenticationConfiguration();
+            var authConfig = new AuthenticationConfiguration
+            {
+                InheritHostClientIdentity = true,
+                ClaimsAuthenticationManager = FederatedAuthentication.FederationConfiguration.IdentityConfiguration.ClaimsAuthenticationManager
+            };
 
             // setup authentication against membership
             authConfig.AddBasicAuthentication((userName, password) => Membership.ValidateUser(userName, password));

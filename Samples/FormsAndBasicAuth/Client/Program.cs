@@ -21,6 +21,7 @@ namespace Client
             var response = client.GetAsync("").Result;
 
             Console.WriteLine("Hello {0}", response.Content.ReadAsStringAsync().Result);
+            Console.ReadLine();
         }
     }
 }

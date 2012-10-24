@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Services;
 using System.Linq;
+using System.Security.Claims;
+using System.Threading;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
@@ -22,6 +25,18 @@ namespace FormsAndBasicAuth
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+        }
+
+        protected void Application_PostAuthenticateRequest()
+        {
+            if (ClaimsPrincipal.Current.Identity.IsAuthenticated)
+            {
+                var transformer = FederatedAuthentication.FederationConfiguration.IdentityConfiguration.ClaimsAuthenticationManager;
+                var newPrincipal = transformer.Authenticate(string.Empty, ClaimsPrincipal.Current);
+
+                Thread.CurrentPrincipal = newPrincipal;
+                HttpContext.Current.User = newPrincipal;
+            }
         }
     }
 }
