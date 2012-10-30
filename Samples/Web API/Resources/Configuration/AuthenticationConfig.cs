@@ -20,8 +20,7 @@ namespace Resources.Configuration
             var config = new AuthenticationConfiguration
             {
                 DefaultAuthenticationScheme = "Basic",
-                EnableSessionToken = true,
-                SetNoRedirectMarker = true
+                EnableSessionToken = true
             };
 
             #region BasicAuthentication
@@ -46,7 +45,7 @@ namespace Resources.Configuration
 
             #region JsonWebToken Windows Store Client
             config.AddJsonWebToken(
-                issuer: "http://identityserver45.thinktecture.com/trust/changethis",
+                issuer: "http://identityserver.v2.thinktecture.com/trust/changethis",
                 audience: "https://test/rp/",
                 signingKey: "3ihK5qGVhp8ptIk9+TDucXQW4Aaengg3d5m6gU8nzc8=",
                 options: AuthenticationOptions.ForAuthorizationHeader("Win8"));
