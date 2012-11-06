@@ -33,7 +33,7 @@ namespace WinStoreClient
         /// property is typically used to configure the page.</param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            ClearVault();
+            //ClearVault();
 
             RetrieveStoredToken();
         }
@@ -58,8 +58,7 @@ namespace WinStoreClient
                 var response = await WebAuthentication.DoImplicitFlowAsync(
                     endpoint: new Uri("https://adfs.leastprivilege.vm/idsrv/issue/oauth2/authorize"),
                     clientId: "test",
-                    scope: "https://test/rp/",
-                    callbackUri: WebAuthenticationBroker.GetCurrentApplicationCallbackUri());
+                    scope: "https://test/rp/");
 
                 TokenVault.StoreToken(_resourceName, response);
                 RetrieveStoredToken();

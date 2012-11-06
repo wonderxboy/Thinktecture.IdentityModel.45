@@ -7,6 +7,11 @@ namespace Thinktecture.IdentityModel.WinRT
 {
     public static class WebAuthentication
     {
+        public async static Task<TokenResponse> DoImplicitFlowAsync(Uri endpoint, string clientId, string scope)
+        {
+            return await DoImplicitFlowAsync(endpoint, clientId, scope, WebAuthenticationBroker.GetCurrentApplicationCallbackUri());
+        }
+
         public async static Task<TokenResponse> DoImplicitFlowAsync(Uri endpoint, string clientId, string scope, Uri callbackUri)
         {
             var startUri = new Uri(string.Format("{0}?client_id={1}&scope={2}&redirect_uri={3}&response_type=token",
