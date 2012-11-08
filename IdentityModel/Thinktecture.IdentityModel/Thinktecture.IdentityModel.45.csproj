@@ -287,6 +287,8 @@
     <Compile Include="Tokens\Http\AuthenticationConfiguration.cs" />
     <Compile Include="Clients\WrapClient.cs" />
     <Compile Include="Tokens\Http\ClientCertificateHandler.cs" />
+    <Compile Include="Tokens\Http\HttpRequestSecurityToken.cs" />
+    <Compile Include="Tokens\Http\HttpRequestSecurityTokenHandler.cs" />
     <Compile Include="Tokens\Http\SessionTokenConfiguration.cs" />
     <Compile Include="Authorization\Todo\ApiAuthorizeAttribute.cs" />
     <Compile Include="Authorization\DefaultPolicy.cs" />
