@@ -28,6 +28,18 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             Validator = validator;
         }
 
+        protected virtual ClaimsIdentity ValidateRequest(HttpRequestMessage request)
+        {
+            if (Validator != null)
+            {
+                return Validator(request).Identity as ClaimsIdentity;
+            }
+            else
+            {
+                throw new InvalidOperationException("No validator");
+            }
+        }
+
         public override ReadOnlyCollection<ClaimsIdentity> ValidateToken(SecurityToken token)
         {
             var requestToken = token as HttpRequestSecurityToken;
@@ -36,7 +48,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                 throw new ArgumentException("SecurityToken is not a SimpleSecurityToken");
             }
 
-            var identity = Validator(requestToken.Request).Identity as ClaimsIdentity;
+            var identity = ValidateRequest(requestToken.Request);
 
             if (identity != null)
             {
