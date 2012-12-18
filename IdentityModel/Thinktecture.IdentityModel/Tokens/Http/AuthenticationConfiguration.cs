@@ -8,8 +8,6 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Thinktecture.IdentityModel.Tokens.Http
 {
@@ -67,128 +65,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             SessionToken = new SessionTokenConfiguration();
         }
 
-        public void AddAccessKey(SimpleSecurityTokenHandler handler, AuthenticationOptions options)
-        {
-            AddMapping(new AuthenticationOptionMapping
-            {
-                TokenHandler = new SecurityTokenHandlerCollection { handler },
-                Options = options
-            });
-        }
-
-        public void AddAccessKey(SimpleSecurityTokenHandler.ValidateTokenDelegate validateTokenDelegate, AuthenticationOptions options)
-        {
-            AddMapping(new AuthenticationOptionMapping
-            {
-                TokenHandler = new SecurityTokenHandlerCollection { new SimpleSecurityTokenHandler(validateTokenDelegate) },
-                Options = options
-            });
-        }
-
-        public void AddSimpleWebToken(string issuer, string audience, string signingKey, AuthenticationOptions options)
-        {
-            var config = new SecurityTokenHandlerConfiguration();
-            var registry = new WebTokenIssuerNameRegistry();
-            registry.AddTrustedIssuer(issuer, issuer);
-            config.IssuerNameRegistry = registry;
-
-            var issuerResolver = new WebTokenIssuerTokenResolver();
-            issuerResolver.AddSigningKey(issuer, signingKey);
-            config.IssuerTokenResolver = issuerResolver;
-
-            config.AudienceRestriction.AllowedAudienceUris.Add(new Uri(audience));
-
-            var handler = new SimpleWebTokenHandler();
-            handler.Configuration = config;
-
-            AddMapping(new AuthenticationOptionMapping
-            {
-                TokenHandler = new SecurityTokenHandlerCollection { handler },
-                Options = options
-            });
-        }
-
-        public void AddJsonWebToken(string issuer, string audience, string signingKey, AuthenticationOptions options)
-        {
-            var config = new SecurityTokenHandlerConfiguration();
-            var registry = new WebTokenIssuerNameRegistry();
-            registry.AddTrustedIssuer(issuer, issuer);
-            config.IssuerNameRegistry = registry;
-
-            var issuerResolver = new WebTokenIssuerTokenResolver();
-            issuerResolver.AddSigningKey(issuer, signingKey);
-            config.IssuerTokenResolver = issuerResolver;
-
-            config.AudienceRestriction.AllowedAudienceUris.Add(new Uri(audience));
-
-            var handler = new JsonWebTokenHandler();
-            handler.Configuration = config;
-
-            AddMapping(new AuthenticationOptionMapping
-            {
-                TokenHandler = new SecurityTokenHandlerCollection { handler },
-                Options = options
-            });
-        }
-
-        public void AddBasicAuthentication(BasicAuthenticationSecurityTokenHandler.ValidateUserNameCredentialDelegate validationDelegate, bool retainPassword = false)
-        {
-            var handler = new BasicAuthenticationSecurityTokenHandler(validationDelegate);
-            handler.RetainPassword = retainPassword;
-
-            AddMapping(new AuthenticationOptionMapping
-            {
-                TokenHandler = new SecurityTokenHandlerCollection { handler },
-                Options = AuthenticationOptions.ForAuthorizationHeader(scheme: "Basic")
-            });
-        }
-
-        public void AddClientCertificate(SecurityTokenHandler handler)
-        {
-            AddMapping(new AuthenticationOptionMapping
-            {
-                TokenHandler = new SecurityTokenHandlerCollection { handler },
-                Options = AuthenticationOptions.ForClientCertificate()
-            });
-        }
-
-        public void AddClientCertificate(ClientCertificateMode mode, params string[] values)
-        {
-            var handler = new ClientCertificateHandler(mode, values);
-
-            AddMapping(new AuthenticationOptionMapping
-            {
-                TokenHandler = new SecurityTokenHandlerCollection { handler },
-                Options = AuthenticationOptions.ForClientCertificate()
-            });
-        }
-
-        public void AddSaml2(SecurityTokenHandlerConfiguration configuration, AuthenticationOptions options)
-        {
-            var handler = new HttpSaml2SecurityTokenHandler();
-            handler.Configuration = configuration;
-
-            AddMapping(new AuthenticationOptionMapping
-            {
-                TokenHandler = new SecurityTokenHandlerCollection { handler },
-                Options = options
-            });
-        }
-
-        public void AddSaml11(SecurityTokenHandlerConfiguration configuration, AuthenticationOptions options)
-        {
-            var handler = new HttpSamlSecurityTokenHandler();
-            handler.Configuration = configuration;
-
-            AddMapping(new AuthenticationOptionMapping
-            {
-                TokenHandler = new SecurityTokenHandlerCollection { handler },
-                Options = options
-            });
-        }
-
-
-        private void AddMapping(AuthenticationOptionMapping mapping)
+        public void AddMapping(AuthenticationOptionMapping mapping)
         {
             var hit = from m in Mappings
                       where m.Options.RequestType == mapping.Options.RequestType &&

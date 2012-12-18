@@ -275,6 +275,7 @@
     <Compile Include="Clients\AccessTokenResponse.cs" />
     <Compile Include="Extensions\HttpRequestMessageExtensions.cs" />
     <Compile Include="Http\RequireHttpsHandler.cs" />
+    <Compile Include="Tokens\Http\AuthenticationConfigurationExtensionsCore.cs" />
     <Compile Include="Tokens\Http\BasicAuthenticationHeaderValue.cs" />
     <Compile Include="Clients\OAuth2Client.cs" />
     <Compile Include="Tokens\Http\AuthenticationHandler.cs" />
