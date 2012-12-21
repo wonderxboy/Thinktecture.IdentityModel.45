@@ -1,5 +1,5 @@
 ﻿using System.Web.Mvc;
-using Thinktecture.Samples.Controller;
+using Thinktecture.Samples.Data;
 
 namespace WebHost.Controllers
 {
@@ -15,8 +15,7 @@ namespace WebHost.Controllers
         [Authorize]
         public ActionResult IdentityMvc()
         {
-            var claims = new IdentityController().Get();
-            return View(claims);
+            return View(ViewClaim.GetAll());
         }
 
         [Authorize]
