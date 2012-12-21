@@ -86,6 +86,18 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             });
         }
 
+        public static void AddBasicAuthentication(this AuthenticationConfiguration configuration, BasicAuthenticationSecurityTokenHandler.ValidateUserNameCredentialDelegate validationDelegate, AuthenticationOptions options, bool retainPassword = false)
+        {
+            var handler = new BasicAuthenticationSecurityTokenHandler(validationDelegate);
+            handler.RetainPassword = retainPassword;
+
+            configuration.AddMapping(new AuthenticationOptionMapping
+            {
+                TokenHandler = new SecurityTokenHandlerCollection { handler },
+                Options = options
+            });
+        }
+
         public static void AddClientCertificate(this AuthenticationConfiguration configuration, SecurityTokenHandler handler)
         {
             configuration.AddMapping(new AuthenticationOptionMapping
