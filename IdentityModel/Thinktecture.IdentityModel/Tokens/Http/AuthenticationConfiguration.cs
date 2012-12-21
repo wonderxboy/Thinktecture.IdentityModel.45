@@ -26,6 +26,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
         public bool InheritHostClientIdentity { get; set; }
         public bool EnableSessionToken { get; set; }
         public SessionTokenConfiguration SessionToken { get; set; }
+        public bool RequireSsl { get; set; }
 
         #region HasMapping Properties
         public bool HasAuthorizationHeaderMapping
@@ -57,12 +58,21 @@ namespace Thinktecture.IdentityModel.Tokens.Http
         public AuthenticationConfiguration()
         {
             Mappings = new List<AuthenticationOptionMapping>();
-            DefaultAuthenticationScheme = "unspecified";
+            DefaultAuthenticationScheme = string.Empty;
             SendWwwAuthenticateResponseHeader = true;
             InheritHostClientIdentity = false;
+            RequireSsl = false;
 
             EnableSessionToken = false;
             SessionToken = new SessionTokenConfiguration();
+        }
+
+        public void SetDefaultAuthenticationScheme(string scheme)
+        {
+            if (string.IsNullOrWhiteSpace(DefaultAuthenticationScheme))
+            {
+                DefaultAuthenticationScheme = scheme;
+            }
         }
 
         public void AddMapping(AuthenticationOptionMapping mapping)

@@ -84,6 +84,8 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                 TokenHandler = new SecurityTokenHandlerCollection { handler },
                 Options = AuthenticationOptions.ForAuthorizationHeader(scheme: "Basic")
             });
+
+            configuration.SetDefaultAuthenticationScheme("Basic");
         }
 
         public static void AddBasicAuthentication(this AuthenticationConfiguration configuration, BasicAuthenticationSecurityTokenHandler.ValidateUserNameCredentialDelegate validationDelegate, AuthenticationOptions options, bool retainPassword = false)

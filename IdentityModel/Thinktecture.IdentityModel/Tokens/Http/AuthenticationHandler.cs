@@ -49,9 +49,23 @@ namespace Thinktecture.IdentityModel.Tokens.Http
         {
             Tracing.Start(Area.HttpAuthentication);
 
+            // check SSL requirement
+            if (_authN.Configuration.RequireSsl)
+            {
+                if (request.RequestUri.Scheme != Uri.UriSchemeHttps)
+                {
+                    var forbiddenResponse =
+                        request.CreateResponse(HttpStatusCode.Forbidden);
+
+                    forbiddenResponse.ReasonPhrase = "HTTPS Required";
+                    return Task.FromResult<HttpResponseMessage>(forbiddenResponse);
+                }
+            }
+
+            // check if reuse of host client identity is allowed
             if (_authN.Configuration.InheritHostClientIdentity == false)
             {
-                //Tracing.Information(Area.HttpAuthentication, "Setting anonymous principal");
+                Tracing.Verbose(Area.HttpAuthentication, "Host client identity is not inherited. Setting anonymous principal");
                 SetPrincipal(Principal.Anonymous);
             }
 
@@ -114,13 +128,22 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         private Task<HttpResponseMessage> SendUnauthorizedResponse(HttpRequestMessage request)
         {
-            return Task<HttpResponseMessage>.Factory.StartNew(() =>
-            {
-                var response = new HttpResponseMessage(HttpStatusCode.Unauthorized);
-                SetAuthenticateHeader(response);
+            var unauthorizedResponse =
+                        request.CreateResponse(HttpStatusCode.Forbidden);
 
-                return response;
-            });
+            SetAuthenticateHeader(unauthorizedResponse);
+            unauthorizedResponse.ReasonPhrase = "Unauthorized.";
+
+            return Task.FromResult<HttpResponseMessage>(unauthorizedResponse);
+
+
+            //return Task<HttpResponseMessage>.Factory.StartNew(() =>
+            //{
+            //    var response = new HttpResponseMessage(HttpStatusCode.Unauthorized);
+            //    SetAuthenticateHeader(response);
+
+            //    return response;
+            //});
         }
 
         private Task<HttpResponseMessage> SendSessionTokenResponse(ClaimsPrincipal principal)
