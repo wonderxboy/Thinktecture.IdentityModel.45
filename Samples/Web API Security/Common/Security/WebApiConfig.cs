@@ -21,10 +21,10 @@ namespace Thinktecture.Samples.Security
 
         private static AuthenticationConfiguration CreateAuthenticationConfiguration()
         {
-            var authentication = new AuthenticationConfiguration
+            var authentication = new AuthenticationConfiguration 
             {
                 InheritHostClientIdentity = true,
-                DefaultAuthenticationScheme = "Basic"
+                ClaimsAuthenticationManager = new ClaimsTransformer()
             };
 
             authentication.AddBasicAuthentication((username, password) 

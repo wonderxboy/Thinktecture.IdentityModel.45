@@ -36,13 +36,13 @@
 
             ko.applyBindings(viewModel);
 
-            $.get("/api/identity", function (items) {
+            $.get("../api/identity", function (items) {
                 $.each(items, function (idx, item) {
                     viewModel.add(item.Type, item.Value);
                 });
             }, "json");
         });
-
+        
         function IdentityViewModel() {
             var self = this;
 
