@@ -146,7 +146,9 @@
       <DependentUpon>jquery-1.7.2.js</DependentUpon>
     </Content>
     <Content Include="Scripts\qunit.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -158,7 +160,7 @@
     <Content Include="Views\Home\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\IdentityModel\Thinktecture.IdentityModel\Thinktecture.IdentityModel.csproj">
+    <ProjectReference Include="..\..\..\..\IdentityModel\Thinktecture.IdentityModel\Thinktecture.IdentityModel.45.csproj">
       <Project>{ac9a74df-4aab-43c8-b0ed-b7602721e545}</Project>
       <Name>Thinktecture.IdentityModel</Name>
     </ProjectReference>
