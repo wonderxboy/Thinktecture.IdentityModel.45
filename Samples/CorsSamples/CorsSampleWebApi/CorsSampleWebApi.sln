@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{1D7122
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thinktecture.IdentityModel", "..\..\..\IdentityModel\Thinktecture.IdentityModel\Thinktecture.IdentityModel.csproj", "{AC9A74DF-4AAB-43C8-B0ED-B7602721E545}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thinktecture.IdentityModel", "..\..\..\IdentityModel\Thinktecture.IdentityModel\Thinktecture.IdentityModel.45.csproj", "{AC9A74DF-4AAB-43C8-B0ED-B7602721E545}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
