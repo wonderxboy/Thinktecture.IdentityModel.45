@@ -88,6 +88,43 @@ namespace Thinktecture.IdentityModel.Authorization
         /// <summary>
         /// Checks the authorization policy.
         /// </summary>
+        /// <param name="action">The action.</param>
+        /// <param name="resources">The resources.</param>
+        /// <returns>true when authorized, otherwise false</returns>
+        public static bool CheckAccess(string action, params Claim[] resources)
+        {
+            Contract.Requires(action != null);
+            Contract.Requires(resources != null);
+
+            var actionCollection = new Collection<Claim>();
+            actionCollection.Add(new Claim(ActionType, action));
+            var resourceCollection = new Collection<Claim>();
+            foreach (var resource in resources) resourceCollection.Add(resource);
+
+            return CheckAccess(new AuthorizationContext(
+                ClaimsPrincipal.Current, resourceCollection, actionCollection));
+        }
+        
+        /// <summary>
+        /// Checks the authorization policy.
+        /// </summary>
+        /// <param name="action">The action.</param>
+        /// <param name="resource">The resource name.</param>
+        /// <param name="resources">The resources.</param>
+        /// <returns>true when authorized, otherwise false</returns>
+        public static bool CheckAccess(string action, string resource, params Claim[] resources)
+        {
+            Contract.Requires(action != null);
+            Contract.Requires(resource != null);
+
+            var resourceList = resources.ToList();
+            resourceList.Add(new Claim(ResourceType, resource));
+            return CheckAccess(action, resourceList.ToArray());
+        }
+
+        /// <summary>
+        /// Checks the authorization policy.
+        /// </summary>
         /// <param name="context">The authorization context.</param>
         /// <returns>true when authorized, otherwise false</returns>
         public static bool CheckAccess(AuthorizationContext context)
