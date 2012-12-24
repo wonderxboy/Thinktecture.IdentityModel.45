@@ -268,9 +268,7 @@
     <Content Include="Views\Home\IdentityApi.cshtml" />
     <Content Include="Views\Home\IdentityMvc.cshtml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{5e446e61-8452-433b-ab59-7a822c0a2f9c}</Project>

@@ -4,9 +4,9 @@ using System.Security.Claims;
 
 namespace Thinktecture.Samples.Data
 {
-    public class ViewClaim
+    public class ViewClaims : List<ViewClaim>
     {
-        public static IEnumerable<ViewClaim> GetAll()
+        public static ViewClaims GetAll()
         {
             var principal = ClaimsPrincipal.Current;
 
@@ -18,9 +18,15 @@ namespace Thinktecture.Samples.Data
                     Value = c.Value
                 });
 
-            return claims;
-        }
+            var vc = new ViewClaims();
+            vc.AddRange(claims);
 
+            return vc;
+        }
+    }
+
+    public class ViewClaim
+    {
         public string Type { get; set; }
         public string Value { get; set; }
     }

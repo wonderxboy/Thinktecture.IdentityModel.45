@@ -15,7 +15,7 @@ namespace WebHost.Controllers
         [Authorize]
         public ActionResult IdentityMvc()
         {
-            return View(ViewClaim.GetAll());
+            return View(ViewClaims.GetAll());
         }
 
         [Authorize]

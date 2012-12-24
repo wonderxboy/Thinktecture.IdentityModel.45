@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using Thinktecture.Samples;
 using Thinktecture.Samples.Data;
@@ -26,7 +25,7 @@ namespace BasicAuthenticationClient
                     var response = client.GetAsync("identity").Result;
                     response.EnsureSuccessStatusCode();
 
-                    var claims = response.Content.ReadAsAsync<IEnumerable<ViewClaim>>().Result;
+                    var claims = response.Content.ReadAsAsync<ViewClaims>().Result;
                     Helper.ShowConsole(claims);
                 });
 
