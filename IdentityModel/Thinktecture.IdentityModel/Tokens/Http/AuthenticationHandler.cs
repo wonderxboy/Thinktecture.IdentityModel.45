@@ -5,6 +5,7 @@
 
 using System;
 using System.IdentityModel.Tokens;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -15,13 +16,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
-using System.Web.Http.Hosting;
-using Thinktecture.IdentityModel;
-using Thinktecture.IdentityModel.Constants;
 using Thinktecture.IdentityModel.Diagnostics;
-using System.Linq;
-using System.Collections;
-using Thinktecture.IdentityModel.Web;
 
 namespace Thinktecture.IdentityModel.Tokens.Http
 {

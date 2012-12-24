@@ -4,7 +4,6 @@
  */
 
 using System.Runtime.CompilerServices;
-using System.Threading;
 
 namespace Thinktecture.IdentityModel
 {

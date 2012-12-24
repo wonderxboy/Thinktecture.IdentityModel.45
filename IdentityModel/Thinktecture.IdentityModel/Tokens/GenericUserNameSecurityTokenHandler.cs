@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IdentityModel.Tokens;
 using System.Security.Claims;
-using Thinktecture.IdentityModel;
 
 namespace Thinktecture.IdentityModel.Tokens
 {

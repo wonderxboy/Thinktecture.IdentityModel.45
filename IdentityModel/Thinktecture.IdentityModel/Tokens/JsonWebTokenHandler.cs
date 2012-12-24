@@ -3,6 +3,8 @@
  * see license.txt
  */
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,8 +18,6 @@ using System.Security.Cryptography;
 using System.ServiceModel.Security;
 using System.Text;
 using System.Xml;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Thinktecture.IdentityModel.Constants;
 using Thinktecture.IdentityModel.Extensions;
 

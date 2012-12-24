@@ -3,7 +3,6 @@
  * see license.txt
  */
 
-using System;
 using System.Runtime.Serialization;
 
 

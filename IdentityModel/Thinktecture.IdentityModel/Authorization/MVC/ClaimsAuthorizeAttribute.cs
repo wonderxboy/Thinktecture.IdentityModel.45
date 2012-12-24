@@ -1,7 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Linq;
-using System.Security.Claims;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 
 namespace Thinktecture.IdentityModel.Authorization.Mvc
 {

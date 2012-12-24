@@ -3,12 +3,8 @@
  * see license.txt
  */
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Thinktecture.IdentityModel.Http.Cors;
 
 namespace Thinktecture.IdentityModel.Http.Cors
 {

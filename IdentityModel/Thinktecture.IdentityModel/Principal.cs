@@ -4,8 +4,8 @@
  */
 
 using System.Collections.Generic;
-using System.Security.Claims;
 using System.Linq;
+using System.Security.Claims;
 
 namespace Thinktecture.IdentityModel
 {

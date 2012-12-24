@@ -1,7 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Linq;
-using System.Security.Claims;
-using System.Web.Http;
+﻿using System.Web.Http;
 using System.Web.Http.Controllers;
 
 namespace Thinktecture.IdentityModel.Authorization.WebApi
