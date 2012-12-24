@@ -49,10 +49,12 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             {
                 if (request.RequestUri.Scheme != Uri.UriSchemeHttps)
                 {
+                    Tracing.Information(Area.HttpAuthentication, "Request rejected because it is not over HTTPS.");
+
                     var forbiddenResponse =
                         request.CreateResponse(HttpStatusCode.Forbidden);
 
-                    forbiddenResponse.ReasonPhrase = "HTTPS Required";
+                    forbiddenResponse.ReasonPhrase = "HTTPS Required.";
                     return Task.FromResult<HttpResponseMessage>(forbiddenResponse);
                 }
             }
@@ -84,7 +86,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                     if (_authN.IsSessionTokenRequest(request))
                     {
                         Tracing.Information(Area.HttpAuthentication, "Request for session token.");
-                        return SendSessionTokenResponse(principal);
+                        return SendSessionTokenResponse(principal, request);
                     }
 
                     // else set the principal
@@ -123,36 +125,31 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         private Task<HttpResponseMessage> SendUnauthorizedResponse(HttpRequestMessage request)
         {
-            var unauthorizedResponse =
-                        request.CreateResponse(HttpStatusCode.Forbidden);
+            var unauthorizedResponse = request.CreateResponse(HttpStatusCode.Unauthorized);
 
             SetAuthenticateHeader(unauthorizedResponse);
             unauthorizedResponse.ReasonPhrase = "Unauthorized.";
 
             return Task.FromResult<HttpResponseMessage>(unauthorizedResponse);
-
-
-            //return Task<HttpResponseMessage>.Factory.StartNew(() =>
-            //{
-            //    var response = new HttpResponseMessage(HttpStatusCode.Unauthorized);
-            //    SetAuthenticateHeader(response);
-
-            //    return response;
-            //});
         }
 
-        private Task<HttpResponseMessage> SendSessionTokenResponse(ClaimsPrincipal principal)
+        private Task<HttpResponseMessage> SendSessionTokenResponse(ClaimsPrincipal principal, HttpRequestMessage request)
         {
             var token = _authN.CreateSessionToken(principal);
             var tokenResponse = _authN.CreateSessionTokenResponse(token);
 
-            return Task<HttpResponseMessage>.Factory.StartNew(() =>
-            {
-                var response = new HttpResponseMessage(HttpStatusCode.OK);
-                response.Content = new StringContent(tokenResponse, Encoding.UTF8, "application/json");
+            var response = request.CreateResponse(HttpStatusCode.OK);
+            response.Content = new StringContent(tokenResponse, Encoding.UTF8, "application/json");
 
-                return response;
-            });
+            return Task.FromResult<HttpResponseMessage>(response);
+
+            //return Task<HttpResponseMessage>.Factory.StartNew(() =>
+            //{
+            //    var response = new HttpResponseMessage(HttpStatusCode.OK);
+            //    response.Content = new StringContent(tokenResponse, Encoding.UTF8, "application/json");
+
+            //    return response;
+            //});
         }
 
         protected virtual void SetAuthenticateHeader(HttpResponseMessage response)
