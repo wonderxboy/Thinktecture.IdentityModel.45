@@ -60,8 +60,8 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             Mappings = new List<AuthenticationOptionMapping>();
             DefaultAuthenticationScheme = string.Empty;
             SendWwwAuthenticateResponseHeader = true;
-            InheritHostClientIdentity = false;
-            RequireSsl = false;
+            InheritHostClientIdentity = true;
+            RequireSsl = true;
 
             EnableSessionToken = false;
             SessionToken = new SessionTokenConfiguration();
