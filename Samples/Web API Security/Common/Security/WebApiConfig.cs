@@ -27,8 +27,18 @@ namespace Thinktecture.Samples.Security
                 ClaimsAuthenticationManager = new ClaimsTransformer()
             };
 
+            #region Basic Authentication
             authentication.AddBasicAuthentication((username, password) 
                 => UserCredentials.Validate(username, password));
+            #endregion
+
+            #region identityserver JWT
+            authentication.AddJsonWebToken(
+                Constants.Issuer,
+                Constants.Audience,
+                Constants.IdentityServerSigningKey);
+            #endregion
+
 
             return authentication;
         }

@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Security.Claims;
 
-namespace Thinktecture.Samples.Data
+namespace Thinktecture.Samples
 {
     public class ViewClaims : List<ViewClaim>
     {

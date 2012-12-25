@@ -1,5 +1,4 @@
-﻿using System.IdentityModel.Services;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Threading;
 using System.Web;
 using System.Web.Http;
@@ -10,7 +9,7 @@ using Thinktecture.Samples.Security;
 
 namespace WebHost
 {
-    public class MvcApplication : System.Web.HttpApplication
+    public class MvcApplication : HttpApplication
     {
         protected void Application_Start()
         {

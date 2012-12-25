@@ -1,5 +1,5 @@
 ﻿using System.Web.Mvc;
-using Thinktecture.Samples.Data;
+using Thinktecture.Samples;
 
 namespace WebHost.Controllers
 {

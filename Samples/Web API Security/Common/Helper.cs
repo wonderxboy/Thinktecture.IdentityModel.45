@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Thinktecture.IdentityModel.Extensions;
-using Thinktecture.Samples.Data;
 
 namespace Thinktecture.Samples
 {

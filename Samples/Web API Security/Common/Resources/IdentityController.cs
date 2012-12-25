@@ -1,7 +1,6 @@
 ﻿using System.Web.Http;
-using Thinktecture.Samples.Data;
 
-namespace Thinktecture.Samples.Resources
+namespace Thinktecture.Samples
 {
     [Authorize]
     public class IdentityController : ApiController
