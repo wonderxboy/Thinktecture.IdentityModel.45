@@ -18,7 +18,7 @@ namespace Thinktecture.Samples
         private static string RequestToken()
         {
             var client = new OAuth2Client(
-                new Uri(Constants.IdSrv.OAuth2Endpoint),
+                new Uri(Constants.IdSrv.OAuth2TokenEndpoint),
                 Constants.IdSrv.OAuthClientName,
                 Constants.IdSrv.OAuthClientSecret);
 
