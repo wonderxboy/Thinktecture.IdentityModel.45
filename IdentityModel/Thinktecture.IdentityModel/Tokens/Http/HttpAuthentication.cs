@@ -266,6 +266,11 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             return handler.WriteToken(token);
         }
 
+        public virtual string CreateSessionTokenResponse(ClaimsPrincipal principal)
+        {
+            return CreateSessionTokenResponse(CreateSessionToken(principal));
+        }
+
         public virtual string CreateSessionTokenResponse(string sessionToken)
         {
             var response = new JObject();

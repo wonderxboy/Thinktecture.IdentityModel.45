@@ -80,7 +80,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
                 if (principal.Identity.IsAuthenticated)
                 {
-                    Tracing.Information(Area.HttpAuthentication, "Authentication successful.");
+                    Tracing.Verbose(Area.HttpAuthentication, "Authentication successful.");
 
                     // check for token request - if yes send token back and return
                     if (_authN.IsSessionTokenRequest(request))
@@ -135,21 +135,12 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         private Task<HttpResponseMessage> SendSessionTokenResponse(ClaimsPrincipal principal, HttpRequestMessage request)
         {
-            var token = _authN.CreateSessionToken(principal);
-            var tokenResponse = _authN.CreateSessionTokenResponse(token);
+            var tokenResponse = _authN.CreateSessionTokenResponse(principal);
 
             var response = request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(tokenResponse, Encoding.UTF8, "application/json");
 
             return Task.FromResult<HttpResponseMessage>(response);
-
-            //return Task<HttpResponseMessage>.Factory.StartNew(() =>
-            //{
-            //    var response = new HttpResponseMessage(HttpStatusCode.OK);
-            //    response.Content = new StringContent(tokenResponse, Encoding.UTF8, "application/json");
-
-            //    return response;
-            //});
         }
 
         protected virtual void SetAuthenticateHeader(HttpResponseMessage response)
@@ -177,11 +168,11 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                     name = principal.Claims.First().Value;
                 }
 
-                Tracing.Information(Area.HttpAuthentication, "Authentication successful for: " + name);
+                Tracing.Verbose(Area.HttpAuthentication, "Authentication successful for: " + name);
             }
             else
             {
-                Tracing.Information(Area.HttpAuthentication, "Setting anonymous principal.");
+                Tracing.Verbose(Area.HttpAuthentication, "Setting anonymous principal.");
             }
 
             Thread.CurrentPrincipal = principal;

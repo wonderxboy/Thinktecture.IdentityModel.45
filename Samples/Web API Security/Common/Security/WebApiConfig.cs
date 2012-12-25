@@ -23,7 +23,6 @@ namespace Thinktecture.Samples.Security
         {
             var authentication = new AuthenticationConfiguration 
             {
-                InheritHostClientIdentity = true,
                 ClaimsAuthenticationManager = new ClaimsTransformer()
             };
 
@@ -32,13 +31,12 @@ namespace Thinktecture.Samples.Security
                 => UserCredentials.Validate(username, password));
             #endregion
 
-            #region identityserver JWT
+            #region IdentityServer JWT
             authentication.AddJsonWebToken(
                 Constants.Issuer,
                 Constants.Audience,
                 Constants.IdentityServerSigningKey);
             #endregion
-
 
             return authentication;
         }
