@@ -33,9 +33,9 @@ namespace Thinktecture.Samples.Security
 
             #region IdentityServer JWT
             authentication.AddJsonWebToken(
-                Constants.Issuer,
+                Constants.IdSrv.Issuer,
                 Constants.Audience,
-                Constants.IdentityServerSigningKey);
+                Constants.IdSrv.SigningKey);
             #endregion
 
             return authentication;

@@ -23,11 +23,15 @@
         public const string Audience = Realm;
         public const string Scope = Realm;
 
-        public const string OAuth2Endpoint = "https://identity.thinktecture.com/sample/issue/oauth2/token";
-        public const string Issuer = "http://identityserver.v2.thinktecture.com/samples";
-        public const string IdentityServerSigningKey = "fWUU28oBOIcaQuwUKiL01KztD/CsZX83C3I0M1MOYN4=";
+        public static class IdSrv
+        {
+            public const string OAuth2Endpoint = "https://identity.thinktecture.com/sample/issue/oauth2/token";
+            public const string Issuer = "http://identityserver.v2.thinktecture.com/samples";
+            public const string SigningKey = "fWUU28oBOIcaQuwUKiL01KztD/CsZX83C3I0M1MOYN4=";
 
-        public const string OAuthClientName = "client";
-        public const string OAuthClientSecret = "secret";
+            public const string OAuthClientName = "client";
+            public const string OAuthClientSecret = "secret";        
+        }
+
     }
 }
