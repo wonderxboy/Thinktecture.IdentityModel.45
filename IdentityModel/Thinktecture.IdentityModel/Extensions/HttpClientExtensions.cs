@@ -1,4 +1,6 @@
-﻿using Thinktecture.IdentityModel.Tokens.Http;
+﻿using System.Net.Http.Headers;
+using Thinktecture.IdentityModel.Constants;
+using Thinktecture.IdentityModel.Tokens.Http;
 
 namespace System.Net.Http
 {
@@ -7,6 +9,11 @@ namespace System.Net.Http
         public static void SetBasicAuthentication(this HttpClient client, string userName, string password)
         {
             client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(userName, password);
+        }
+
+        public static void SetBearerToken(this HttpClient client, string token)
+        {
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(JwtConstants.Bearer, token);
         }
     }
 }

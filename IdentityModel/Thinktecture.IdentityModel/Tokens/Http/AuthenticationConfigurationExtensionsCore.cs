@@ -5,6 +5,7 @@
 
 using System;
 using System.IdentityModel.Tokens;
+using Thinktecture.IdentityModel.Constants;
 
 namespace Thinktecture.IdentityModel.Tokens.Http
 {
@@ -72,6 +73,11 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                 TokenHandler = new SecurityTokenHandlerCollection { handler },
                 Options = options
             });
+        }
+
+        public static void AddJsonWebToken(this AuthenticationConfiguration configuration, string issuer, string audience, string signingKey)
+        {
+            configuration.AddJsonWebToken(issuer, audience, signingKey, AuthenticationOptions.ForAuthorizationHeader(JwtConstants.Bearer));
         }
 
         public static void AddBasicAuthentication(this AuthenticationConfiguration configuration, BasicAuthenticationSecurityTokenHandler.ValidateUserNameCredentialDelegate validationDelegate, bool retainPassword = false)
