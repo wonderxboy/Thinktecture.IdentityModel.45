@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Basic Authentication", "Cli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OAuth2 Resource Owner Password Flow", "Clients\OAuth2ResourceOwnerPasswordFlow\OAuth2 Resource Owner Password Flow.csproj", "{ED29CA6E-9F3C-4F52-BDB9-71CF6897BEC9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SamlAuthentication", "Clients\SamlAuthentication\SamlAuthentication.csproj", "{0BE22C84-1FCE-4DB6-8049-8F8CC768BD56}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Analysis (Debug)|Any CPU = Analysis (Debug)|Any CPU
@@ -70,6 +72,14 @@ Global
 		{ED29CA6E-9F3C-4F52-BDB9-71CF6897BEC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED29CA6E-9F3C-4F52-BDB9-71CF6897BEC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED29CA6E-9F3C-4F52-BDB9-71CF6897BEC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BE22C84-1FCE-4DB6-8049-8F8CC768BD56}.Analysis (Debug)|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BE22C84-1FCE-4DB6-8049-8F8CC768BD56}.Analysis (Debug)|Any CPU.Build.0 = Debug|Any CPU
+		{0BE22C84-1FCE-4DB6-8049-8F8CC768BD56}.Debug and Contracts|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BE22C84-1FCE-4DB6-8049-8F8CC768BD56}.Debug and Contracts|Any CPU.Build.0 = Debug|Any CPU
+		{0BE22C84-1FCE-4DB6-8049-8F8CC768BD56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BE22C84-1FCE-4DB6-8049-8F8CC768BD56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BE22C84-1FCE-4DB6-8049-8F8CC768BD56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BE22C84-1FCE-4DB6-8049-8F8CC768BD56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,5 +88,6 @@ Global
 		{AC9A74DF-4AAB-43C8-B0ED-B7602721E545} = {8E0D18CA-76E9-47A1-8F7E-16670381010D}
 		{9A1D2998-99AA-44CC-AFE6-4E784B641E6B} = {1516840A-5B1A-4A26-BB73-6572A9AF4C82}
 		{ED29CA6E-9F3C-4F52-BDB9-71CF6897BEC9} = {1516840A-5B1A-4A26-BB73-6572A9AF4C82}
+		{0BE22C84-1FCE-4DB6-8049-8F8CC768BD56} = {1516840A-5B1A-4A26-BB73-6572A9AF4C82}
 	EndGlobalSection
 EndGlobal
