@@ -4,6 +4,7 @@
  */
 
 using System;
+using System.IdentityModel.Selectors;
 using System.IdentityModel.Tokens;
 using Thinktecture.IdentityModel.Constants;
 
@@ -124,6 +125,19 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                 TokenHandler = new SecurityTokenHandlerCollection { handler },
                 Options = AuthenticationOptions.ForClientCertificate()
             });
+        }
+
+        public static void AddSaml2(this AuthenticationConfiguration configuration, string issuerThumbprint, string issuerName, string audienceUri, X509CertificateValidator certificateValidator, AuthenticationOptions options)
+        {
+            var registry = new ConfigurationBasedIssuerNameRegistry();
+            registry.AddTrustedIssuer(issuerThumbprint, issuerName);
+
+            var handlerConfig = new SecurityTokenHandlerConfiguration();
+            handlerConfig.AudienceRestriction.AllowedAudienceUris.Add(new Uri(audienceUri));
+            handlerConfig.IssuerNameRegistry = registry;
+            handlerConfig.CertificateValidator = certificateValidator;
+
+            configuration.AddSaml2(handlerConfig, options);
         }
 
         public static void AddSaml2(this AuthenticationConfiguration configuration, SecurityTokenHandlerConfiguration handlerConfiguration, AuthenticationOptions options)

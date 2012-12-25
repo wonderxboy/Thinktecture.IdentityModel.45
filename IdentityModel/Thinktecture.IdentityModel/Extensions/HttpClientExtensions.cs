@@ -11,9 +11,14 @@ namespace System.Net.Http
             client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(userName, password);
         }
 
+        public static void SetToken(this HttpClient client, string scheme, string token)
+        {
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(scheme, token);
+        }
+
         public static void SetBearerToken(this HttpClient client, string token)
         {
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(JwtConstants.Bearer, token);
+            client.SetToken(JwtConstants.Bearer, token);
         }
     }
 }

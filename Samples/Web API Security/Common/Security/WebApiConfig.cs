@@ -1,4 +1,5 @@
-﻿using System.Web.Http;
+﻿using System.IdentityModel.Selectors;
+using System.Web.Http;
 using Thinktecture.IdentityModel.Tokens.Http;
 
 namespace Thinktecture.Samples.Security
@@ -36,6 +37,15 @@ namespace Thinktecture.Samples.Security
                 Constants.IdSrv.Issuer,
                 Constants.Audience,
                 Constants.IdSrv.SigningKey);
+            #endregion
+
+            #region #IdentityServer SAML
+            authentication.AddSaml2(
+                issuerThumbprint: Constants.IdSrv.SigningCertThumbprint,
+                issuerName: Constants.IdSrv.Issuer,
+                audienceUri: Constants.Realm,
+                certificateValidator: X509CertificateValidator.None,
+                options: AuthenticationOptions.ForAuthorizationHeader("SAML"));
             #endregion
 
             return authentication;
