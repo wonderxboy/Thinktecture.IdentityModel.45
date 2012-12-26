@@ -1,46 +1,18 @@
-﻿using System;
+﻿/*
+ * Copyright (c) Dominick Baier.  All rights reserved.
+ * see license.txt
+ */
+
+using System;
 using System.IdentityModel.Tokens;
 using System.Net.Http;
 
 namespace Thinktecture.IdentityModel.Tokens.Http
 {
-    public class HttpRequestSecurityToken : SecurityToken
+    public class HttpRequestSecurityToken : WrappedSecurityToken<HttpRequestMessage>
     {
-        HttpRequestMessage _request;
-
-        public HttpRequestMessage Request 
-        {
-            get
-            {
-                return _request;
-            }
-        }
-
-        public HttpRequestSecurityToken(HttpRequestMessage request)
-        {
-            _request = request;
-        }
-
-        #region Not Implemented
-        public override string Id
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public override System.Collections.ObjectModel.ReadOnlyCollection<SecurityKey> SecurityKeys
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public override DateTime ValidFrom
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public override DateTime ValidTo
-        {
-            get { throw new NotImplementedException(); }
-        }
-        #endregion
+        public HttpRequestSecurityToken(HttpRequestMessage request) : 
+            base(request)
+        { }
     }
 }

@@ -3,7 +3,6 @@
  * see license.txt
  */
 
-
 namespace Thinktecture.IdentityModel.Tokens
 {
     public class SimpleSecurityToken : WrappedSecurityToken<string>

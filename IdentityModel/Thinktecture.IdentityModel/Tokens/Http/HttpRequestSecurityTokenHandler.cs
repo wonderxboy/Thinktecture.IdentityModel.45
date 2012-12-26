@@ -48,7 +48,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                 throw new ArgumentException("SecurityToken is not a HttpRequestSecurityToken");
             }
 
-            var identity = ValidateRequest(requestToken.Request);
+            var identity = ValidateRequest(requestToken.Token);
 
             if (identity != null)
             {
