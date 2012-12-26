@@ -7,7 +7,6 @@ using System.ServiceModel.Security;
 using Thinktecture.IdentityModel.Constants;
 using Thinktecture.IdentityModel.Extensions;
 using Thinktecture.IdentityModel.WSTrust;
-using Thinktecture.Samples;
 
 namespace Thinktecture.Samples
 {
@@ -20,30 +19,6 @@ namespace Thinktecture.Samples
         {
             var token = GetSamlToken();
             CallService(token);
-        }
-
-        private static void CallService(string token)
-        {
-            var client = new HttpClient
-            {
-                BaseAddress = _baseAddress
-            };
-
-            client.SetToken(Constants.IdSrv.SamlScheme, token);
-
-            while (true)
-            {
-                Helper.Timer(() =>
-                {
-                    var response = client.GetAsync("identity").Result;
-                    response.EnsureSuccessStatusCode();
-
-                    var claims = response.Content.ReadAsAsync<ViewClaims>().Result;
-                    Helper.ShowConsole(claims);
-                });
-
-                Console.ReadLine();
-            }            
         }
 
         private static string GetSamlToken()
@@ -68,6 +43,32 @@ namespace Thinktecture.Samples
 
             var token = factory.CreateChannel().Issue(rst) as GenericXmlSecurityToken;
             return token.TokenXml.OuterXml;
+        }
+
+        private static void CallService(string token)
+        {
+            var client = new HttpClient
+            {
+                BaseAddress = _baseAddress
+            };
+
+            client.SetToken(Constants.IdSrv.SamlScheme, token);
+
+            while (true)
+            {
+                Helper.Timer(() =>
+                {
+                    "Calling service.".ConsoleYellow();
+
+                    var response = client.GetAsync("identity").Result;
+                    response.EnsureSuccessStatusCode();
+
+                    var claims = response.Content.ReadAsAsync<ViewClaims>().Result;
+                    Helper.ShowConsole(claims);
+                });
+
+                Console.ReadLine();
+            }            
         }
     }
 }

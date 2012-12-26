@@ -42,7 +42,7 @@ namespace SamlJwtConversionUsingAcs
                 RequestType = RequestTypes.Issue,
                 KeyType = KeyTypes.Bearer,
                 TokenType = TokenTypes.Saml2TokenProfile11,
-                AppliesTo = new EndpointReference(Constants.Realm)
+                AppliesTo = new EndpointReference(Constants.ACS.IssuerUri)
             };
 
             var token = factory.CreateChannel().Issue(rst) as GenericXmlSecurityToken;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using Thinktecture.IdentityModel.Clients;
+using Thinktecture.IdentityModel.Extensions;
 
 namespace Thinktecture.Samples
 {
@@ -17,6 +18,8 @@ namespace Thinktecture.Samples
 
         private static string RequestToken()
         {
+            "Requesting token.".ConsoleYellow();
+
             var client = new OAuth2Client(
                 new Uri(Constants.IdSrv.OAuth2TokenEndpoint),
                 Constants.IdSrv.OAuthClientName,
@@ -36,6 +39,8 @@ namespace Thinktecture.Samples
 
             while (true)
             {
+                "Calling service.".ConsoleYellow();
+
                 Helper.Timer(() =>
                 {
                     var response = client.GetAsync("identity").Result;

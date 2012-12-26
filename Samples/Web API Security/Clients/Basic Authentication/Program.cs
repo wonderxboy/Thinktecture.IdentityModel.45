@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using Thinktecture.IdentityModel.Extensions;
 
 namespace Thinktecture.Samples
 {
@@ -20,6 +21,8 @@ namespace Thinktecture.Samples
             {
                 Helper.Timer(() =>
                 {
+                    "Calling service.".ConsoleYellow();
+
                     var response = client.GetAsync("identity").Result;
                     response.EnsureSuccessStatusCode();
 
