@@ -29,7 +29,7 @@
             public const string OAuth2AuthorizeEndpoint = "https://identity.thinktecture.com/sample/issue/oauth2/authorize";
             public const string WSTrustEndpoint = "https://identity.thinktecture.com/sample/issue/wstrust/mixed/username";
 
-            public const string Issuer = "http://identityserver.v2.thinktecture.com/samples";
+            public const string IssuerUri = "http://identityserver.v2.thinktecture.com/samples";
             public const string SigningKey = "fWUU28oBOIcaQuwUKiL01KztD/CsZX83C3I0M1MOYN4=";
             public const string SigningCertThumbprint = "a1eed7897e55388fce60fef1a1eed81ff1cbaec6";
 
@@ -37,7 +37,16 @@
             public const string OAuthClientName = "client"; 
             public const string Win8OAuthClientName = "win8client";
             public const string OAuthClientSecret = "secret";
+
+            public static string SamlScheme = "SAML";
         }
 
+        public static class ACS
+        {
+            public static string Namespace = "webapisecuritysample";
+            public static string IssuerUri = "https://" + Namespace + ".accesscontrol.windows.net/";
+            public static string Scheme = "ACS";
+            public const string SigningKey = "eo95XJ/5jT++blJlxybYwSn+BhP932QogAeUWVfWG8k=";
+        }
     }
 }

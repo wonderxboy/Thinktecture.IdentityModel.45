@@ -29,7 +29,7 @@ namespace Thinktecture.Samples
                 BaseAddress = _baseAddress
             };
 
-            client.SetToken("SAML", token);
+            client.SetToken(Constants.IdSrv.SamlScheme, token);
 
             while (true)
             {

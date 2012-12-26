@@ -34,18 +34,26 @@ namespace Thinktecture.Samples.Security
 
             #region IdentityServer JWT
             authentication.AddJsonWebToken(
-                Constants.IdSrv.Issuer,
+                Constants.IdSrv.IssuerUri,
                 Constants.Audience,
                 Constants.IdSrv.SigningKey);
+            #endregion
+
+            #region Access Control Service JWT
+            authentication.AddJsonWebToken(
+                Constants.ACS.IssuerUri,
+                Constants.Audience,
+                Constants.ACS.SigningKey,
+                AuthenticationOptions.ForAuthorizationHeader(Constants.ACS.Scheme));
             #endregion
 
             #region #IdentityServer SAML
             authentication.AddSaml2(
                 issuerThumbprint: Constants.IdSrv.SigningCertThumbprint,
-                issuerName: Constants.IdSrv.Issuer,
+                issuerName: Constants.IdSrv.IssuerUri,
                 audienceUri: Constants.Realm,
                 certificateValidator: X509CertificateValidator.None,
-                options: AuthenticationOptions.ForAuthorizationHeader("SAML"));
+                options: AuthenticationOptions.ForAuthorizationHeader(Constants.IdSrv.SamlScheme));
             #endregion
 
             return authentication;

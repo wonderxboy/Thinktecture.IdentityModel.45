@@ -1,5 +1,4 @@
-﻿
-namespace Thinktecture.Samples
+﻿namespace Thinktecture.Samples
 {
     public class ViewClaim
     {
