@@ -43,10 +43,12 @@
 
         public static class ACS
         {
-            public static string Namespace = "webapisecuritysample";
-            public static string IssuerUri = "https://" + Namespace + ".accesscontrol.windows.net/";
-            public static string Scheme = "ACS";
+            public const string Namespace = "webapisecuritysample";
+            public const string IssuerUri = "https://" + Namespace + ".accesscontrol.windows.net/";
+            public const string Scheme = "ACS";
             public const string SigningKey = "eo95XJ/5jT++blJlxybYwSn+BhP932QogAeUWVfWG8k=";
+
+            public const string OAuth2Endpoint = IssuerUri + "v2/OAuth2-13";
         }
     }
 }
