@@ -45,7 +45,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             var requestToken = token as HttpRequestSecurityToken;
             if (requestToken == null)
             {
-                throw new ArgumentException("SecurityToken is not a SimpleSecurityToken");
+                throw new ArgumentException("SecurityToken is not a HttpRequestSecurityToken");
             }
 
             var identity = ValidateRequest(requestToken.Request);

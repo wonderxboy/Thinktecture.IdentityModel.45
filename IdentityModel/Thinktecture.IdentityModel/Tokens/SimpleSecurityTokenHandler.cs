@@ -45,7 +45,7 @@ namespace Thinktecture.IdentityModel.Tokens
                 throw new ArgumentException("SecurityToken is not a SimpleSecurityToken");
             }
 
-            var identity = Validator(simpleToken.Value).Identity as ClaimsIdentity;
+            var identity = Validator(simpleToken.Token).Identity as ClaimsIdentity;
 
             if (identity != null)
             {
@@ -70,7 +70,7 @@ namespace Thinktecture.IdentityModel.Tokens
                 throw new ArgumentException("SecurityToken is not a SimpleSecurityToken");
             }
 
-            return simpleToken.Value;
+            return simpleToken.Token;
         }
 
         public override string[] GetTokenTypeIdentifiers()
