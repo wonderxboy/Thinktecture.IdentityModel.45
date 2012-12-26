@@ -3,8 +3,6 @@
  * see license.txt
  */
 
-using System;
-using System.IdentityModel.Tokens;
 
 namespace Thinktecture.IdentityModel.Tokens
 {
