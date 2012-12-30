@@ -19,8 +19,8 @@ namespace SamlJwtConversionUsingAcs
 
         static void Main(string[] args)
         {
-            var samlToken = GetSamlToken();
-            var jwt = ConvertToJwt(samlToken);
+            var saml = GetSamlToken();
+            var jwt = ConvertToJwt(saml);
             
             CallService(jwt);
         }
