@@ -11,3 +11,7 @@ Sample demonstrates various ASP.NET Web API security scenarios:
 - Windows 8 Store App using OAuth2 implicit flow with the WinRT Web Authentication Broker
 - OAuth2 resource owner password flow
 
+Accompanying blog posts:
+
+- [http://leastprivilege.com/2012/12/30/asp-net-web-api-security-prologue/](http://leastprivilege.com/2012/12/30/asp-net-web-api-security-prologue/ "ASP.NET (Web API) Security: Prologue")
+
