@@ -49,10 +49,10 @@ namespace Thinktecture.IdentityModel.Clients
         {
             var values = new Dictionary<string, string>
             {
-                { OAuth2Constants.GrantType, OAuth2Constants.Password },
+                { OAuth2Constants.GrantType, OAuth2Constants.GrantTypes.Password },
                 { OAuth2Constants.UserName, userName },
                 { OAuth2Constants.Password, password },
-                { OAuth2Constants.scope, scope }
+                { OAuth2Constants.Scope, scope }
             };
 
             return new FormUrlEncodedContent(values);
@@ -64,7 +64,7 @@ namespace Thinktecture.IdentityModel.Clients
             {
                 { OAuth2Constants.GrantType, assertionType },
                 { OAuth2Constants.Assertion, assertion },
-                { OAuth2Constants.scope, scope }
+                { OAuth2Constants.Scope, scope }
             };
 
             return new FormUrlEncodedContent(values);
