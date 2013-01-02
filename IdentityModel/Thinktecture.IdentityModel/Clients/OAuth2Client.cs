@@ -36,6 +36,15 @@ namespace Thinktecture.IdentityModel.Clients
             return CreateResponseFromJson(json);
         }
 
+        public AccessTokenResponse RequestAccessTokenRefreshToken(string refreshToken)
+        {
+            var response = _client.PostAsync("", CreateFormRefreshToken(refreshToken)).Result;
+            response.EnsureSuccessStatusCode();
+
+            var json = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+            return CreateResponseFromJson(json);
+        }
+
         public AccessTokenResponse RequestAccessTokenAssertion(string assertion, string assertionType, string scope)
         {
             var response = _client.PostAsync("", CreateFormAssertion(assertion, assertionType, scope)).Result;
@@ -53,6 +62,17 @@ namespace Thinktecture.IdentityModel.Clients
                 { OAuth2Constants.UserName, userName },
                 { OAuth2Constants.Password, password },
                 { OAuth2Constants.Scope, scope }
+            };
+
+            return new FormUrlEncodedContent(values);
+        }
+
+        protected virtual FormUrlEncodedContent CreateFormRefreshToken(string refreshToken)
+        {
+            var values = new Dictionary<string, string>
+            {
+                { OAuth2Constants.GrantType, OAuth2Constants.GrantTypes.RefreshToken },
+                { OAuth2Constants.GrantTypes.RefreshToken, refreshToken}
             };
 
             return new FormUrlEncodedContent(values);
