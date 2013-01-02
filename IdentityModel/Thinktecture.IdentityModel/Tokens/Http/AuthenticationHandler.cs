@@ -93,16 +93,6 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                     SetPrincipal(principal);
                 }
             }
-            catch (SecurityTokenValidationException ex)
-            {
-                Tracing.Error(Area.HttpAuthentication, "Error validating the token: " + ex.ToString());
-                return SendUnauthorizedResponse(request);
-            }
-            catch (SecurityTokenException ex)
-            {
-                Tracing.Error(Area.HttpAuthentication, "Error validating the token: " + ex.ToString());
-                return SendUnauthorizedResponse(request);
-            }
             catch (Exception ex)
             {
                 Tracing.Error(Area.HttpAuthentication, "Exception while validating the token: " + ex.ToString());

@@ -31,7 +31,11 @@ namespace Tests
 
         private static AuthenticationHandler GetDefaultAuthenticationHandler()
         {
-            var authConfig = new AuthenticationConfiguration();
+            var authConfig = new AuthenticationConfiguration
+            {
+                RequireSsl = false,
+                InheritHostClientIdentity = false
+            };
 
             #region Basic Authentication
             authConfig.AddBasicAuthentication((userName, password) => { return userName == password; });
