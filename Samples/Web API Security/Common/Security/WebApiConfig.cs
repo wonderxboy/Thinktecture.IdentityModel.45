@@ -8,6 +8,10 @@ namespace Thinktecture.Samples.Security
     {
         public static void Register(HttpConfiguration config)
         {
+            var sessionTokenAuthentication = CreateSessionTokenAuthenticationConfiguration();
+            config.MessageHandlers.Add(new AuthenticationHandler(sessionTokenAuthentication));
+
+            // authentication configuration for identity controller
             var authentication = CreateAuthenticationConfiguration();
 
             // route to identity controller
@@ -18,13 +22,35 @@ namespace Thinktecture.Samples.Security
                 constraints: null,
                 handler: new AuthenticationHandler(authentication, config)
             );
+
+            // default API route
+            config.Routes.MapHttpRoute(
+                name: "DefaultApi",
+                routeTemplate: "api/{controller}/{id}",
+                defaults: new { id = RouteParameter.Optional }
+            );
+        }
+
+        private static AuthenticationConfiguration CreateSessionTokenAuthenticationConfiguration()
+        {
+            var config = new AuthenticationConfiguration
+            {
+                RequireSsl = false,
+                EnableSessionToken = true
+            };
+
+            config.AddBasicAuthentication((u, p) => u == p);
+
+            return config;
         }
 
         private static AuthenticationConfiguration CreateAuthenticationConfiguration()
         {
             var authentication = new AuthenticationConfiguration 
             {
-                ClaimsAuthenticationManager = new ClaimsTransformer()
+                ClaimsAuthenticationManager = new ClaimsTransformer(),
+                RequireSsl = false,
+                EnableSessionToken = true
             };
 
             #region Basic Authentication
