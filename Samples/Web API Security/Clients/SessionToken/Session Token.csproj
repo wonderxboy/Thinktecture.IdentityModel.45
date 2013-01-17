@@ -63,6 +63,10 @@
       <Project>{ac9a74df-4aab-43c8-b0ed-b7602721e545}</Project>
       <Name>Thinktecture.IdentityModel.45</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Common\Common.csproj">
+      <Project>{5e446e61-8452-433b-ab59-7a822c0a2f9c}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\PortableCommon\PortableCommon.csproj">
       <Project>{2cb6c663-7e1a-4f29-acd4-aca95c60f0fb}</Project>
       <Name>PortableCommon</Name>
