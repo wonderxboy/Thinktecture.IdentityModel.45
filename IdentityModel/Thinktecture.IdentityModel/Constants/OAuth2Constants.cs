@@ -12,6 +12,7 @@ namespace Thinktecture.IdentityModel.Constants
         public const string Scope     = "scope";
         public const string Assertion = "assertion";
         public const string Password  = "password";
+        public const string Code = "code";
 
         public static class GrantTypes
         {
