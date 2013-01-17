@@ -8,11 +8,20 @@ namespace Thinktecture.Samples.Security
     {
         public static void Register(HttpConfiguration config)
         {
-            var sessionTokenAuthentication = CreateSessionTokenAuthenticationConfiguration();
-            config.MessageHandlers.Add(new AuthenticationHandler(sessionTokenAuthentication));
-
             // authentication configuration for identity controller
             var authentication = CreateAuthenticationConfiguration();
+
+            #region session token support
+            // session support - add a handler at the root
+            var sessionTokenAuthentication = CreateSessionTokenAuthenticationConfiguration();
+            config.MessageHandlers.Add(new AuthenticationHandler(sessionTokenAuthentication));
+            
+            // enable sessions on identity controller
+            authentication.EnableSessionToken = true;
+            
+            // synchronize signing keys
+            authentication.SessionToken.SigningKey = sessionTokenAuthentication.SessionToken.SigningKey;
+            #endregion
 
             // route to identity controller
             config.Routes.MapHttpRoute(
@@ -36,7 +45,8 @@ namespace Thinktecture.Samples.Security
             var config = new AuthenticationConfiguration
             {
                 RequireSsl = false,
-                EnableSessionToken = true
+                EnableSessionToken = true,
+                ClaimsAuthenticationManager = new ClaimsTransformer()
             };
 
             config.AddBasicAuthentication((u, p) => u == p);
