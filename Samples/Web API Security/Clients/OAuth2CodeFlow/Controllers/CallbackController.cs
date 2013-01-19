@@ -13,16 +13,9 @@ namespace OAuth2CodeFlow.Controllers
 
         public ActionResult Index()
         {
-            var code = Request.QueryString["code"];
-
-            if (!string.IsNullOrWhiteSpace(code))
-            {
-                ViewBag.Code = code;
-            }
-            else
-            {
-                ViewBag.Code = "none";
-            }
+            ViewBag.Code = Request.QueryString["code"] ?? "none";
+            ViewBag.Error = Request.QueryString["error"] ?? "none";
+            
 
             return View();
         }

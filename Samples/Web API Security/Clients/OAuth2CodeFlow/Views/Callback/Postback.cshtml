@@ -4,26 +4,24 @@
     ViewBag.Title = "Postback";
 }
 
-<h2>Postback</h2>
+<h2>Access Token</h2>
+<br />
 
 <p>
-    Token:
-</p>
-<p>
+    <strong>Token:</strong>
+    <br />
     @Model.AccessToken
 </p>
 
 <p>
-    Expires in:
-</p>
-<p>
-    @Model.ExpiresIn
+    <strong>Expires:</strong>
+    <br />
+    @(DateTime.Now.AddSeconds(Model.ExpiresIn).ToString())
 </p>
 
 <p>
-    Refresh token:
-</p>
-<p>
+    <strong>Refresh token:</strong>
+    <br />
     @Model.RefreshToken
 </p>
 

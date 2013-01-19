@@ -2,14 +2,20 @@
     ViewBag.Title = "Index";
 }
 
-<h2>Index</h2>
+<h2>Authorization response</h2>
+<br />
 
-Code: @ViewBag.Code
+Code: <strong>@ViewBag.Code</strong>
+<br />
+Error: <strong>@ViewBag.Error</strong>
 
 <br />
 <br />
 
-@using (Html.BeginForm())
+@if (ViewBag.Code != "none")
 { 
-    <input type="submit" value="Get token" />
+    using (Html.BeginForm())
+    { 
+        <input type="submit" value="Get token" />
+    }
 }
