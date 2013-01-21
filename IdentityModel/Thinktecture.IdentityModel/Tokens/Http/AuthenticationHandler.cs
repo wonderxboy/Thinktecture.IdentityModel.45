@@ -40,7 +40,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             InnerHandler = innerHandler;
         }
 
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             Tracing.Start(Area.HttpAuthentication);
 
@@ -55,7 +55,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                         request.CreateResponse(HttpStatusCode.Forbidden);
 
                     forbiddenResponse.ReasonPhrase = "HTTPS Required.";
-                    return Task.FromResult<HttpResponseMessage>(forbiddenResponse);
+                    return forbiddenResponse;
                 }
             }
 
@@ -99,38 +99,34 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                 return SendUnauthorizedResponse(request);
             }
 
-            return base.SendAsync(request, cancellationToken).ContinueWith(
-                (task) =>
-                {
-                    var response = task.Result;
+            HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
 
-                    if (response.StatusCode == HttpStatusCode.Unauthorized)
-                    {
-                        SetAuthenticateHeader(response);
-                    }
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                SetAuthenticateHeader(response);
+            }
 
-                    return response;
-                });
+            return response;
         }
 
-        private Task<HttpResponseMessage> SendUnauthorizedResponse(HttpRequestMessage request)
+        private HttpResponseMessage SendUnauthorizedResponse(HttpRequestMessage request)
         {
             var unauthorizedResponse = request.CreateResponse(HttpStatusCode.Unauthorized);
 
             SetAuthenticateHeader(unauthorizedResponse);
             unauthorizedResponse.ReasonPhrase = "Unauthorized.";
 
-            return Task.FromResult<HttpResponseMessage>(unauthorizedResponse);
+            return unauthorizedResponse;
         }
 
-        private Task<HttpResponseMessage> SendSessionTokenResponse(ClaimsPrincipal principal, HttpRequestMessage request)
+        private HttpResponseMessage SendSessionTokenResponse(ClaimsPrincipal principal, HttpRequestMessage request)
         {
             var tokenResponse = _authN.CreateSessionTokenResponse(principal);
 
             var response = request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(tokenResponse, Encoding.UTF8, "application/json");
 
-            return Task.FromResult<HttpResponseMessage>(response);
+            return response;
         }
 
         protected virtual void SetAuthenticateHeader(HttpResponseMessage response)
