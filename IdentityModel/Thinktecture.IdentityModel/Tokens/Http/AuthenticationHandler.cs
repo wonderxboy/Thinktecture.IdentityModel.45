@@ -66,46 +66,69 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                 SetPrincipal(Principal.Anonymous);
             }
 
+            ClaimsPrincipal principal;
             try
             {
                 // try to authenticate
-                // returns an anonymous principal if no credential was 
-                var principal = _authN.Authenticate(request);
+                // returns an anonymous principal if no credential was found
+                principal = _authN.Authenticate(request);
 
                 if (principal == null)
                 {
-                    Tracing.Error(Area.HttpAuthentication, "Authentication returned null principal.");
-                    throw new InvalidOperationException("No principal set");
+                    // this should never return null - check the corresponding handler!
+                    Tracing.Error(Area.HttpAuthentication, "Authentication returned null principal. Something is wrong!");
+                    return SendUnauthorizedResponse(request);
                 }
-
-                if (principal.Identity.IsAuthenticated)
-                {
-                    Tracing.Verbose(Area.HttpAuthentication, "Authentication successful.");
-
-                    // check for token request - if yes send token back and return
-                    if (_authN.IsSessionTokenRequest(request))
-                    {
-                        Tracing.Information(Area.HttpAuthentication, "Request for session token.");
-                        return SendSessionTokenResponse(principal, request);
-                    }
-
-                    // else set the principal
-                    SetPrincipal(principal);
-                }
+            }
+            catch (AuthenticationException aex)
+            {
+                // a handler wants to send back a specific error response
+                return SendAuthenticationExceptionResponse(aex, request);
             }
             catch (Exception ex)
             {
+                // something went wrong during authentication (e.g. invalid credentials)
                 Tracing.Error(Area.HttpAuthentication, "Exception while validating the token: " + ex.ToString());
                 return SendUnauthorizedResponse(request);
             }
 
-            HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
+            // credential was found *and* authentication was successful
+            if (principal.Identity.IsAuthenticated)
+            {
+                Tracing.Verbose(Area.HttpAuthentication, "Authentication successful.");
+
+                // check for token request - if yes send token back and return
+                if (_authN.IsSessionTokenRequest(request))
+                {
+                    Tracing.Information(Area.HttpAuthentication, "Request for session token.");
+                    return SendSessionTokenResponse(principal, request);
+                }
+
+                // else set the principal
+                SetPrincipal(principal);
+            }
+
+            // call service code
+            var response = await base.SendAsync(request, cancellationToken);
 
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
                 SetAuthenticateHeader(response);
             }
 
+            return response;
+        }
+
+        private HttpResponseMessage SendAuthenticationExceptionResponse(AuthenticationException aex, HttpRequestMessage request)
+        {
+            var response = request.CreateResponse(aex.StatusCode);
+            response.ReasonPhrase = aex.ReasonPhrase;
+
+            if (aex.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                SetAuthenticateHeader(response);
+            }
+            
             return response;
         }
 
@@ -129,13 +152,22 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             return response;
         }
 
-        protected virtual void SetAuthenticateHeader(HttpResponseMessage response)
+        protected virtual void SetAuthenticateHeader(HttpResponseMessage response, string scheme = null)
         {
             if (_authN.Configuration.SendWwwAuthenticateResponseHeader)
             {
-                Tracing.Verbose(Area.HttpAuthentication, "Setting Www-Authenticate header with scheme: " + _authN.Configuration.DefaultAuthenticationScheme);
+                AuthenticationHeaderValue header;
+                if (!string.IsNullOrWhiteSpace(scheme))
+                {
+                    header = new AuthenticationHeaderValue(scheme);
+                }
+                else
+                {
+                    header = new AuthenticationHeaderValue(_authN.Configuration.DefaultAuthenticationScheme);
+                }
 
-                response.Headers.WwwAuthenticate.Add(new AuthenticationHeaderValue(_authN.Configuration.DefaultAuthenticationScheme));
+                Tracing.Verbose(Area.HttpAuthentication, "Setting Www-Authenticate header with scheme: " + header.Scheme);
+                response.Headers.WwwAuthenticate.Add(header);
             }
         }
 
