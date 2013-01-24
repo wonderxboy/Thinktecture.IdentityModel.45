@@ -23,21 +23,21 @@ namespace Tests
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);  
         }
 
-        [TestMethod]
-        public void ValidCredentialsCheckIdentity()
-        {
-            var client = new HttpClient(Factory.GetDefaultServer());
-            var request = Factory.GetDefaultRequest();
-            request.Headers.Authorization = new BasicAuthenticationHeaderValue("test", "test");
+        //[TestMethod]
+        //public void ValidCredentialsCheckIdentity()
+        //{
+        //    var client = new HttpClient(Factory.GetDefaultServer());
+        //    var request = Factory.GetDefaultRequest();
+        //    request.Headers.Authorization = new BasicAuthenticationHeaderValue("test", "test");
 
-            var response = client.SendAsync(request).Result;
+        //    var response = client.SendAsync(request).Result;
 
-            var id = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
-            Assert.IsNotNull(id, "Identity is null");
+        //    var id = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
+        //    Assert.IsNotNull(id, "Identity is null");
 
-            Assert.IsTrue(id.IsAuthenticated, "Identity is anonymous");
-            Assert.AreEqual("test", id.Name);
-        }
+        //    Assert.IsTrue(id.IsAuthenticated, "Identity is anonymous");
+        //    Assert.AreEqual("test", id.Name);
+        //}
 
         [TestMethod]
         public void InvalidCredentials()
