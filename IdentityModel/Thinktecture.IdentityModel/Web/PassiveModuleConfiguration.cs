@@ -53,11 +53,13 @@ namespace Thinktecture.IdentityModel.Web
                 {
                     var token = e.SessionToken;
                     var duration = token.ValidTo.Subtract(token.ValidFrom);
-                    var halfWay = duration.TotalMinutes / 2;
-
+                    if (duration <= TimeSpan.Zero) return;
+                    
                     var diff = token.ValidTo.Subtract(DateTime.UtcNow);
-                    var timeLeft = diff.TotalMinutes;
+                    if (diff <= TimeSpan.Zero) return;
 
+                    var halfWay = duration.TotalMinutes / 2;
+                    var timeLeft = diff.TotalMinutes;
                     if (timeLeft <= halfWay)
                     {
                         e.ReissueCookie = true;
