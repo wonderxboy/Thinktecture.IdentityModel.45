@@ -5,7 +5,6 @@ namespace Thinktecture.IdentityModel.Authorization.WebApi
 {
     public class ClaimsAuthorizeAttribute : AuthorizeAttribute
     {
-        private string _resource;
         private string _action;
         private string[] _resources;
 
