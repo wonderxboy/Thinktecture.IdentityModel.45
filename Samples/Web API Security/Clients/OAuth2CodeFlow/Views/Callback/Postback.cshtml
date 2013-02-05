@@ -14,6 +14,12 @@
 </p>
 
 <p>
+    <strong>Token type:</strong>
+    <br />
+    @Model.TokenType
+</p>
+
+<p>
     <strong>Expires:</strong>
     <br />
     @(DateTime.Now.AddSeconds(Model.ExpiresIn).ToString())
