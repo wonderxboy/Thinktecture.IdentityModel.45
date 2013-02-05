@@ -170,6 +170,7 @@
       <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -304,6 +305,9 @@
     <Compile Include="Diagnostics\Tracing.cs" />
     <Compile Include="Tokens\MetadataBasedIssuerNameRegistry.cs" />
     <Compile Include="Tokens\WrappedSecurityToken.cs" />
+    <Compile Include="Web\ITokenCacheRepository.cs" />
+    <Compile Include="Web\PassiveModuleConfiguration.cs" />
+    <Compile Include="Web\PassiveRepositorySessionSecurityTokenCache.cs" />
     <Compile Include="Web\PassiveSessionConfiguration.cs" />
     <Compile Include="Web\ProtectionMode.cs" />
     <Compile Include="WSTrust\CertificateWSTrustBindings.cs" />
