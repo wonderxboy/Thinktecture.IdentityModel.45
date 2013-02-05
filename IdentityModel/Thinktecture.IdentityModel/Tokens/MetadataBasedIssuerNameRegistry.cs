@@ -27,7 +27,6 @@ namespace Thinktecture.IdentityModel.Tokens
         }
 
         public MetadataBasedIssuerNameRegistry(
-            FederationConfiguration federationConfiguration,
             Uri metadataAddress,
             string issuerName,
             X509CertificateValidationMode mode = X509CertificateValidationMode.None,
