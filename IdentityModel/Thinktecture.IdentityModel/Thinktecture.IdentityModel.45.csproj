@@ -304,6 +304,7 @@
     <Compile Include="Diagnostics\Tracing.cs" />
     <Compile Include="Tokens\MetadataBasedIssuerNameRegistry.cs" />
     <Compile Include="Tokens\WrappedSecurityToken.cs" />
+    <Compile Include="Web\PassiveSessionConfiguration.cs" />
     <Compile Include="Web\ProtectionMode.cs" />
     <Compile Include="WSTrust\CertificateWSTrustBindings.cs" />
     <Compile Include="WSTrust\IssuedTokenWSTrustBinding.cs" />
