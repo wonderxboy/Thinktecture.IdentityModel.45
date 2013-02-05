@@ -1,24 +1,41 @@
 ﻿using System;
+using System.Configuration;
 using System.IdentityModel.Metadata;
+using System.IdentityModel.Services;
+using System.IdentityModel.Services.Configuration;
 using System.IdentityModel.Tokens;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
+using System.ServiceModel.Security;
+using System.Xml;
 
 namespace Thinktecture.IdentityModel.Tokens
 {
     public class MetadataBasedIssuerNameRegistry : IssuerNameRegistry
     {
-        private Uri _metadataAddress;
-        private string _issuerName;
+        private Uri metadataAddress;
+        private string issuerName;
+        X509CertificateValidationMode mode;
 
-        private static ConfigurationBasedIssuerNameRegistry _registry;
+        private static volatile ConfigurationBasedIssuerNameRegistry _registry;
         private static object _registryLock = new object();
 
-        public MetadataBasedIssuerNameRegistry(Uri metadataAddress, string issuerName, bool lazyLoad = false)
+        public MetadataBasedIssuerNameRegistry()
         {
-            _metadataAddress = metadataAddress;
-            _issuerName = issuerName;
+        }
+
+        public MetadataBasedIssuerNameRegistry(
+            FederationConfiguration federationConfiguration,
+            Uri metadataAddress,
+            string issuerName,
+            X509CertificateValidationMode mode = X509CertificateValidationMode.None,
+            bool lazyLoad = false)
+        {
+            this.metadataAddress = metadataAddress;
+            this.issuerName = issuerName;
+            this.mode = mode;
 
             if (!lazyLoad)
             {
@@ -42,20 +59,68 @@ namespace Thinktecture.IdentityModel.Tokens
             return _registry.GetIssuerName(securityToken);
         }
 
+        protected virtual Stream GetMetadataStream()
+        {
+            var client = new HttpClient { BaseAddress = metadataAddress };
+            var stream = client.GetStreamAsync("").Result;
+            return stream;
+        }
+
         protected virtual void LoadMetadata()
         {
-            var client = new HttpClient { BaseAddress = _metadataAddress };
-            var stream = client.GetStreamAsync("").Result;
+            using (var stream = GetMetadataStream())
+            {
+                var serializer = new MetadataSerializer();
+                serializer.CertificateValidationMode = mode;
 
-            var serializer = new MetadataSerializer();
-            var md = serializer.ReadMetadata(stream);
+                var md = serializer.ReadMetadata(stream);
+                var ed = md as EntityDescriptor;
+                var stsd = (SecurityTokenServiceDescriptor)ed.RoleDescriptors.FirstOrDefault(x => x is SecurityTokenServiceDescriptor);
 
-            var id = md.SigningCredentials.SigningKeyIdentifier;
-            var clause = id.First() as X509RawDataKeyIdentifierClause;
-            var cert = new X509Certificate2(clause.GetX509RawData());
+                var registry = new ConfigurationBasedIssuerNameRegistry();
+                foreach (var key in stsd.Keys)
+                {
+                    var clause = key.KeyInfo.FirstOrDefault() as X509RawDataKeyIdentifierClause;
+                    if (clause != null)
+                    {
+                        var cert = new X509Certificate2(clause.GetX509RawData());
+                        registry.AddTrustedIssuer(cert.Thumbprint, issuerName);
+                    }
+                }
 
-            _registry = new ConfigurationBasedIssuerNameRegistry();
-            _registry.AddTrustedIssuer(cert.Thumbprint, _issuerName);
+                _registry = registry;
+            }
+        }
+
+        public override void LoadCustomConfiguration(XmlNodeList nodeList)
+        {
+            if (nodeList == null || nodeList.Count == 0)
+            {
+                throw new ConfigurationErrorsException("No configuration provided.");
+            }
+
+            var node = nodeList.Cast<XmlNode>().FirstOrDefault(x => x.LocalName == "trustedIssuerMetadata");
+            if (node == null)
+            {
+                throw new ConfigurationErrorsException("Expected 'trustedIssuerMetadata' element.");
+            }
+
+            var elem = node as XmlElement;
+
+            var name = elem.Attributes["issuerName"];
+            if (name == null || String.IsNullOrWhiteSpace(name.Value))
+            {
+                throw new ConfigurationErrorsException("Expected 'issuerName' attribute.");
+            }
+
+            var address = elem.Attributes["metadataAddress"];
+            if (address == null || String.IsNullOrWhiteSpace(address.Value))
+            {
+                throw new ConfigurationErrorsException("Expected 'metadataAddress' attribute.");
+            }
+
+            this.metadataAddress = new Uri(address.Value);
+            this.issuerName = name.Value;
         }
     }
 }
