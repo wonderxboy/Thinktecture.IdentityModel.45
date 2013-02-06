@@ -38,6 +38,8 @@ namespace Thinktecture.IdentityModel.Web
             SessionSecurityToken value,
             DateTime expiryTime)
         {
+            if (key == null) throw new ArgumentNullException("key");
+
             inner.AddOrUpdate(key, value, expiryTime);
 
             var item = new TokenCacheItem
@@ -51,6 +53,8 @@ namespace Thinktecture.IdentityModel.Web
 
         public override SessionSecurityToken Get(SessionSecurityTokenCacheKey key)
         {
+            if (key == null) throw new ArgumentNullException("key");
+
             var token = inner.Get(key);
             if (token != null) return token;
 
@@ -67,6 +71,8 @@ namespace Thinktecture.IdentityModel.Web
 
         public override void Remove(SessionSecurityTokenCacheKey key)
         {
+            if (key == null) throw new ArgumentNullException("key");
+
             inner.Remove(key);
             factory.Create().Remove(key.ToString());
         }
@@ -89,6 +95,8 @@ namespace Thinktecture.IdentityModel.Web
 
         byte[] TokenToBytes(SessionSecurityToken token)
         {
+            if (token == null) return null;
+
             using (var ms = new MemoryStream())
             {
                 var f = new BinaryFormatter();
@@ -103,6 +111,8 @@ namespace Thinktecture.IdentityModel.Web
 
         SessionSecurityToken BytesToToken(byte[] bytes)
         {
+            if (bytes == null || bytes.Length == 0) return null;
+
             bytes = MachineKey.Unprotect(bytes, Purpose);
 
             using (var ms = new MemoryStream(bytes))
