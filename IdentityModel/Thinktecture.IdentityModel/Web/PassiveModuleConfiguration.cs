@@ -52,10 +52,10 @@ namespace Thinktecture.IdentityModel.Web
                 delegate(object sender, SessionSecurityTokenReceivedEventArgs e)
                 {
                     var token = e.SessionToken;
-                    var duration = token.ValidTo.Subtract(token.ValidFrom);
+                    var duration = token.ValidTo.Add(sam.FederationConfiguration.IdentityConfiguration.MaxClockSkew).Subtract(token.ValidFrom);
                     if (duration <= TimeSpan.Zero) return;
-                    
-                    var diff = token.ValidTo.Subtract(DateTime.UtcNow);
+
+                    var diff = token.ValidTo.Add(sam.FederationConfiguration.IdentityConfiguration.MaxClockSkew).Subtract(DateTime.UtcNow);
                     if (diff <= TimeSpan.Zero) return;
 
                     var halfWay = duration.TotalMinutes / 2;
