@@ -32,6 +32,9 @@ namespace Thinktecture.IdentityModel.Tokens
             X509CertificateValidationMode mode = X509CertificateValidationMode.None,
             bool lazyLoad = false)
         {
+            if (metadataAddress == null) throw new ArgumentNullException("metadataAddress");
+            if (String.IsNullOrWhiteSpace(issuerName)) throw new ArgumentNullException("issuerName");
+
             this.metadataAddress = metadataAddress;
             this.issuerName = issuerName;
             this.mode = mode;
