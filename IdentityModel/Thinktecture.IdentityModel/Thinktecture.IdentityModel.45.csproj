@@ -303,7 +303,7 @@
     <Compile Include="Authorization\Todo\IAuthorizationManager.cs" />
     <Compile Include="Authorization\Todo\PerControllerAuthorization.cs" />
     <Compile Include="Diagnostics\Tracing.cs" />
-    <Compile Include="Tokens\MetadataBasedIssuerNameRegistry.cs" />
+    <Compile Include="Tokens\IssuerNameRegistry\MetadataBasedIssuerNameRegistry.cs" />
     <Compile Include="Tokens\WrappedSecurityToken.cs" />
     <Compile Include="Web\ITokenCacheRepository.cs" />
     <Compile Include="Web\PassiveModuleConfiguration.cs" />
