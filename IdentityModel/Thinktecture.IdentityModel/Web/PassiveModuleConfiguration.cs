@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Mvc;
 
 namespace Thinktecture.IdentityModel.Web
 {
@@ -80,6 +81,33 @@ namespace Thinktecture.IdentityModel.Web
                             };
                     }
                 };
+        }
+
+        private static string WebApiControllerName = "System.Web.Http.WebHost.HttpControllerHandler";
+
+        public static void SuppressLoginRedirectsForApiCalls()
+        {
+            var app = HttpContext.Current.ApplicationInstance;
+            app.PostMapRequestHandler += 
+                delegate
+                {
+                    var ctx = HttpContext.Current;
+                    var req = new HttpRequestWrapper(ctx.Request);
+                    var isApi = (req.IsAjaxRequest() ||
+                                 ctx.Handler.GetType().FullName == WebApiControllerName);
+                    ctx.Response.SuppressFormsAuthenticationRedirect = isApi;
+                };
+
+            var sam = FederatedAuthentication.WSFederationAuthenticationModule;
+            if (sam != null)
+            {
+                sam.AuthorizationFailed +=
+                    delegate(object sender, AuthorizationFailedEventArgs e)
+                    {
+                        var ctx = HttpContext.Current;
+                        e.RedirectToIdentityProvider = !ctx.Response.SuppressFormsAuthenticationRedirect;
+                    };
+            }
         }
     }
 }
