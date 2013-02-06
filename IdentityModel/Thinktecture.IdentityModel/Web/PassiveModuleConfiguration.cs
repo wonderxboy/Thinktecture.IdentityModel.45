@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IdentityModel.Services;
 using System.IdentityModel.Tokens;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,10 +38,17 @@ namespace Thinktecture.IdentityModel.Web
                 };
         }
 
-        public static void CacheSessionsOnServer()
+        public static void CacheSessionsOnServer(bool checkForSessionSecurityTokenCache = true)
         {
+            if (checkForSessionSecurityTokenCache && 
+                !(FederatedAuthentication.FederationConfiguration.IdentityConfiguration.Caches.SessionSecurityTokenCache is PassiveRepositorySessionSecurityTokenCache))
+            {
+                throw new Exception("SessionSecurityTokenCache not configured.");
+            }
+
             SessionAuthenticationModule sam = FederatedAuthentication.SessionAuthenticationModule;
             if (sam == null) throw new ArgumentException("SessionAuthenticationModule is null");
+
             sam.IsReferenceMode = true;
         }
 
