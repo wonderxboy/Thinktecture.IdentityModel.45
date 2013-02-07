@@ -237,6 +237,7 @@
     <Compile Include="Authorization\WebApi\ClaimsAuthorizeAttribute.cs" />
     <Compile Include="Base64Url.cs" />
     <Compile Include="Constants\Internal.cs" />
+    <Compile Include="Extensions\ClaimsExtensions.cs" />
     <Compile Include="Extensions\HttpClientExtensions.cs" />
     <Compile Include="Http\Cors\CorsAccessRequest.cs" />
     <Compile Include="Http\Cors\CorsAccessResponse.cs" />
