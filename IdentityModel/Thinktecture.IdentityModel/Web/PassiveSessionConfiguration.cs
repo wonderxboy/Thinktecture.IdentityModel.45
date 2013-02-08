@@ -11,23 +11,6 @@ namespace Thinktecture.IdentityModel.Web
 {
     public static class PassiveSessionConfiguration
     {
-        public static void ConfigureSessionCache(ITokenCacheRepository tokenCacheRepository)
-        {
-            if (!(FederatedAuthentication.FederationConfiguration.IdentityConfiguration.Caches.SessionSecurityTokenCache is PassiveRepositorySessionSecurityTokenCache))
-            {
-                FederatedAuthentication.FederationConfiguration.IdentityConfiguration.Caches.SessionSecurityTokenCache = new PassiveRepositorySessionSecurityTokenCache(tokenCacheRepository);
-            }
-        }
-
-        public static void ConfigureDefaultSessionDuration(TimeSpan sessionDuration)
-        {
-            var handler = (SessionSecurityTokenHandler)FederatedAuthentication.FederationConfiguration.IdentityConfiguration.SecurityTokenHandlers[typeof(SessionSecurityToken)];
-            if (handler != null)
-            {
-                handler.TokenLifetime = sessionDuration;
-            }
-        }
-        
         public static void ConfigureMackineKeyProtectionForSessionTokens()
         {
             var handler = (SessionSecurityTokenHandler)FederatedAuthentication.FederationConfiguration.IdentityConfiguration.SecurityTokenHandlers[typeof(SessionSecurityToken)];
@@ -39,10 +22,39 @@ namespace Thinktecture.IdentityModel.Web
             }
         }
 
-        public static void ConfigurePersistentSessions(TimeSpan persistentDuration)
+        public static void ConfigureSessionCache(ITokenCacheRepository tokenCacheRepository)
+        {
+            if (!(FederatedAuthentication.FederationConfiguration.IdentityConfiguration.Caches.SessionSecurityTokenCache is PassiveRepositorySessionSecurityTokenCache))
+            {
+                FederatedAuthentication.FederationConfiguration.IdentityConfiguration.Caches.SessionSecurityTokenCache = new PassiveRepositorySessionSecurityTokenCache(tokenCacheRepository);
+            }
+        }
+
+        public static void ConfigureDefaultSessionDuration(TimeSpan sessionDuration)
+        {
+            if (FederatedAuthentication.FederationConfiguration.WsFederationConfiguration.PersistentCookiesOnPassiveRedirects)
+            {
+                throw new Exception("Persistent session cookies are configured. Use ConfigurePersistentSessions instead to set the session cookie duration.");
+            }
+
+            var handler = (SessionSecurityTokenHandler)FederatedAuthentication.FederationConfiguration.IdentityConfiguration.SecurityTokenHandlers[typeof(SessionSecurityToken)];
+            if (handler != null)
+            {
+                handler.TokenLifetime = sessionDuration;
+            }
+        }
+
+        public static void ConfigurePersistentSessions(TimeSpan sessionDuration)
         {
             FederatedAuthentication.FederationConfiguration.WsFederationConfiguration.PersistentCookiesOnPassiveRedirects = true;
-            FederatedAuthentication.FederationConfiguration.CookieHandler.PersistentSessionLifetime = persistentDuration;
+
+            var handler = (SessionSecurityTokenHandler)FederatedAuthentication.FederationConfiguration.IdentityConfiguration.SecurityTokenHandlers[typeof(SessionSecurityToken)];
+            if (handler != null)
+            {
+                handler.TokenLifetime = sessionDuration;
+                var skew = FederatedAuthentication.FederationConfiguration.IdentityConfiguration.MaxClockSkew;
+                FederatedAuthentication.FederationConfiguration.CookieHandler.PersistentSessionLifetime = sessionDuration + skew;
+            }
         }
     }
 }
