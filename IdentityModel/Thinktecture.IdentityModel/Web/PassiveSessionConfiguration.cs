@@ -28,7 +28,7 @@ namespace Thinktecture.IdentityModel.Web
             }
         }
         
-        public static void ConfigureMackineKeyForSessionTokens()
+        public static void ConfigureMackineKeyProtectionForSessionTokens()
         {
             var handler = (SessionSecurityTokenHandler)FederatedAuthentication.FederationConfiguration.IdentityConfiguration.SecurityTokenHandlers[typeof(SessionSecurityToken)];
             if (!(handler is MachineKeySessionSecurityTokenHandler))
