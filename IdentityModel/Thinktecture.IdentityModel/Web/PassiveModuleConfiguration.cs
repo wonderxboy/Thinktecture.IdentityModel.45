@@ -53,7 +53,7 @@ namespace Thinktecture.IdentityModel.Web
             sam.IsReferenceMode = true;
         }
 
-        public static void EnableSlidingExpirations()
+        public static void EnableSlidingSessionExpirations()
         {
             SessionAuthenticationModule sam = FederatedAuthentication.SessionAuthenticationModule;
             if (sam == null) throw new ArgumentException("SessionAuthenticationModule is null");
