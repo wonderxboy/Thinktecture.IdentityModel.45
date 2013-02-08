@@ -74,7 +74,11 @@ namespace Thinktecture.IdentityModel.Web
                     {
                         e.ReissueCookie = true;
                         e.SessionToken =
-                            new SessionSecurityToken(token.ClaimsPrincipal, duration)
+                            new SessionSecurityToken(
+                                token.ClaimsPrincipal, 
+                                token.Context, 
+                                DateTime.UtcNow, 
+                                DateTime.UtcNow.Add(duration))
                             {
                                 IsPersistent = token.IsPersistent,
                                 IsReferenceMode = token.IsReferenceMode
@@ -108,6 +112,34 @@ namespace Thinktecture.IdentityModel.Web
                         e.RedirectToIdentityProvider = !ctx.Response.SuppressFormsAuthenticationRedirect;
                     };
             }
+        }
+
+        public static void OverrideWSFedTokenLifetime()
+        {
+            var fam = FederatedAuthentication.WSFederationAuthenticationModule;
+            if (fam == null)
+            {
+                throw new Exception("WSFederationAuthenticationModule not configured.");
+            }
+
+            fam.SessionSecurityTokenCreated +=
+                delegate(object sender, SessionSecurityTokenCreatedEventArgs e)
+                {
+                    var handler = (SessionSecurityTokenHandler)FederatedAuthentication.FederationConfiguration.IdentityConfiguration.SecurityTokenHandlers[typeof(SessionSecurityToken)];
+                    var duration = handler.TokenLifetime;
+                    
+                    var token = e.SessionToken;
+                    e.SessionToken = 
+                        new SessionSecurityToken(
+                            token.ClaimsPrincipal,
+                            token.Context,
+                            token.ValidFrom,
+                            token.ValidFrom.Add(duration))
+                        {
+                            IsPersistent = token.IsPersistent,
+                            IsReferenceMode = token.IsReferenceMode
+                        };
+                };
         }
     }
 }
