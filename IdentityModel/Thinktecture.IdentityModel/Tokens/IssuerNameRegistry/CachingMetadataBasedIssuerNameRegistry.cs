@@ -33,14 +33,20 @@ namespace Thinktecture.IdentityModel.Tokens
             Uri metadataAddress, string issuerName,
             IMetadataCache cache, 
             int cacheDuration = DefaultCacheDuration, 
-            bool protect = true)
-            : base(metadataAddress, issuerName)
+            bool protect = true,
+            bool lazyLoad = false)
+            : base(metadataAddress, issuerName, System.ServiceModel.Security.X509CertificateValidationMode.None, true)
         {
             if (cache == null) throw new ArgumentNullException("cache");
 
             this.protect = protect;
             SetCache(cache);
             this.cacheDuration = cacheDuration;
+
+            if (!lazyLoad)
+            {
+                this.LoadMetadata();
+            }
         }
 
         private void SetCache(IMetadataCache cache)
@@ -122,6 +128,10 @@ namespace Thinktecture.IdentityModel.Tokens
             var protect = elem.Attributes["protect"];
             if (protect != null)
             {
+                if (protect.Value != "true" && protect.Value != "false")
+                {
+                    throw new ConfigurationErrorsException("Expected 'protect' to be 'true' or 'false'.");
+                }
                 this.protect = protect.Value == "true";
             }
             
@@ -151,6 +161,15 @@ namespace Thinktecture.IdentityModel.Tokens
                 config.LoadCustomConfiguration(elem.ChildNodes);
             }
             SetCache(cacheInstance);
+
+            try
+            {
+                this.LoadMetadata();
+            }
+            catch (Exception ex)
+            {
+                throw new ConfigurationErrorsException(ex.ToString());
+            }
         }
     }
 }
