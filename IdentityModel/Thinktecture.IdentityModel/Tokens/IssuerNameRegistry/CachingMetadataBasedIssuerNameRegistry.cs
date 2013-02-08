@@ -96,12 +96,21 @@ namespace Thinktecture.IdentityModel.Tokens
                 if (age > halfTime)
                 {
                     // reload on background thread
-                    Task.Factory.StartNew(delegate
-                    {
-                        var data = GetMetadataFromSource();
-                        
-                        this.cache.Save(data);
-                    });
+                    Task.Factory.StartNew(
+                        delegate
+                        {
+                            var data = GetMetadataFromSource();
+                            this.cache.Save(data);
+                        })
+                    .ContinueWith(task =>
+                        {
+                            // don't take down process if this fails 
+                            // if ThrowUnobservedTaskExceptions is enabled
+                            if (task.IsFaulted)
+                            {
+                                var ex = task.Exception;
+                            }
+                        });
                 }
             }
             
