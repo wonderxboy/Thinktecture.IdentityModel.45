@@ -14,11 +14,6 @@ namespace Thinktecture.IdentityModel.Web
         void Remove(string key);
     }
 
-    public interface ITokenCacheRepositoryFactory
-    {
-        ITokenCacheRepository Create();
-    }
-
     public class TokenCacheItem
     {
         [Key]

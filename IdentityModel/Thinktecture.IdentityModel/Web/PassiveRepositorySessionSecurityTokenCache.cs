@@ -16,20 +16,21 @@ namespace Thinktecture.IdentityModel.Web
     {
         const string Purpose = "PassiveSessionTokenCache";
 
-        ITokenCacheRepositoryFactory factory;
+        ITokenCacheRepository tokenCacheRepository;
         SessionSecurityTokenCache inner;
 
-        public PassiveRepositorySessionSecurityTokenCache(ITokenCacheRepositoryFactory factory)
-            : this(factory, FederatedAuthentication.FederationConfiguration.IdentityConfiguration.Caches.SessionSecurityTokenCache)
+        public PassiveRepositorySessionSecurityTokenCache(ITokenCacheRepository tokenCacheRepository)
+            : this(tokenCacheRepository,
+                   FederatedAuthentication.FederationConfiguration.IdentityConfiguration.Caches.SessionSecurityTokenCache)
         {
         }
 
-        public PassiveRepositorySessionSecurityTokenCache(ITokenCacheRepositoryFactory factory, SessionSecurityTokenCache inner)
+        public PassiveRepositorySessionSecurityTokenCache(ITokenCacheRepository tokenCacheRepository, SessionSecurityTokenCache inner)
         {
-            if (factory == null) throw new ArgumentNullException("factory");
+            if (tokenCacheRepository == null) throw new ArgumentNullException("tokenCacheRepository");
             if (inner == null) throw new ArgumentNullException("inner");
 
-            this.factory = factory;
+            this.tokenCacheRepository = tokenCacheRepository;
             this.inner = inner;
         }
 
@@ -48,7 +49,8 @@ namespace Thinktecture.IdentityModel.Web
                 Expires = expiryTime,
                 Token = TokenToBytes(value),
             };
-            factory.Create().AddOrUpdate(item);
+            
+            tokenCacheRepository.AddOrUpdate(item);
         }
 
         public override SessionSecurityToken Get(SessionSecurityTokenCacheKey key)
@@ -58,7 +60,7 @@ namespace Thinktecture.IdentityModel.Web
             var token = inner.Get(key);
             if (token != null) return token;
 
-            var item = factory.Create().Get(key.ToString());
+            var item = tokenCacheRepository.Get(key.ToString());
             if (item == null) return null;
 
             token = BytesToToken(item.Token);
@@ -74,7 +76,7 @@ namespace Thinktecture.IdentityModel.Web
             if (key == null) throw new ArgumentNullException("key");
 
             inner.Remove(key);
-            factory.Create().Remove(key.ToString());
+            tokenCacheRepository.Remove(key.ToString());
         }
 
         public override IEnumerable<SessionSecurityToken> GetAll(

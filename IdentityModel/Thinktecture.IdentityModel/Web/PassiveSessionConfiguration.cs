@@ -11,11 +11,11 @@ namespace Thinktecture.IdentityModel.Web
 {
     public static class PassiveSessionConfiguration
     {
-        public static void ConfigureSessionCache(ITokenCacheRepositoryFactory factory)
+        public static void ConfigureSessionCache(ITokenCacheRepository tokenCacheRepository)
         {
             if (!(FederatedAuthentication.FederationConfiguration.IdentityConfiguration.Caches.SessionSecurityTokenCache is PassiveRepositorySessionSecurityTokenCache))
             {
-                FederatedAuthentication.FederationConfiguration.IdentityConfiguration.Caches.SessionSecurityTokenCache = new PassiveRepositorySessionSecurityTokenCache(factory);
+                FederatedAuthentication.FederationConfiguration.IdentityConfiguration.Caches.SessionSecurityTokenCache = new PassiveRepositorySessionSecurityTokenCache(tokenCacheRepository);
             }
         }
 
