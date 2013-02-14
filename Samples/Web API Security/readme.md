@@ -14,3 +14,4 @@ Sample demonstrates various ASP.NET Web API security scenarios:
 Accompanying blog posts:
 
 - [ASP.NET (Web API) Security: Prologue](http://leastprivilege.com/2012/12/30/asp-net-web-api-security-prologue/)
+- [Setting up the Sample](http://leastprivilege.com/2013/01/09/asp-net-web-api-security-setting-up-the-sample/)
