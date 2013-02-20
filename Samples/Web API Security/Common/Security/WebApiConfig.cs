@@ -16,27 +16,7 @@ namespace Thinktecture.Samples.Security
 
             // authentication configuration for identity controller
             var authentication = CreateAuthenticationConfiguration();
-
-            #region session token support
-            // session support - add a handler at the root
-            var sessionTokenAuthentication = CreateSessionTokenAuthenticationConfiguration();
-            config.MessageHandlers.Add(new AuthenticationHandler(sessionTokenAuthentication));
-            
-            // enable sessions on identity controller
-            authentication.EnableSessionToken = true;
-            
-            // synchronize signing keys
-            authentication.SessionToken.SigningKey = sessionTokenAuthentication.SessionToken.SigningKey;
-            #endregion
-
-            // route to identity controller
-            config.Routes.MapHttpRoute(
-                name: "Identity",
-                routeTemplate: "api/identity",
-                defaults: new { controller = "identity" },
-                constraints: null,
-                handler: new AuthenticationHandler(authentication, config)
-            );
+            config.MessageHandlers.Add(new AuthenticationHandler(authentication));
 
             // default API route
             config.Routes.MapHttpRoute(
@@ -44,20 +24,6 @@ namespace Thinktecture.Samples.Security
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
-        }
-
-        private static AuthenticationConfiguration CreateSessionTokenAuthenticationConfiguration()
-        {
-            var config = new AuthenticationConfiguration
-            {
-                RequireSsl = false,
-                EnableSessionToken = true,
-                ClaimsAuthenticationManager = new ClaimsTransformer()
-            };
-
-            config.AddBasicAuthentication((u, p) => u == p);
-
-            return config;
         }
 
         private static AuthenticationConfiguration CreateAuthenticationConfiguration()
