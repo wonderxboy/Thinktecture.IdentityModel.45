@@ -34,6 +34,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Session Token", "Clients\Se
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OAuth2 Code Flow", "Clients\OAuth2CodeFlow\OAuth2 Code Flow.csproj", "{A3D6AE27-9630-4482-AD4A-5A14ADE69D8C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsBasicAuth", "Clients\JsBasicAuth\JsBasicAuth.csproj", "{84A9C845-5486-4E1A-8E9A-9F772AEE901F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Analysis (Debug)|Any CPU = Analysis (Debug)|Any CPU
@@ -130,6 +132,14 @@ Global
 		{A3D6AE27-9630-4482-AD4A-5A14ADE69D8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3D6AE27-9630-4482-AD4A-5A14ADE69D8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3D6AE27-9630-4482-AD4A-5A14ADE69D8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84A9C845-5486-4E1A-8E9A-9F772AEE901F}.Analysis (Debug)|Any CPU.ActiveCfg = Debug|Any CPU
+		{84A9C845-5486-4E1A-8E9A-9F772AEE901F}.Analysis (Debug)|Any CPU.Build.0 = Debug|Any CPU
+		{84A9C845-5486-4E1A-8E9A-9F772AEE901F}.Debug and Contracts|Any CPU.ActiveCfg = Debug|Any CPU
+		{84A9C845-5486-4E1A-8E9A-9F772AEE901F}.Debug and Contracts|Any CPU.Build.0 = Debug|Any CPU
+		{84A9C845-5486-4E1A-8E9A-9F772AEE901F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84A9C845-5486-4E1A-8E9A-9F772AEE901F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84A9C845-5486-4E1A-8E9A-9F772AEE901F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84A9C845-5486-4E1A-8E9A-9F772AEE901F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -143,5 +153,6 @@ Global
 		{14B82805-5E79-4D5F-BB03-CB2879F3297D} = {1516840A-5B1A-4A26-BB73-6572A9AF4C82}
 		{C2D3D2A3-F1F0-4357-AAF5-641A58509D5B} = {1516840A-5B1A-4A26-BB73-6572A9AF4C82}
 		{A3D6AE27-9630-4482-AD4A-5A14ADE69D8C} = {1516840A-5B1A-4A26-BB73-6572A9AF4C82}
+		{84A9C845-5486-4E1A-8E9A-9F772AEE901F} = {1516840A-5B1A-4A26-BB73-6572A9AF4C82}
 	EndGlobalSection
 EndGlobal

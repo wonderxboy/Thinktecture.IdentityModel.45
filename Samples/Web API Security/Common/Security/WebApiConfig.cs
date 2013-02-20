@@ -1,5 +1,6 @@
 ﻿using System.IdentityModel.Selectors;
 using System.Web.Http;
+using Thinktecture.IdentityModel.Http.Cors;
 using Thinktecture.IdentityModel.Tokens.Http;
 
 namespace Thinktecture.Samples.Security
@@ -38,6 +39,11 @@ namespace Thinktecture.Samples.Security
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+
+            CorsConfiguration corsConfig = new CorsConfiguration();
+            corsConfig.AllowAll();
+            var corsHandler = new Thinktecture.IdentityModel.Http.Cors.WebApi.CorsMessageHandler(corsConfig, config);
+            config.MessageHandlers.Add(corsHandler);
         }
 
         private static AuthenticationConfiguration CreateSessionTokenAuthenticationConfiguration()
