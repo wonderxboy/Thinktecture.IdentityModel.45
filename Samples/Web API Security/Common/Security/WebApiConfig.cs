@@ -9,6 +9,11 @@ namespace Thinktecture.Samples.Security
     {
         public static void Register(HttpConfiguration config)
         {
+            CorsConfiguration corsConfig = new CorsConfiguration();
+            corsConfig.AllowAll();
+            var corsHandler = new Thinktecture.IdentityModel.Http.Cors.WebApi.CorsMessageHandler(corsConfig, config);
+            config.MessageHandlers.Add(corsHandler);
+
             // authentication configuration for identity controller
             var authentication = CreateAuthenticationConfiguration();
 
@@ -39,11 +44,6 @@ namespace Thinktecture.Samples.Security
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
-
-            CorsConfiguration corsConfig = new CorsConfiguration();
-            corsConfig.AllowAll();
-            var corsHandler = new Thinktecture.IdentityModel.Http.Cors.WebApi.CorsMessageHandler(corsConfig, config);
-            config.MessageHandlers.Add(corsHandler);
         }
 
         private static AuthenticationConfiguration CreateSessionTokenAuthenticationConfiguration()
