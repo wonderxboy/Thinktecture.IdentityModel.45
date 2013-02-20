@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+    <ul></ul>
+    <script src="Scripts/jquery-1.9.1.js"></script>
+    <script>
+        var baseUrl = '@Thinktecture.Samples.Constants.WebHostBaseAddress';
+        var identityUrl = baseUrl + 'identity';
+
+        function HttpBearerTokenClient(token) {
+            this.scheme = "Bearer";
+            this.token = token;
+        }
+        HttpBearerTokenClient.prototype.get = function (url) {
+            var scheme = this.scheme;
+            var token = this.token;
+            var settings = {
+                type: "GET",
+                url: url,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Authorization", scheme + " " + token);
+                }
+            };
+            return $.ajax(settings);
+        }
+
+        $(function () {
+            function log(msg) {
+                $("<li>").text(msg).appendTo("ul");
+            }
+
+            var params = {},
+                queryString = location.hash.substring(1),
+                regex = /([^&=]+)=([^&]*)/g,
+                m;
+            while (m = regex.exec(queryString)) {
+                params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+            }
+
+            if (params.error) {
+                log("error -- " + param.error);
+                return;
+            }
+
+            var state = sessionStorage["state"];
+            if (params.state !== state) {
+                log("error -- bad state");
+                return;
+            }
+
+            var token = params.access_token;
+            var client = new HttpBearerTokenClient(token);
+            client.get(identityUrl).done(function (result) {
+                console.log(result);
+                log("Claims");
+                result.forEach(function (item) {
+                    log(item.Type + ", " + item.Value);
+                });
+            });
+
+        });
+
+    </script>
+</body>
+</html>
