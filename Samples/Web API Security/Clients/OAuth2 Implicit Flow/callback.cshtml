@@ -20,6 +20,7 @@
             var settings = {
                 type: "GET",
                 url: url,
+                dataType:"json",
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader("Authorization", scheme + " " + token);
                 }
@@ -41,13 +42,13 @@
             }
 
             if (params.error) {
-                log("error -- " + param.error);
+                log("error: " + params.error);
                 return;
             }
 
             var state = sessionStorage["state"];
             if (params.state !== state) {
-                log("error -- bad state");
+                log("error: bad state");
                 return;
             }
 
@@ -60,7 +61,6 @@
                     log(item.Type + ", " + item.Value);
                 });
             });
-
         });
 
     </script>
