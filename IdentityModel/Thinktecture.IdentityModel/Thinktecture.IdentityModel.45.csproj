@@ -363,7 +363,6 @@
     <Compile Include="Tokens\WebTokenSecurityKeyClause.cs" />
     <Compile Include="Web\ClaimsAuthenticationHttpModule.cs" />
     <Compile Include="Web\ProtectedCookie.cs" />
-    <Compile Include="Web\ServiceAwareWSFederationAuthenticationModule.cs" />
     <Compile Include="X509Certificates\X509.cs" />
     <Compile Include="X509Certificates\X509CertificatesFinder.cs" />
     <Compile Include="X509Certificates\X509CertificatesLocation.cs" />
