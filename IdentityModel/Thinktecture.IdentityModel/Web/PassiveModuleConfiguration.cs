@@ -73,6 +73,10 @@ namespace Thinktecture.IdentityModel.Web
                     var timeLeft = diff.TotalMinutes;
                     if (timeLeft <= halfWay)
                     {
+                        // set duration not from original token, but from current app configuration
+                        var handler = sam.FederationConfiguration.IdentityConfiguration.SecurityTokenHandlers[typeof(SessionSecurityToken)] as SessionSecurityTokenHandler;
+                        duration = handler.TokenLifetime;
+
                         e.ReissueCookie = true;
                         e.SessionToken =
                             new SessionSecurityToken(
