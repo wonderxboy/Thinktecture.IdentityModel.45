@@ -54,5 +54,16 @@ namespace OAuth2CodeFlow.Controllers
 
             return View("Claims", claims);
         }
+
+        [HttpPost]
+        public ActionResult RenewToken(string refreshToken)
+        {
+            var client = new OAuth2Client(
+                new Uri("https://idsrv.local/issue/oauth2/token"),
+                "codeflowclient",
+                "secret");
+            var response = client.RequestAccessTokenRefreshToken(refreshToken);
+            return View("Postback", response);
+        }
     }
 }
