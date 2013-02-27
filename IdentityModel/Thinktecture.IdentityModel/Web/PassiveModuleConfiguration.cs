@@ -69,7 +69,7 @@ namespace Thinktecture.IdentityModel.Web
                     var diff = token.ValidTo.Add(sam.FederationConfiguration.IdentityConfiguration.MaxClockSkew).Subtract(DateTime.UtcNow);
                     if (diff <= TimeSpan.Zero) return;
 
-                    var halfWay = duration.TotalMinutes / 2;
+                    var halfWay = duration.Add(sam.FederationConfiguration.IdentityConfiguration.MaxClockSkew).TotalMinutes / 2;
                     var timeLeft = diff.TotalMinutes;
                     if (timeLeft <= halfWay)
                     {
