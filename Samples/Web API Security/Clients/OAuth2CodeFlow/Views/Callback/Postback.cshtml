@@ -40,6 +40,6 @@
 
 @using (Html.BeginForm("RenewToken", "Callback"))
 { 
-    @Html.Hidden("refreshToken", @Model.RefreshToken)
+    <input type="hidden" name="refreshToken" value="@Model.RefreshToken" />
     <input type="submit" value="Renew Token" />
 }
