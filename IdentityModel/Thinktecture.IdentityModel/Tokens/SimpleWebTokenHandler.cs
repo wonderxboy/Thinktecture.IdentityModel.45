@@ -24,6 +24,7 @@ namespace Thinktecture.IdentityModel.Tokens
     /// <summary>
     /// Handles SWT tokens.
     /// </summary>
+    [Obsolete("Use JSON Web Token (JWT) instead")]
     public class SimpleWebTokenHandler : SecurityTokenHandler
     {
         private string[] _identifiers = new string[] { TokenTypes.SimpleWebToken, SwtConstants.SWT };

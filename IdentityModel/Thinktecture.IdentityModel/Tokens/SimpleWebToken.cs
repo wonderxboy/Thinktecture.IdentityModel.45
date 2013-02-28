@@ -16,6 +16,7 @@ namespace Thinktecture.IdentityModel.Tokens
     /// <summary>
     /// This class represents the token format for the SimpleWebToken.
     /// </summary>
+    [Obsolete("Use JSON Web Token (JWT) instead")]
     public class SimpleWebToken : SecurityToken
     {
         string _id;
