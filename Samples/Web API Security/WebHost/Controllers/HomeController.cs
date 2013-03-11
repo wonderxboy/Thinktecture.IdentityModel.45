@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System.Security.Claims;
+using System.Web.Mvc;
 using Thinktecture.Samples;
 
 namespace WebHost.Controllers
@@ -15,7 +16,8 @@ namespace WebHost.Controllers
         [Authorize]
         public ActionResult IdentityMvc()
         {
-            return View(ViewClaims.GetAll());
+            var principal = ClaimsPrincipal.Current;
+            return View(ViewClaims.GetAll(principal));
         }
 
         [Authorize]

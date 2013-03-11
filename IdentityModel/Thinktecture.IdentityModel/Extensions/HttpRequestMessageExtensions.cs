@@ -5,12 +5,24 @@
 
 using System;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Web;
+using Thinktecture.IdentityModel.Tokens.Http;
 
 namespace Thinktecture.IdentityModel.Extensions
 {
     public static class HttpRequestMessageExtensions
     {
+        public static ClaimsPrincipal GetClaimsPrincipal(this HttpRequestMessage request)
+        {
+            if (request.Properties.ContainsKey(AuthenticationHandler.PrincipalKey))
+            {
+                return request.Properties[AuthenticationHandler.PrincipalKey] as ClaimsPrincipal;
+            }
+
+            return null;
+        }
+
         public static HttpRequestMessage ToHttpRequestMessage(this HttpRequestBase httpRequest, bool includeContent = true)
         {
             var httpMethod = GetHttpMethod(httpRequest.HttpMethod);

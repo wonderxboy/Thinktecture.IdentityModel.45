@@ -24,6 +24,8 @@ namespace Thinktecture.IdentityModel.Tokens.Http
     {
         HttpAuthentication _authN;
 
+        public const string PrincipalKey = "TT_Principal";
+
         public AuthenticationHandler(AuthenticationConfiguration configuration, HttpConfiguration httpConfiguration = null)
         {
             _authN = new HttpAuthentication(configuration);
@@ -63,7 +65,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             if (_authN.Configuration.InheritHostClientIdentity == false)
             {
                 Tracing.Verbose(Area.HttpAuthentication, "Host client identity is not inherited. Setting anonymous principal");
-                SetPrincipal(Principal.Anonymous);
+                SetPrincipal(request, Principal.Anonymous);
             }
 
             ClaimsPrincipal principal;
@@ -105,7 +107,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                 }
 
                 // else set the principal
-                SetPrincipal(principal);
+                SetPrincipal(request, principal);
             }
 
             // call service code
@@ -171,7 +173,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             }
         }
 
-        protected virtual void SetPrincipal(ClaimsPrincipal principal)
+        protected virtual void SetPrincipal(HttpRequestMessage request, ClaimsPrincipal principal)
         {
             if (principal.Identity.IsAuthenticated)
             {
@@ -186,7 +188,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                     name = principal.Claims.First().Value;
                 }
 
-                Tracing.Verbose(Area.HttpAuthentication, "Authentication successful for: " + name);
+                Tracing.Verbose(Area.HttpAuthentication, "Principal set for: " + name);
             }
             else
             {
@@ -198,6 +200,11 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             if (HttpContext.Current != null)
             {
                 HttpContext.Current.User = principal;
+            }
+
+            if (_authN.Configuration.SetPrincipalOnRequestInstance)
+            {
+                request.Properties[PrincipalKey] = principal;
             }
         }
     }

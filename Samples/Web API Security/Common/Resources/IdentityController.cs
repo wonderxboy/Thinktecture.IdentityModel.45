@@ -1,4 +1,5 @@
-﻿using System.Web.Http;
+﻿using System.Security.Claims;
+using System.Web.Http;
 
 namespace Thinktecture.Samples
 {
@@ -7,7 +8,8 @@ namespace Thinktecture.Samples
     {
         public ViewClaims Get()
         {
-            return ViewClaims.GetAll();
+            var principal = Request.GetClaimsPrincipal();
+            return ViewClaims.GetAll(principal);
         }
     }
 }

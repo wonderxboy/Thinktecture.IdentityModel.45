@@ -239,6 +239,7 @@
     <Compile Include="Constants\Internal.cs" />
     <Compile Include="Extensions\ClaimsExtensions.cs" />
     <Compile Include="Extensions\HttpClientExtensions.cs" />
+    <Compile Include="Extensions\HttpRequestMessageProxyExtensions.cs" />
     <Compile Include="Http\Cors\CorsAccessRequest.cs" />
     <Compile Include="Http\Cors\CorsAccessResponse.cs" />
     <Compile Include="Http\Cors\CorsConfiguration.cs" />

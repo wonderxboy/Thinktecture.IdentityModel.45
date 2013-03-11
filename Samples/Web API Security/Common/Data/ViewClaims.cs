@@ -6,10 +6,8 @@ namespace Thinktecture.Samples
 {
     public class ViewClaims : List<ViewClaim>
     {
-        public static ViewClaims GetAll()
+        public static ViewClaims GetAll(ClaimsPrincipal principal)
         {
-            var principal = ClaimsPrincipal.Current;
-
             var claims = new List<ViewClaim>(
                 from c in principal.Claims
                 select new ViewClaim

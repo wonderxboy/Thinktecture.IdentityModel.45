@@ -27,6 +27,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
         public bool EnableSessionToken { get; set; }
         public SessionTokenConfiguration SessionToken { get; set; }
         public bool RequireSsl { get; set; }
+        public bool SetPrincipalOnRequestInstance { get; set; }
 
         #region HasMapping Properties
         public bool HasAuthorizationHeaderMapping
@@ -62,6 +63,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             SendWwwAuthenticateResponseHeader = true;
             InheritHostClientIdentity = true;
             RequireSsl = true;
+            SetPrincipalOnRequestInstance = true;
 
             EnableSessionToken = false;
             SessionToken = new SessionTokenConfiguration();

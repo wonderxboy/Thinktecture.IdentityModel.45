@@ -55,7 +55,7 @@ namespace Thinktecture.Samples.Security
                 AuthenticationOptions.ForAuthorizationHeader(Constants.ACS.Scheme));
             #endregion
 
-            #region #IdentityServer SAML
+            #region IdentityServer SAML
             authentication.AddSaml2(
                 issuerThumbprint: Constants.IdSrv.SigningCertThumbprint,
                 issuerName: Constants.IdSrv.IssuerUri,
