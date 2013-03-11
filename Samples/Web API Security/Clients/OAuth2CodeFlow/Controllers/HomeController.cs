@@ -12,7 +12,7 @@ namespace OAuth2CodeFlow.Controllers
                 "https://idsrv.local/issue/oauth2/authorize",
                 "codeflowclient",
                 Constants.Scope,
-                "https://localhost:44306/callback");
+                "https://localhost:44303/callback");
             
             ViewBag.AuthorizeUrl = url;
 
