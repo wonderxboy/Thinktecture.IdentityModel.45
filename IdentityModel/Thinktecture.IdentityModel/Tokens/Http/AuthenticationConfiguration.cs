@@ -20,8 +20,10 @@ namespace Thinktecture.IdentityModel.Tokens.Http
         private bool _hasClientCert;
 
         public List<AuthenticationOptionMapping> Mappings { get; set; }
-        public string DefaultAuthenticationScheme { get; set; }
-        public bool SendWwwAuthenticateResponseHeader { get; set; }
+        public List<AuthenticationScheme> AuthenticationSchemes { get; set; }
+        
+        //public string DefaultAuthenticationScheme { get; set; }
+        public bool SendWwwAuthenticateResponseHeaders { get; set; }
         public ClaimsAuthenticationManager ClaimsAuthenticationManager { get; set; }
         public bool InheritHostClientIdentity { get; set; }
         public bool EnableSessionToken { get; set; }
@@ -59,8 +61,10 @@ namespace Thinktecture.IdentityModel.Tokens.Http
         public AuthenticationConfiguration()
         {
             Mappings = new List<AuthenticationOptionMapping>();
-            DefaultAuthenticationScheme = string.Empty;
-            SendWwwAuthenticateResponseHeader = true;
+            //AuthenticationSchemes = new List<AuthenticationScheme>();
+            
+            //DefaultAuthenticationScheme = string.Empty;
+            SendWwwAuthenticateResponseHeaders = true;
             InheritHostClientIdentity = true;
             RequireSsl = true;
             SetPrincipalOnRequestInstance = true;
@@ -69,13 +73,13 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             SessionToken = new SessionTokenConfiguration();
         }
 
-        public void SetDefaultAuthenticationScheme(string scheme)
-        {
-            if (string.IsNullOrWhiteSpace(DefaultAuthenticationScheme))
-            {
-                DefaultAuthenticationScheme = scheme;
-            }
-        }
+        //public void SetDefaultAuthenticationScheme(string scheme)
+        //{
+        //    if (string.IsNullOrWhiteSpace(DefaultAuthenticationScheme))
+        //    {
+        //        DefaultAuthenticationScheme = scheme;
+        //    }
+        //}
 
         public void AddMapping(AuthenticationOptionMapping mapping)
         {

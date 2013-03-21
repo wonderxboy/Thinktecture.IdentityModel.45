@@ -11,5 +11,6 @@ namespace Thinktecture.IdentityModel.Tokens.Http
     {
         public AuthenticationOptions Options { get; set; }
         public SecurityTokenHandlerCollection TokenHandler { get; set; }
+        public AuthenticationScheme Scheme { get; set; }
     }
 }

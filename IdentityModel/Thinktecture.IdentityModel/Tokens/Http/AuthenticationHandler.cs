@@ -4,7 +4,6 @@
  */
 
 using System;
-using System.IdentityModel.Tokens;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -115,7 +114,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
-                SetAuthenticateHeader(response);
+                SetAuthenticateHeaders(response);
             }
 
             return response;
@@ -128,7 +127,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
             if (aex.StatusCode == HttpStatusCode.Unauthorized)
             {
-                SetAuthenticateHeader(response);
+                SetAuthenticateHeaders(response);
             }
             
             return response;
@@ -138,7 +137,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
         {
             var unauthorizedResponse = request.CreateResponse(HttpStatusCode.Unauthorized);
 
-            SetAuthenticateHeader(unauthorizedResponse);
+            SetAuthenticateHeaders(unauthorizedResponse);
             unauthorizedResponse.ReasonPhrase = "Unauthorized.";
 
             return unauthorizedResponse;
@@ -154,22 +153,18 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             return response;
         }
 
-        protected virtual void SetAuthenticateHeader(HttpResponseMessage response, string scheme = null)
+        protected virtual void SetAuthenticateHeaders(HttpResponseMessage response)
         {
-            if (_authN.Configuration.SendWwwAuthenticateResponseHeader)
+            if (_authN.Configuration.SendWwwAuthenticateResponseHeaders)
             {
-                AuthenticationHeaderValue header;
-                if (!string.IsNullOrWhiteSpace(scheme))
+                foreach (var mapping in _authN.Configuration.Mappings)
                 {
-                    header = new AuthenticationHeaderValue(scheme);
+                    if (mapping.Scheme != null && !string.IsNullOrEmpty(mapping.Scheme.Scheme))
+                    {
+                        var header = new AuthenticationHeaderValue(mapping.Scheme.Scheme, mapping.Scheme.Challenge ?? "");
+                        response.Headers.WwwAuthenticate.Add(header);
+                    }
                 }
-                else
-                {
-                    header = new AuthenticationHeaderValue(_authN.Configuration.DefaultAuthenticationScheme);
-                }
-
-                Tracing.Verbose(Area.HttpAuthentication, "Setting Www-Authenticate header with scheme: " + header.Scheme);
-                response.Headers.WwwAuthenticate.Add(header);
             }
         }
 
