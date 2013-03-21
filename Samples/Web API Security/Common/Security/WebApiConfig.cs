@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Selectors;
 using System.Web.Http;
 using Thinktecture.IdentityModel.Http.Cors;
+using Thinktecture.IdentityModel.Http.Cors.WebApi;
 using Thinktecture.IdentityModel.Tokens.Http;
 
 namespace Thinktecture.Samples.Security
@@ -11,7 +12,7 @@ namespace Thinktecture.Samples.Security
         {
             CorsConfiguration corsConfig = new CorsConfiguration();
             corsConfig.AllowAll();
-            var corsHandler = new Thinktecture.IdentityModel.Http.Cors.WebApi.CorsMessageHandler(corsConfig, config);
+            var corsHandler = new CorsMessageHandler(corsConfig, config);
             config.MessageHandlers.Add(corsHandler);
 
             // authentication configuration for identity controller
@@ -42,17 +43,17 @@ namespace Thinktecture.Samples.Security
 
             #region IdentityServer JWT
             authentication.AddJsonWebToken(
-                Constants.IdSrv.IssuerUri,
-                Constants.Audience,
-                Constants.IdSrv.SigningKey);
+                issuer: Constants.IdSrv.IssuerUri,
+                audience: Constants.Audience,
+                signingKey: Constants.IdSrv.SigningKey);
             #endregion
 
             #region Access Control Service JWT
             authentication.AddJsonWebToken(
-                Constants.ACS.IssuerUri,
-                Constants.Audience,
-                Constants.ACS.SigningKey,
-                AuthenticationOptions.ForAuthorizationHeader(Constants.ACS.Scheme));
+                issuer: Constants.ACS.IssuerUri,
+                audience: Constants.Audience,
+                signingKey: Constants.ACS.SigningKey,
+                scheme: Constants.ACS.Scheme);
             #endregion
 
             #region IdentityServer SAML
@@ -61,7 +62,8 @@ namespace Thinktecture.Samples.Security
                 issuerName: Constants.IdSrv.IssuerUri,
                 audienceUri: Constants.Realm,
                 certificateValidator: X509CertificateValidator.None,
-                options: AuthenticationOptions.ForAuthorizationHeader(Constants.IdSrv.SamlScheme));
+                options: AuthenticationOptions.ForAuthorizationHeader(Constants.IdSrv.SamlScheme),
+                scheme: AuthenticationScheme.SchemeOnly(Constants.IdSrv.SamlScheme));
             #endregion
 
             return authentication;
