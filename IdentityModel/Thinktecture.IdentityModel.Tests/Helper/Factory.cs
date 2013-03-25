@@ -58,7 +58,7 @@ namespace Tests
             saml2Config.IssuerNameRegistry = registry;
             saml2Config.CertificateValidator = X509CertificateValidator.None;
 
-            authConfig.AddSaml2(saml2Config, AuthenticationOptions.ForAuthorizationHeader("Saml2"));
+            authConfig.AddSaml2(saml2Config, AuthenticationOptions.ForAuthorizationHeader("Saml2"), null);
             #endregion
 
             var authHandler = new AuthenticationHandler(authConfig);
