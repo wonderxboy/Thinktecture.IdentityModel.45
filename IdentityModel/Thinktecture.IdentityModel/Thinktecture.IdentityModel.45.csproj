@@ -287,6 +287,7 @@
     <Compile Include="Tokens\Http\AuthenticationHandler.cs" />
     <Compile Include="Tokens\Http\AuthenticationOptionMapping.cs" />
     <Compile Include="Tokens\Http\AuthenticationOptions.cs" />
+    <Compile Include="Tokens\Http\BasicAuthenticationWithRoleSecurityTokenHandler.cs" />
     <Compile Include="Tokens\Http\ClaimsTransformationHandler.cs" />
     <Compile Include="Tokens\Http\ClientCertificateIssuerNameRegistry.cs" />
     <Compile Include="Tokens\Http\ClientCertificateMode.cs" />
