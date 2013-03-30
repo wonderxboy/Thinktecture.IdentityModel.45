@@ -48,6 +48,9 @@ namespace SessionToken
 
             client.SetToken("Session", token);
 
+            // some alternative header for session token 
+            //client.DefaultRequestHeaders.Add("X-Session", "Session " + token);
+
             while (true)
             {
                 "Calling service.".ConsoleYellow();
