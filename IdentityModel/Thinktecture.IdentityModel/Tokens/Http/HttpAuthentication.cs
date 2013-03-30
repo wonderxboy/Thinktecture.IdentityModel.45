@@ -122,18 +122,22 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         public virtual ClaimsPrincipal AuthenticateSessionToken(HttpRequestMessage request)
         {
-            // grab authorization header
-            var authZheader = request.Headers.Authorization;
+            // grab header
+            var header = request.Headers.SingleOrDefault(h => h.Key == Configuration.SessionToken.HeaderName).Value.SingleOrDefault();
 
-            if (authZheader != null)
+            if (header != null)
             {
-                // if configured scheme was sent, try to authenticate the session token
-                if (authZheader.Scheme == Configuration.SessionToken.Scheme)
+                var parts = header.Split(' ');
+                if (parts.Length == 2)
                 {
-                    var handler = Configuration.SessionToken.SecurityTokenHandler;
+                    // if configured scheme was sent, try to authenticate the session token
+                    if (parts[0] == Configuration.SessionToken.Scheme)
+                    {
+                        var handler = Configuration.SessionToken.SecurityTokenHandler;
 
-                    var token = handler.ReadToken(authZheader.Parameter);
-                    return new ClaimsPrincipal(handler.ValidateToken(token));
+                        var token = handler.ReadToken(parts[1]);
+                        return new ClaimsPrincipal(handler.ValidateToken(token));
+                    }
                 }
             }
 

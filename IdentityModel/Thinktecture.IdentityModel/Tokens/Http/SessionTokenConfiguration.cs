@@ -10,6 +10,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         public TimeSpan DefaultTokenLifetime { get; set; }
         public string EndpointAddress { get; set; }
+        public string HeaderName { get; set; }
         public string Scheme { get; set; }
         public Uri Audience { get; set; }
         public string SigningKey { get; set; }
@@ -52,6 +53,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
         {
             DefaultTokenLifetime = TimeSpan.FromHours(10);
             EndpointAddress = "/token";
+            HeaderName = "Authorization";
             Scheme = "Session";
             Audience = new Uri("http://session.tt");
             IssuerName = "session issuer";
