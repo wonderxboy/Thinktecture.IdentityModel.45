@@ -66,6 +66,11 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                 Tracing.Verbose(Area.HttpAuthentication, "Host client identity is not inherited. Setting anonymous principal");
                 SetPrincipal(request, Principal.Anonymous);
             }
+            else
+            {
+                Tracing.Verbose(Area.HttpAuthentication, "Host client identity is inherited. Setting current principal");
+                SetPrincipal(request, ClaimsPrincipal.Current);
+            }
 
             ClaimsPrincipal principal;
             try
