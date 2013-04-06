@@ -132,6 +132,19 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             });
         }
 
+        public static void AddBasicAuthentication(this AuthenticationConfiguration configuration, Func<string, string, bool> validationDelegate, Func<string, string[]> roleDelegate, string realm = "localhost", bool retainPassword = false)
+        {
+            var handler = new BasicAuthenticationWithRoleSecurityTokenHandler(validationDelegate, roleDelegate);
+            handler.RetainPassword = retainPassword;
+
+            configuration.AddMapping(new AuthenticationOptionMapping
+            {
+                TokenHandler = new SecurityTokenHandlerCollection { handler },
+                Options = AuthenticationOptions.ForAuthorizationHeader(scheme: "Basic"),
+                Scheme = AuthenticationScheme.SchemeAndRealm("Basic", realm)
+            });
+        }
+
         public static void AddClientCertificate(this AuthenticationConfiguration configuration, SecurityTokenHandler handler)
         {
             configuration.AddMapping(new AuthenticationOptionMapping
