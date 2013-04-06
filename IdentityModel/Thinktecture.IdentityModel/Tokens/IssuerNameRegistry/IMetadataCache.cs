@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.IdentityModel.Configuration;
-using System.IO;
-using System.Linq;
-using System.Web;
-using System.Xml;
+﻿/*
+ * Copyright (c) Dominick Baier, Brock Allen.  All rights reserved.
+ * see license.txt
+ */
+
+using System;
 
 namespace Thinktecture.IdentityModel.Tokens
 {

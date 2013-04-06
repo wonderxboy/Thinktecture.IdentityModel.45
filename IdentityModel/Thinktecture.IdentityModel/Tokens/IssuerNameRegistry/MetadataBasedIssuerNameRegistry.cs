@@ -1,8 +1,11 @@
-﻿using System;
+﻿/*
+ * Copyright (c) Dominick Baier, Brock Allen.  All rights reserved.
+ * see license.txt
+ */
+
+using System;
 using System.Configuration;
 using System.IdentityModel.Metadata;
-using System.IdentityModel.Services;
-using System.IdentityModel.Services.Configuration;
 using System.IdentityModel.Tokens;
 using System.IO;
 using System.Linq;
