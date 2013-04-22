@@ -98,15 +98,15 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                 AuthenticationScheme.SchemeOnly(JwtConstants.Bearer));
         }
 
-        public static void AddBasicAuthentication(this AuthenticationConfiguration configuration, BasicAuthenticationSecurityTokenHandler.ValidateUserNameCredentialDelegate validationDelegate, bool retainPassword = false)
-        {
-            configuration.AddBasicAuthentication(
-                validationDelegate, 
-                "localhost", 
-                retainPassword);
-        }
+        //public static void AddBasicAuthentication(this AuthenticationConfiguration configuration, BasicAuthenticationSecurityTokenHandler.ValidateUserNameCredentialDelegate validationDelegate, bool retainPassword = false)
+        //{
+        //    configuration.AddBasicAuthentication(
+        //        validationDelegate, 
+        //        "localhost", 
+        //        retainPassword);
+        //}
 
-        public static void AddBasicAuthentication(this AuthenticationConfiguration configuration, BasicAuthenticationSecurityTokenHandler.ValidateUserNameCredentialDelegate validationDelegate, string realm, bool retainPassword = false)
+        public static void AddBasicAuthentication(this AuthenticationConfiguration configuration, BasicAuthenticationSecurityTokenHandler.ValidateUserNameCredentialDelegate validationDelegate, string realm = "localhost", bool retainPassword = false)
         {
             var handler = new BasicAuthenticationSecurityTokenHandler(validationDelegate);
             handler.RetainPassword = retainPassword;
@@ -119,7 +119,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             });
         }
 
-        public static void AddBasicAuthentication(this AuthenticationConfiguration configuration, BasicAuthenticationSecurityTokenHandler.ValidateUserNameCredentialDelegate validationDelegate, AuthenticationOptions options, string realm, bool retainPassword = false)
+        public static void AddBasicAuthentication(this AuthenticationConfiguration configuration, BasicAuthenticationSecurityTokenHandler.ValidateUserNameCredentialDelegate validationDelegate, AuthenticationOptions options, string realm = "localhost", bool retainPassword = false)
         {
             var handler = new BasicAuthenticationSecurityTokenHandler(validationDelegate);
             handler.RetainPassword = retainPassword;
