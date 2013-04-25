@@ -3,6 +3,7 @@ using System.Web.Http;
 using Thinktecture.IdentityModel.Http.Cors;
 using Thinktecture.IdentityModel.Http.Cors.WebApi;
 using Thinktecture.IdentityModel.Tokens.Http;
+using Thinktecture.Samples.Security;
 
 namespace Thinktecture.Samples.Security
 {
@@ -42,7 +43,12 @@ namespace Thinktecture.Samples.Security
             #endregion
 
             #region IdentityServer JWT
-            authentication.AddJsonWebToken(
+            //authentication.AddJsonWebToken(
+            //    issuer: Constants.IdSrv.IssuerUri,
+            //    audience: Constants.Audience,
+            //    signingKey: Constants.IdSrv.SigningKey);
+
+            authentication.AddMsftJsonWebToken(
                 issuer: Constants.IdSrv.IssuerUri,
                 audience: Constants.Audience,
                 signingKey: Constants.IdSrv.SigningKey);
