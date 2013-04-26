@@ -38,8 +38,7 @@ namespace Thinktecture.Samples.Security
             };
 
             #region Basic Authentication
-            authentication.AddBasicAuthentication((username, password) 
-                => UserCredentials.Validate(username, password));
+            authentication.AddBasicAuthentication(UserCredentials.Validate);
             #endregion
 
             #region IdentityServer JWT
