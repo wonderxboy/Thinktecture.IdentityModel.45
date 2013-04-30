@@ -9,6 +9,7 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using WebMatrix.WebData;
 
 namespace FormsAndBasicAuth
 {
@@ -25,6 +26,13 @@ namespace FormsAndBasicAuth
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            WebSecurity.InitializeDatabaseConnection("AccountConnection", "UserProfile", "UserId", "UserName", autoCreateTables: true);
+            
+            if (!WebSecurity.UserExists("admin"))
+            { 
+                WebSecurity.CreateUserAndAccount("admin", "admin"); 
+            }
         }
 
         protected void Application_PostAuthenticateRequest()

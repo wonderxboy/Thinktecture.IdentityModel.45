@@ -2,6 +2,7 @@
 using System.Web.Http;
 using System.Web.Security;
 using Thinktecture.IdentityModel.Tokens.Http;
+using WebMatrix.WebData;
 
 namespace FormsAndBasicAuth
 {
@@ -18,11 +19,12 @@ namespace FormsAndBasicAuth
             var authConfig = new AuthenticationConfiguration
             {
                 InheritHostClientIdentity = true,
-                ClaimsAuthenticationManager = FederatedAuthentication.FederationConfiguration.IdentityConfiguration.ClaimsAuthenticationManager
+                ClaimsAuthenticationManager = FederatedAuthentication.FederationConfiguration.IdentityConfiguration.ClaimsAuthenticationManager,
+                RequireSsl = false
             };
 
             // setup authentication against membership
-            authConfig.AddBasicAuthentication((userName, password) => Membership.ValidateUser(userName, password));
+            authConfig.AddBasicAuthentication((userName, password) => WebSecurity.Login(userName, password)); //Membership.ValidateUser(userName, password));
             
             config.MessageHandlers.Add(new AuthenticationHandler(authConfig));
         }

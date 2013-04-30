@@ -1,6 +1,7 @@
 ﻿using FormsAndBasicAuth.Models;
 using System.Web.Mvc;
 using System.Web.Security;
+using WebMatrix.WebData;
 
 namespace FormsAndBasicAuth.Controllers
 {
@@ -26,12 +27,12 @@ namespace FormsAndBasicAuth.Controllers
             if (ModelState.IsValid)
             {
                 // authenticate user
-                var success = Membership.ValidateUser(model.UserName, model.Password);
+                var success = WebSecurity.Login(model.UserName, model.Password);//Membership.ValidateUser(model.UserName, model.Password);
 
                 if (success)
                 {
                     // set authentication cookie
-                    FormsAuthentication.SetAuthCookie(model.UserName, model.RememberMe);
+                    //FormsAuthentication.SetAuthCookie(model.UserName, model.RememberMe);
 
                     return RedirectToLocal(returnUrl);
                 }
