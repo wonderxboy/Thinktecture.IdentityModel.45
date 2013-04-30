@@ -13,5 +13,10 @@ Sample demonstrates various ASP.NET Web API security scenarios:
 
 Accompanying blog posts:
 
-- [ASP.NET (Web API) Security: Prologue](http://leastprivilege.com/2012/12/30/asp-net-web-api-security-prologue/)
-- [Setting up the Sample](http://leastprivilege.com/2013/01/09/asp-net-web-api-security-setting-up-the-sample/)
+* [Prologue] (http://leastprivilege.com/2012/12/30/asp-net-web-api-security-prologue/)
+* [Setting up the Sample] (http://leastprivilege.com/2013/01/09/asp-net-web-api-security-setting-up-the-sample/)
+* [Web Host and Service] (http://leastprivilege.com/2013/01/08/asp-net-web-api-security-the-web-host-and-service/)
+* [The Authentication Handler] (http://leastprivilege.com/2013/04/22/asp-net-web-api-security-the-thinktecture-identitymodel-authenticationhandler/)
+* [Basic Authentication] (http://leastprivilege.com/2013/04/22/web-api-security-basic-authentication-with-thinktecture-identitymodel-authenticationhandler/)
+* [OAuth2 and JSON Web Tokens/JWTs] (http://leastprivilege.com/2013/04/29/web-api-security-json-web-tokenoauth2-with-thinktecture-identitymodel-authenticationhandler/)
+* [X.509 Client Certificates] (http://leastprivilege.com/2013/04/29/support-for-x-509-client-certificates-in-thinktecture-identitymodel-for-web-api-2/)
