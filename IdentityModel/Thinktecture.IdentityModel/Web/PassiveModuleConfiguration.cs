@@ -101,14 +101,17 @@ namespace Thinktecture.IdentityModel.Web
                     ctx.Response.SuppressFormsAuthenticationRedirect = isApi;
                 };
 
-            var sam = FederatedAuthentication.WSFederationAuthenticationModule;
-            if (sam != null)
+            var fam = FederatedAuthentication.WSFederationAuthenticationModule;
+            if (fam != null)
             {
-                sam.AuthorizationFailed +=
+                fam.AuthorizationFailed +=
                     delegate(object sender, AuthorizationFailedEventArgs e)
                     {
                         var ctx = HttpContext.Current;
-                        e.RedirectToIdentityProvider = !ctx.Response.SuppressFormsAuthenticationRedirect;
+                        if (!ctx.User.Identity.IsAuthenticated)
+                        {
+                            e.RedirectToIdentityProvider = !ctx.Response.SuppressFormsAuthenticationRedirect;
+                        }
                     };
             }
         }
