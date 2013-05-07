@@ -96,8 +96,10 @@ namespace Thinktecture.IdentityModel.Web
                 {
                     var ctx = HttpContext.Current;
                     var req = new HttpRequestWrapper(ctx.Request);
+                    var handler = ctx.Handler;
                     var isApi = (req.IsAjaxRequest() ||
-                                 ctx.Handler.GetType().FullName == WebApiControllerName);
+                                 (handler != null && 
+                                  handler.GetType().FullName == WebApiControllerName));
                     ctx.Response.SuppressFormsAuthenticationRedirect = isApi;
                 };
 
