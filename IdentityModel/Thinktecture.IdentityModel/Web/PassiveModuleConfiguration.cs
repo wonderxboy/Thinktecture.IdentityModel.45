@@ -96,19 +96,24 @@ namespace Thinktecture.IdentityModel.Web
                 {
                     var ctx = HttpContext.Current;
                     var req = new HttpRequestWrapper(ctx.Request);
+                    var handler = ctx.Handler;
                     var isApi = (req.IsAjaxRequest() ||
-                                 ctx.Handler.GetType().FullName == WebApiControllerName);
+                                 (handler != null && 
+                                  handler.GetType().FullName == WebApiControllerName));
                     ctx.Response.SuppressFormsAuthenticationRedirect = isApi;
                 };
 
-            var sam = FederatedAuthentication.WSFederationAuthenticationModule;
-            if (sam != null)
+            var fam = FederatedAuthentication.WSFederationAuthenticationModule;
+            if (fam != null)
             {
-                sam.AuthorizationFailed +=
+                fam.AuthorizationFailed +=
                     delegate(object sender, AuthorizationFailedEventArgs e)
                     {
                         var ctx = HttpContext.Current;
-                        e.RedirectToIdentityProvider = !ctx.Response.SuppressFormsAuthenticationRedirect;
+                        if (!ctx.User.Identity.IsAuthenticated)
+                        {
+                            e.RedirectToIdentityProvider = !ctx.Response.SuppressFormsAuthenticationRedirect;
+                        }
                     };
             }
         }

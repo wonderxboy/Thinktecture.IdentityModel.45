@@ -43,7 +43,7 @@ namespace WebRP
             PassiveModuleConfiguration.CacheSessionsOnServer();
             //PassiveModuleConfiguration.EnableSlidingSessionExpirations();
             //PassiveModuleConfiguration.OverrideWSFedTokenLifetime();
-            //PassiveModuleConfiguration.SuppressLoginRedirectsForApiCalls();
+            PassiveModuleConfiguration.SuppressLoginRedirectsForApiCalls();
             //PassiveModuleConfiguration.SuppressSecurityTokenExceptions();
         }
     }
