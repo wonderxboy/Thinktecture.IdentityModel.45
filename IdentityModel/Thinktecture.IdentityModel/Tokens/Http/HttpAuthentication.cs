@@ -30,6 +30,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
         public ClaimsPrincipal Authenticate(HttpRequestMessage request)
         {
             string resourceName = request.RequestUri.AbsoluteUri;
+            var identities = new List<ClaimsIdentity>();
 
             // if session feature is enabled (and this is not a token request), check for session token first
             if (Configuration.EnableSessionToken && !IsSessionTokenRequest(request))
@@ -56,8 +57,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                     if (principal.Identity.IsAuthenticated)
                     {
                         Tracing.Information(Area.HttpAuthentication, "Client authenticated using authorization header mapping: " + authZ.Scheme);
-
-                        return Transform(resourceName, principal);
+                        identities.Add(principal.Identities.First());
                     }
                 }
             }
@@ -74,8 +74,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                     if (principal.Identity.IsAuthenticated)
                     {
                         Tracing.Information(Area.HttpAuthentication, "Client authenticated using header mapping");
-
-                        return Transform(resourceName, principal);
+                        identities.Add(principal.Identities.First());
                     }
                 }
             }
@@ -92,7 +91,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                     if (principal.Identity.IsAuthenticated)
                     {
                         Tracing.Information(Area.HttpAuthentication, "Client authenticated using query string mapping");
-                        return Transform(resourceName, principal);
+                        identities.Add(principal.Identities.First());
                     }
                 }
             }
@@ -111,9 +110,14 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                     if (principal.Identity.IsAuthenticated)
                     {
                         Tracing.Information(Area.HttpAuthentication, "Client authenticated using client certificate");
-                        return Transform(resourceName, principal);
+                        identities.Add(principal.Identities.First());
                     }
                 }
+            }
+
+            if (identities.Count > 0)
+            {
+                return Transform(resourceName, new ClaimsPrincipal(identities));
             }
 
             // do claim transformation (if enabled), and return.
