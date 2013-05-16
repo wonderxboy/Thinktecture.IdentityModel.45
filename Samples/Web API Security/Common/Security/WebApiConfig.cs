@@ -71,6 +71,10 @@ namespace Thinktecture.Samples.Security
                 scheme: AuthenticationScheme.SchemeOnly(Constants.IdSrv.SamlScheme));
             #endregion
 
+            #region Client Certificates
+            authentication.AddClientCertificate(ClientCertificateMode.ChainValidation);
+            #endregion
+
             return authentication;
         }
     }
