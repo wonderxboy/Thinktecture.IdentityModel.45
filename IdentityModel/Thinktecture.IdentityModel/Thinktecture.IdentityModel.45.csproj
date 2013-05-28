@@ -313,6 +313,10 @@
     <Compile Include="Tokens\IssuerNameRegistry\MachineKeyMetadataCache.cs" />
     <Compile Include="Tokens\IssuerNameRegistry\MetadataBasedIssuerNameRegistry.cs" />
     <Compile Include="Tokens\WrappedSecurityToken.cs" />
+    <Compile Include="Web\Configuration\AppStart.cs" />
+    <Compile Include="Web\Configuration\SecuritySessionSection.cs" />
+    <Compile Include="Web\Configuration\SessionConfiguration.cs" />
+    <Compile Include="Web\Configuration\SessionConfigurationModule.cs" />
     <Compile Include="Web\ITokenCacheRepository.cs" />
     <Compile Include="Web\PassiveModuleConfiguration.cs" />
     <Compile Include="Web\PassiveRepositorySessionSecurityTokenCache.cs" />
