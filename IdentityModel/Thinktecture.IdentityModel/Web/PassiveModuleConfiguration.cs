@@ -86,8 +86,6 @@ namespace Thinktecture.IdentityModel.Web
                 };
         }
 
-        private static string WebApiControllerName = "System.Web.Http.WebHost.HttpControllerHandler";
-
         public static void SuppressLoginRedirectsForApiCalls()
         {
             var app = HttpContext.Current.ApplicationInstance;
@@ -96,11 +94,10 @@ namespace Thinktecture.IdentityModel.Web
                 {
                     var ctx = HttpContext.Current;
                     var req = new HttpRequestWrapper(ctx.Request);
-                    var handler = ctx.Handler;
-                    var isApi = (req.IsAjaxRequest() ||
-                                 (handler != null && 
-                                  handler.GetType().FullName == WebApiControllerName));
-                    ctx.Response.SuppressFormsAuthenticationRedirect = isApi;
+                    if (req.IsAjaxRequest())
+                    {
+                        ctx.Response.SuppressFormsAuthenticationRedirect = true;
+                    }
                 };
 
             var fam = FederatedAuthentication.WSFederationAuthenticationModule;
