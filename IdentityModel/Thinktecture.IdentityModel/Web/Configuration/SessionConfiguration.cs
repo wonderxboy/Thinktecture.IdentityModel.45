@@ -49,14 +49,13 @@ namespace Thinktecture.IdentityModel.Web.Configuration
                 PassiveSessionConfiguration.ConfigureMackineKeyProtectionForSessionTokens();
             }
 
-            if (this.config.DefaultSessionDuration > TimeSpan.Zero)
-            {
-                PassiveSessionConfiguration.ConfigureDefaultSessionDuration(this.config.DefaultSessionDuration);
-            }
-
             if (this.config.PersistentSessionDuration > TimeSpan.Zero)
             {
                 PassiveSessionConfiguration.ConfigurePersistentSessions(this.config.PersistentSessionDuration);
+            }
+            else if (this.config.DefaultSessionDuration > TimeSpan.Zero)
+            {
+                PassiveSessionConfiguration.ConfigureDefaultSessionDuration(this.config.DefaultSessionDuration);
             }
 
             if (this.RequiresModuleConfig)
