@@ -4,8 +4,11 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Selectors;
 using System.IdentityModel.Tokens;
+using System.Security.Cryptography.X509Certificates;
+using System.ServiceModel.Security.Tokens;
 using Thinktecture.IdentityModel.Constants;
 
 namespace Thinktecture.IdentityModel.Tokens.Http
@@ -30,45 +33,100 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             });
         }
 
-        [Obsolete("Use JSON Web Tokens instead")]
-        public static void AddSimpleWebToken(this AuthenticationConfiguration configuration, string issuer, string audience, string signingKey, AuthenticationOptions options)
+        public static void AddJsonWebToken(
+            this AuthenticationConfiguration configuration, 
+            string issuer, 
+            string audience, 
+            string signingKey, 
+            Dictionary<string, string> claimMappings = null)
         {
-            var config = new SecurityTokenHandlerConfiguration();
-            var registry = new WebTokenIssuerNameRegistry();
-            registry.AddTrustedIssuer(issuer, issuer);
-            config.IssuerNameRegistry = registry;
-
-            var issuerResolver = new WebTokenIssuerTokenResolver();
-            issuerResolver.AddSigningKey(issuer, signingKey);
-            config.IssuerTokenResolver = issuerResolver;
-
-            config.AudienceRestriction.AllowedAudienceUris.Add(new Uri(audience));
-
-            var handler = new SimpleWebTokenHandler();
-            handler.Configuration = config;
-
-            configuration.AddMapping(new AuthenticationOptionMapping
+            var validationParameters = new TokenValidationParameters()
             {
-                TokenHandler = new SecurityTokenHandlerCollection { handler },
-                Options = options
-            });
+                AllowedAudience = audience,
+                SigningToken = new BinarySecretSecurityToken(Convert.FromBase64String(signingKey)),
+                ValidIssuer = issuer,
+            };
+
+            configuration.AddJsonWebToken(
+                validationParameters,
+                AuthenticationOptions.ForAuthorizationHeader(JwtConstants.Bearer),
+                AuthenticationScheme.SchemeOnly(JwtConstants.Bearer),
+                claimMappings);
         }
 
-        public static void AddJsonWebToken(this AuthenticationConfiguration configuration, string issuer, string audience, string signingKey, AuthenticationOptions options, AuthenticationScheme scheme)
+        public static void AddJsonWebToken(
+            this AuthenticationConfiguration configuration,
+            string issuer,
+            string audience,
+            string signingKey,
+            string scheme,
+            Dictionary<string, string> claimMappings = null)
         {
-            var config = new SecurityTokenHandlerConfiguration();
-            var registry = new WebTokenIssuerNameRegistry();
-            registry.AddTrustedIssuer(issuer, issuer);
-            config.IssuerNameRegistry = registry;
+            var validationParameters = new TokenValidationParameters()
+            {
+                AllowedAudience = audience,
+                SigningToken = new BinarySecretSecurityToken(Convert.FromBase64String(signingKey)),
+                ValidIssuer = issuer,
+            };
 
-            var issuerResolver = new WebTokenIssuerTokenResolver();
-            issuerResolver.AddSigningKey(issuer, signingKey);
-            config.IssuerTokenResolver = issuerResolver;
+            configuration.AddJsonWebToken(
+                validationParameters,
+                AuthenticationOptions.ForAuthorizationHeader(scheme),
+                AuthenticationScheme.SchemeOnly(scheme),
+                claimMappings);
+        }
 
-            config.AudienceRestriction.AllowedAudienceUris.Add(new Uri(audience));
+        public static void AddJsonWebToken(
+            this AuthenticationConfiguration configuration, 
+            string issuer, 
+            string audience, 
+            X509Certificate2 signingCertificate, 
+            Dictionary<string, string> claimMappings = null)
+        {
+            var validationParameters = new TokenValidationParameters()
+            {
+                AllowedAudience = audience,
+                SigningToken = new X509SecurityToken(signingCertificate),
+                ValidIssuer = issuer,
+            };
 
-            var handler = new JsonWebTokenHandler();
-            handler.Configuration = config;
+            configuration.AddJsonWebToken(
+                validationParameters,
+                AuthenticationOptions.ForAuthorizationHeader(JwtConstants.Bearer),
+                AuthenticationScheme.SchemeOnly(JwtConstants.Bearer),
+                claimMappings);
+        }
+
+        public static void AddJsonWebToken(
+            this AuthenticationConfiguration configuration,
+            string issuer,
+            string audience,
+            X509Certificate2 signingCertificate,
+            string scheme,
+            Dictionary<string, string> claimMappings = null)
+        {
+            var validationParameters = new TokenValidationParameters()
+            {
+                AllowedAudience = audience,
+                SigningToken = new X509SecurityToken(signingCertificate),
+                ValidIssuer = issuer,
+            };
+
+            configuration.AddJsonWebToken(
+                validationParameters,
+                AuthenticationOptions.ForAuthorizationHeader(scheme),
+                AuthenticationScheme.SchemeOnly(scheme),
+                claimMappings);
+        }
+
+        public static void AddJsonWebToken(
+            this AuthenticationConfiguration configuration, 
+            TokenValidationParameters validationParameters,
+            AuthenticationOptions options,
+            AuthenticationScheme scheme,
+            Dictionary<string, string> claimMappings = null)
+        {
+            var handler = new JwtSecurityTokenHandlerWrapper(validationParameters, claimMappings);
 
             configuration.AddMapping(new AuthenticationOptionMapping
             {
@@ -78,32 +136,48 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             });
         }
 
-        public static void AddJsonWebToken(this AuthenticationConfiguration configuration, string issuer, string audience, string signingKey, string scheme)
-        {
-            configuration.AddJsonWebToken(
-                issuer,
-                audience,
-                signingKey,
-                AuthenticationOptions.ForAuthorizationHeader(scheme),
-                AuthenticationScheme.SchemeOnly(scheme));
-        }
-
-        public static void AddJsonWebToken(this AuthenticationConfiguration configuration, string issuer, string audience, string signingKey)
-        {
-            configuration.AddJsonWebToken(
-                issuer, 
-                audience, 
-                signingKey, 
-                AuthenticationOptions.ForAuthorizationHeader(JwtConstants.Bearer),
-                AuthenticationScheme.SchemeOnly(JwtConstants.Bearer));
-        }
-
-        //public static void AddBasicAuthentication(this AuthenticationConfiguration configuration, BasicAuthenticationSecurityTokenHandler.ValidateUserNameCredentialDelegate validationDelegate, bool retainPassword = false)
+        //public static void AddJsonWebToken(this AuthenticationConfiguration configuration, string issuer, string audience, string signingKey, AuthenticationOptions options, AuthenticationScheme scheme)
         //{
-        //    configuration.AddBasicAuthentication(
-        //        validationDelegate, 
-        //        "localhost", 
-        //        retainPassword);
+        //    var config = new SecurityTokenHandlerConfiguration();
+        //    var registry = new WebTokenIssuerNameRegistry();
+        //    registry.AddTrustedIssuer(issuer, issuer);
+        //    config.IssuerNameRegistry = registry;
+
+        //    var issuerResolver = new WebTokenIssuerTokenResolver();
+        //    issuerResolver.AddSigningKey(issuer, signingKey);
+        //    config.IssuerTokenResolver = issuerResolver;
+
+        //    config.AudienceRestriction.AllowedAudienceUris.Add(new Uri(audience));
+
+        //    var handler = new JsonWebTokenHandler();
+        //    handler.Configuration = config;
+
+        //    configuration.AddMapping(new AuthenticationOptionMapping
+        //    {
+        //        TokenHandler = new SecurityTokenHandlerCollection { handler },
+        //        Options = options,
+        //        Scheme = scheme
+        //    });
+        //}
+
+        //public static void AddJsonWebToken(this AuthenticationConfiguration configuration, string issuer, string audience, string signingKey, string scheme)
+        //{
+        //    configuration.AddJsonWebToken(
+        //        issuer,
+        //        audience,
+        //        signingKey,
+        //        AuthenticationOptions.ForAuthorizationHeader(scheme),
+        //        AuthenticationScheme.SchemeOnly(scheme));
+        //}
+
+        //public static void AddJsonWebToken(this AuthenticationConfiguration configuration, string issuer, string audience, string signingKey)
+        //{
+        //    configuration.AddJsonWebToken(
+        //        issuer, 
+        //        audience, 
+        //        signingKey, 
+        //        AuthenticationOptions.ForAuthorizationHeader(JwtConstants.Bearer),
+        //        AuthenticationScheme.SchemeOnly(JwtConstants.Bearer));
         //}
 
         public static void AddBasicAuthentication(this AuthenticationConfiguration configuration, BasicAuthenticationSecurityTokenHandler.ValidateUserNameCredentialDelegate validationDelegate, string realm = "localhost", bool retainPassword = false)

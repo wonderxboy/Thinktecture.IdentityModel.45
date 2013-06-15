@@ -14,6 +14,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
+using System.ServiceModel.Security.Tokens;
 using Thinktecture.IdentityModel.Diagnostics;
 
 namespace Thinktecture.IdentityModel.Tokens.Http
@@ -139,10 +140,17 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                         // if configured scheme was sent, try to authenticate the session token
                         if (parts[0] == Configuration.SessionToken.Scheme)
                         {
-                            var handler = Configuration.SessionToken.SecurityTokenHandler;
+                            var token = new JwtSecurityToken(parts[1]);
 
-                            var token = handler.ReadToken(parts[1]);
-                            return new ClaimsPrincipal(handler.ValidateToken(token));
+                            var validationParameters = new TokenValidationParameters
+                            {
+                                ValidIssuer = Configuration.SessionToken.IssuerName,
+                                AllowedAudience = Configuration.SessionToken.Audience,
+                                SigningToken = new BinarySecretSecurityToken(Configuration.SessionToken.SigningKey),
+                            };
+
+                            var handler = new JwtSecurityTokenHandler();
+                            return handler.ValidateToken(token, validationParameters);
                         }
                     }
                 }
@@ -263,18 +271,14 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         public virtual string CreateSessionToken(ClaimsPrincipal principal)
         {
-            var handler = Configuration.SessionToken.SecurityTokenHandler;
+            var token = new JwtSecurityToken(
+                issuer: Configuration.SessionToken.IssuerName,
+                audience: Configuration.SessionToken.Audience,
+                claims: principal.Claims,
+                lifetime: new Lifetime(DateTime.UtcNow, DateTime.UtcNow.Add(Configuration.SessionToken.DefaultTokenLifetime)),
+                signingCredentials: new HmacSigningCredentials(Configuration.SessionToken.SigningKey));
 
-            var descriptor = new SecurityTokenDescriptor
-            {
-                AppliesToAddress = Configuration.SessionToken.Audience.AbsoluteUri,
-                TokenIssuerName = Configuration.SessionToken.IssuerName,
-                SigningCredentials = new HmacSigningCredentials(Configuration.SessionToken.SigningKey),
-                Lifetime = new Lifetime(DateTime.UtcNow, DateTime.UtcNow.Add(Configuration.SessionToken.DefaultTokenLifetime)),
-                Subject = principal.Identities.First()
-            };
-
-            var token = handler.CreateToken(descriptor);
+            var handler = new JwtSecurityTokenHandler();
             return handler.WriteToken(token);
         }
 
