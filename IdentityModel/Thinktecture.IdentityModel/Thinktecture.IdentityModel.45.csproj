@@ -301,14 +301,7 @@
     <Compile Include="Tokens\Http\HttpRequestSecurityToken.cs" />
     <Compile Include="Tokens\Http\HttpRequestSecurityTokenHandler.cs" />
     <Compile Include="Tokens\Http\SessionTokenConfiguration.cs" />
-    <Compile Include="Authorization\Todo\ApiAuthorizeAttribute.cs" />
     <Compile Include="Authorization\DefaultPolicy.cs" />
-    <Compile Include="Authorization\Todo\GlobalAuthorization.cs" />
-    <Compile Include="Authorization\Todo\HttpAuthorizationContext.cs" />
-    <Compile Include="Authorization\Todo\HttpClaimsAuthorizationManager.cs" />
-    <Compile Include="Authorization\Todo\HttpConfigurationExtensions.cs" />
-    <Compile Include="Authorization\Todo\IAuthorizationManager.cs" />
-    <Compile Include="Authorization\Todo\PerControllerAuthorization.cs" />
     <Compile Include="Diagnostics\Tracing.cs" />
     <Compile Include="Tokens\IssuerNameRegistry\CachingMetadataBasedIssuerNameRegistry.cs" />
     <Compile Include="Tokens\IssuerNameRegistry\FileBasedMetadataCache.cs" />
