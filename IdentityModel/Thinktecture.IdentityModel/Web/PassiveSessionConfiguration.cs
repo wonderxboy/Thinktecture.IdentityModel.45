@@ -26,6 +26,14 @@ namespace Thinktecture.IdentityModel.Web
             }
         }
 
+        public static void ConfigureReplayTokenCache(IReplayTokenCacheRepository replayTokenCacheRepository)
+        {
+            if (!(FederatedAuthentication.FederationConfiguration.IdentityConfiguration.Caches.TokenReplayCache is PassiveRepositoryReplayTokenCache))
+            {
+                FederatedAuthentication.FederationConfiguration.IdentityConfiguration.Caches.TokenReplayCache = new PassiveRepositoryReplayTokenCache(replayTokenCacheRepository);
+            }
+        }
+
         public static void ConfigureDefaultSessionDuration(TimeSpan sessionDuration)
         {
             if (FederatedAuthentication.FederationConfiguration.WsFederationConfiguration.PersistentCookiesOnPassiveRedirects)
