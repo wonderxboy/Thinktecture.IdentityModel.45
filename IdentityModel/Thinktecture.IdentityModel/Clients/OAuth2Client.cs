@@ -3,6 +3,7 @@
  * see license.txt
  */
 
+using System.Linq;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -54,43 +55,43 @@ namespace Thinktecture.IdentityModel.Clients
             return url;
         }
 
-        public AccessTokenResponse RequestAccessTokenUserName(string userName, string password, string scope)
+		public AccessTokenResponse RequestAccessTokenUserName(string userName, string password, string scope, Dictionary<string, string> additionalProperties = null)
         {
-            var response = _client.PostAsync("", CreateFormUserName(userName, password, scope)).Result;
+            var response = _client.PostAsync("", CreateFormUserName(userName, password, scope, additionalProperties)).Result;
             response.EnsureSuccessStatusCode();
 
             var json = JObject.Parse(response.Content.ReadAsStringAsync().Result);
             return CreateResponseFromJson(json);
         }
 
-        public AccessTokenResponse RequestAccessTokenRefreshToken(string refreshToken)
+		public AccessTokenResponse RequestAccessTokenRefreshToken(string refreshToken, Dictionary<string, string> additionalProperties = null)
         {
-            var response = _client.PostAsync("", CreateFormRefreshToken(refreshToken)).Result;
+            var response = _client.PostAsync("", CreateFormRefreshToken(refreshToken, additionalProperties)).Result;
             response.EnsureSuccessStatusCode();
 
             var json = JObject.Parse(response.Content.ReadAsStringAsync().Result);
             return CreateResponseFromJson(json);
         }
 
-        public AccessTokenResponse RequestAccessTokenCode(string code)
+		public AccessTokenResponse RequestAccessTokenCode(string code, Dictionary<string, string> additionalProperties = null)
         {
-            var response = _client.PostAsync("", CreateFormCode(code)).Result;
+            var response = _client.PostAsync("", CreateFormCode(code, additionalProperties)).Result;
             response.EnsureSuccessStatusCode();
 
             var json = JObject.Parse(response.Content.ReadAsStringAsync().Result);
             return CreateResponseFromJson(json);
         }
 
-        public AccessTokenResponse RequestAccessTokenAssertion(string assertion, string assertionType, string scope)
+		public AccessTokenResponse RequestAccessTokenAssertion(string assertion, string assertionType, string scope, Dictionary<string, string> additionalProperties = null)
         {
-            var response = _client.PostAsync("", CreateFormAssertion(assertion, assertionType, scope)).Result;
+            var response = _client.PostAsync("", CreateFormAssertion(assertion, assertionType, scope, additionalProperties)).Result;
             response.EnsureSuccessStatusCode();
 
             var json = JObject.Parse(response.Content.ReadAsStringAsync().Result);
             return CreateResponseFromJson(json);
         }
 
-        protected virtual FormUrlEncodedContent CreateFormUserName(string userName, string password, string scope)
+		protected virtual FormUrlEncodedContent CreateFormUserName(string userName, string password, string scope, Dictionary<string, string> additionalProperties = null)
         {
             var values = new Dictionary<string, string>
             {
@@ -100,10 +101,10 @@ namespace Thinktecture.IdentityModel.Clients
                 { OAuth2Constants.Scope, scope }
             };
 
-            return new FormUrlEncodedContent(values);
+            return CreateForm(values, additionalProperties);
         }
 
-        protected virtual FormUrlEncodedContent CreateFormRefreshToken(string refreshToken)
+		protected virtual FormUrlEncodedContent CreateFormRefreshToken(string refreshToken, Dictionary<string, string> additionalProperties = null)
         {
             var values = new Dictionary<string, string>
             {
@@ -111,10 +112,10 @@ namespace Thinktecture.IdentityModel.Clients
                 { OAuth2Constants.GrantTypes.RefreshToken, refreshToken}
             };
 
-            return new FormUrlEncodedContent(values);
+			return CreateForm(values, additionalProperties);
         }
 
-        protected virtual FormUrlEncodedContent CreateFormCode(string code)
+		protected virtual FormUrlEncodedContent CreateFormCode(string code, Dictionary<string, string> additionalProperties = null)
         {
             var values = new Dictionary<string, string>
             {
@@ -122,10 +123,10 @@ namespace Thinktecture.IdentityModel.Clients
                 { OAuth2Constants.Code, code}
             };
 
-            return new FormUrlEncodedContent(values);
+            return CreateForm(values, additionalProperties);
         }
 
-        protected virtual FormUrlEncodedContent CreateFormAssertion(string assertion, string assertionType, string scope)
+		protected virtual FormUrlEncodedContent CreateFormAssertion(string assertion, string assertionType, string scope, Dictionary<string, string> additionalProperties = null)
         {
             var values = new Dictionary<string, string>
             {
@@ -134,7 +135,7 @@ namespace Thinktecture.IdentityModel.Clients
                 { OAuth2Constants.Scope, scope }
             };
 
-            return new FormUrlEncodedContent(values);
+            return CreateForm(values, additionalProperties);
         }
 
         private AccessTokenResponse CreateResponseFromJson(JObject json)
@@ -153,5 +154,37 @@ namespace Thinktecture.IdentityModel.Clients
 
             return response;
         }
+		/// <summary>
+		/// FormUrlEncodes both Sets of Key Value Pairs into one form object
+		/// </summary>
+		/// <param name="explicitProperties"></param>
+		/// <param name="additionalProperties"></param>
+		/// <returns></returns>
+		private static FormUrlEncodedContent CreateForm(Dictionary<string, string> explicitProperties, Dictionary<string, string> additionalProperties = null)
+		{
+
+			return
+				new FormUrlEncodedContent(MergeAdditionKeyValuePairsIntoExplicitKeyValuePairs(explicitProperties,
+																							  additionalProperties));
+		}
+		/// <summary>
+		/// Merges additional into explicit properties keeping all explicit properties intact
+		/// </summary>
+		/// <param name="explicitProperties"></param>
+		/// <param name="additionalProperties"></param>
+		/// <returns></returns>
+		private static Dictionary<string, string> MergeAdditionKeyValuePairsIntoExplicitKeyValuePairs(
+			Dictionary<string, string> explicitProperties, Dictionary<string, string> additionalProperties = null)
+		{
+			Dictionary<string, string> merged = explicitProperties;
+			//no need to iterate if additional is null
+			if (additionalProperties != null)
+			{
+				merged =
+					explicitProperties.Concat(additionalProperties.Where(add => !explicitProperties.ContainsKey(add.Key)))
+										 .ToDictionary(final => final.Key, final => final.Value);
+			}
+			return merged;
+		}
     } 
 }
