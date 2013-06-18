@@ -30,12 +30,24 @@ namespace Thinktecture.IdentityModel.Clients
 
 		public static string CreateCodeFlowUrl(string endpoint, string clientId, string scope, string redirectUri, string state = null)
 		{
-			return CreateUrl(endpoint, clientId, scope, redirectUri, OAuth2Constants.ResponseTypes.Code, state);
+			return CreateUrl(
+				endpoint, 
+				clientId, 
+				scope, 
+				redirectUri, 
+				OAuth2Constants.ResponseTypes.Code, 
+				state);
 		}
 
 		public static string CreateImplicitFlowUrl(string endpoint, string clientId, string scope, string redirectUri, string state = null)
 		{
-			return CreateUrl(endpoint, clientId, scope, redirectUri, OAuth2Constants.ResponseTypes.Token, state);
+			return CreateUrl(
+				endpoint, 
+				clientId, 
+				scope, 
+				redirectUri, 
+				OAuth2Constants.ResponseTypes.Token, 
+				state);
 		}
 
 		private static string CreateUrl(string endpoint, string clientId, string scope, string redirectUri, string responseType, string state = null)
@@ -64,6 +76,15 @@ namespace Thinktecture.IdentityModel.Clients
 			return CreateResponseFromJson(json);
 		}
 
+		public AccessTokenResponse RequestAccessTokenClientCredentials(string scope, Dictionary<string, string> additionalProperties = null)
+		{
+			var response = _client.PostAsync("", CreateFormClientCredentials(scope, additionalProperties)).Result;
+			response.EnsureSuccessStatusCode();
+
+			var json = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+			return CreateResponseFromJson(json);
+		}
+
 		public AccessTokenResponse RequestAccessTokenRefreshToken(string refreshToken, Dictionary<string, string> additionalProperties = null)
 		{
 			var response = _client.PostAsync("", CreateFormRefreshToken(refreshToken, additionalProperties)).Result;
@@ -82,6 +103,15 @@ namespace Thinktecture.IdentityModel.Clients
 			return CreateResponseFromJson(json);
 		}
 
+		public AccessTokenResponse RequestAccessTokenCode(string code, Uri redirectUri, Dictionary<string, string> additionalProperties = null)
+		{
+			var response = _client.PostAsync("", CreateFormCode(code, redirectUri, additionalProperties)).Result;
+			response.EnsureSuccessStatusCode();
+
+			var json = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+			return CreateResponseFromJson(json);
+		}
+
 		public AccessTokenResponse RequestAccessTokenAssertion(string assertion, string assertionType, string scope, Dictionary<string, string> additionalProperties = null)
 		{
 			var response = _client.PostAsync("", CreateFormAssertion(assertion, assertionType, scope, additionalProperties)).Result;
@@ -89,6 +119,17 @@ namespace Thinktecture.IdentityModel.Clients
 
 			var json = JObject.Parse(response.Content.ReadAsStringAsync().Result);
 			return CreateResponseFromJson(json);
+		}
+
+		protected virtual FormUrlEncodedContent CreateFormClientCredentials(string scope, Dictionary<string, string> additionalProperties = null)
+		{
+			var values = new Dictionary<string, string>
+			{
+				{ OAuth2Constants.GrantType, OAuth2Constants.GrantTypes.ClientCredentials },
+				{ OAuth2Constants.Scope, scope }
+			};
+
+			return CreateForm(values, additionalProperties);
 		}
 
 		protected virtual FormUrlEncodedContent CreateFormUserName(string userName, string password, string scope, Dictionary<string, string> additionalProperties = null)
@@ -120,6 +161,18 @@ namespace Thinktecture.IdentityModel.Clients
 			var values = new Dictionary<string, string>
 			{
 				{ OAuth2Constants.GrantType, OAuth2Constants.GrantTypes.AuthorizationCode },
+				{ OAuth2Constants.Code, code}
+			};
+
+			return CreateForm(values, additionalProperties);
+		}
+
+		protected virtual FormUrlEncodedContent CreateFormCode(string code, Uri redirectUri, Dictionary<string, string> additionalProperties = null)
+		{
+			var values = new Dictionary<string, string>
+			{
+				{ OAuth2Constants.GrantType, OAuth2Constants.GrantTypes.AuthorizationCode },
+				{ OAuth2Constants.RedirectUri, redirectUri.AbsoluteUri },
 				{ OAuth2Constants.Code, code}
 			};
 
