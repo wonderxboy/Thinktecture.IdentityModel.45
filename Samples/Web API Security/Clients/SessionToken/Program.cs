@@ -40,7 +40,7 @@ namespace SessionToken
             "\nExpiration:".ConsoleRed();
             Console.WriteLine(expiration.ToLongDateString() + " " + expiration.ToLongTimeString());
 
-            //DecodeSessionToken(token);
+            DecodeSessionToken(token);
             return token;
         }
 
