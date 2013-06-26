@@ -271,15 +271,26 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         public virtual string CreateSessionToken(ClaimsPrincipal principal)
         {
+            var claims = FilterInternalClaims(principal);
+
             var token = new JwtSecurityToken(
                 issuer: Configuration.SessionToken.IssuerName,
                 audience: Configuration.SessionToken.Audience,
-                claims: principal.Claims,
+                claims: claims,
                 lifetime: new Lifetime(DateTime.UtcNow, DateTime.UtcNow.Add(Configuration.SessionToken.DefaultTokenLifetime)),
                 signingCredentials: new HmacSigningCredentials(Configuration.SessionToken.SigningKey));
 
             var handler = new JwtSecurityTokenHandler();
             return handler.WriteToken(token);
+        }
+
+        private IEnumerable<Claim> FilterInternalClaims(ClaimsPrincipal principal)
+        {
+            return principal.FindAll(c => 
+                c.Type != "exp" && 
+                c.Type != "nbf" && 
+                c.Type != "iss" && 
+                c.Type != "aud");
         }
 
         public virtual string CreateSessionTokenResponse(ClaimsPrincipal principal)
