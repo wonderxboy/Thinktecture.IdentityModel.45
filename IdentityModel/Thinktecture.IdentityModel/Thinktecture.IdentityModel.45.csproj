@@ -238,6 +238,7 @@
   <ItemGroup>
     <Compile Include="Authorization\MVC\ClaimsAuthorizeAttribute.cs" />
     <Compile Include="Authorization\WebApi\ClaimsAuthorizeAttribute.cs" />
+    <Compile Include="Authorization\WebApi\ScopeAttribute.cs" />
     <Compile Include="Base64Url.cs" />
     <Compile Include="Constants\Internal.cs" />
     <Compile Include="Extensions\ClaimsExtensions.cs" />
