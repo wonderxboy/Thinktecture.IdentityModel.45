@@ -1,7 +1,4 @@
-﻿// This file is part of Hawk for ASP.NET Web API.
-
-// Hawk for ASP.NET Web API is free software: you can redistribute it
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
