@@ -280,27 +280,28 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             });
         }
 
-        public static void AddHawkAuthentication(this AuthenticationConfiguration configuration, Func<string, Credential> credentialsCallback, bool allowBewit = false, Func<HttpResponseMessage, string> normalizationCallback = null, Func<HttpRequestMessage, string, bool> verificationCallback = null)
-        {
-            var handler = new HawkSecurityTokenHandler(
-                            new HawkAuthenticationHandler(credentialsCallback,
-                                                            normalizationCallback, verificationCallback));
+        // todo: think about integration strategy
+        //public static void AddHawkAuthentication(this AuthenticationConfiguration configuration, Func<string, Credential> credentialsCallback, bool allowBewit = false, Func<HttpResponseMessage, string> normalizationCallback = null, Func<HttpRequestMessage, string, bool> verificationCallback = null)
+        //{
+        //    var handler = new HawkSecurityTokenHandler(
+        //                    new HawkAuthenticationHandler(credentialsCallback,
+        //                                                    normalizationCallback, verificationCallback));
 
-            configuration.AddMapping(new AuthenticationOptionMapping
-            {
-                TokenHandler = new SecurityTokenHandlerCollection { handler },
-                Options = AuthenticationOptions.ForAuthorizationHeader(scheme: "hawk"),
-                Scheme = AuthenticationScheme.SchemeOnly("hawk")
-            });
+        //    configuration.AddMapping(new AuthenticationOptionMapping
+        //    {
+        //        TokenHandler = new SecurityTokenHandlerCollection { handler },
+        //        Options = AuthenticationOptions.ForAuthorizationHeader(scheme: "hawk"),
+        //        Scheme = AuthenticationScheme.SchemeOnly("hawk")
+        //    });
 
-            if (allowBewit)
-            {
-                configuration.AddMapping(new AuthenticationOptionMapping
-                {
-                    TokenHandler = new SecurityTokenHandlerCollection { handler },
-                    Options = AuthenticationOptions.ForQueryString("bewit")
-                });
-            }
-        }
+        //    if (allowBewit)
+        //    {
+        //        configuration.AddMapping(new AuthenticationOptionMapping
+        //        {
+        //            TokenHandler = new SecurityTokenHandlerCollection { handler },
+        //            Options = AuthenticationOptions.ForQueryString("bewit")
+        //        });
+        //    }
+        //}
     }
 }

@@ -377,42 +377,43 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             throw new InvalidOperationException("No handler found");
         }
 
-        public virtual SecurityTokenHandler GetDelegatingHandlers(HttpRequestMessage request)
-        {
-            SecurityTokenHandlerCollection handlers = null;
+        // todo: think about integration strategy
+        //public virtual SecurityTokenHandler GetDelegatingHandlers(HttpRequestMessage request)
+        //{
+        //    SecurityTokenHandlerCollection handlers = null;
 
-            if (Configuration.HasAuthorizationHeaderMapping)
-            {
-                var authZ = request.Headers.Authorization;
-                if (authZ != null)
-                {
-                    Configuration.TryGetAuthorizationHeaderMapping(authZ.Scheme, out handlers);
+        //    if (Configuration.HasAuthorizationHeaderMapping)
+        //    {
+        //        var authZ = request.Headers.Authorization;
+        //        if (authZ != null)
+        //        {
+        //            Configuration.TryGetAuthorizationHeaderMapping(authZ.Scheme, out handlers);
 
-                    if (handlers != null)
-                        return handlers.First();
-                }
-            }
+        //            if (handlers != null)
+        //                return handlers.First();
+        //        }
+        //    }
             
-            if (Configuration.HasQueryStringMapping)
-            {
-                if (request.RequestUri != null && !string.IsNullOrWhiteSpace(request.RequestUri.Query))
-                {
-                    var queryString = request.RequestUri.ParseQueryString();
+        //    if (Configuration.HasQueryStringMapping)
+        //    {
+        //        if (request.RequestUri != null && !string.IsNullOrWhiteSpace(request.RequestUri.Query))
+        //        {
+        //            var queryString = request.RequestUri.ParseQueryString();
 
-                    if (queryString != null)
-                    {
-                        foreach (string param in queryString.Keys)
-                        {
-                            Configuration.TryGetQueryStringMapping(param, out handlers);
+        //            if (queryString != null)
+        //            {
+        //                foreach (string param in queryString.Keys)
+        //                {
+        //                    Configuration.TryGetQueryStringMapping(param, out handlers);
 
-                            if (handlers != null)
-                                return handlers.First();
-                        }
-                    }
-                }
-            }
+        //                    if (handlers != null)
+        //                        return handlers.First();
+        //                }
+        //            }
+        //        }
+        //    }
 
-            return null;
-        }
+        //    return null;
+        //}
     }
 }
