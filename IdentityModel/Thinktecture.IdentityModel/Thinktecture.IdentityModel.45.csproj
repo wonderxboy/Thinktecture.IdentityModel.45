@@ -268,6 +268,28 @@
     <Compile Include="Http\Cors\WebApi\WebApiHttpRequest.cs" />
     <Compile Include="Http\Cors\WebApi\WebApiHttpResponse.cs" />
     <Compile Include="Diagnostics\Area.cs" />
+    <Compile Include="Http\Hawk\Core\ArtifactsContainer.cs" />
+    <Compile Include="Http\Hawk\Core\AuthenticationResult.cs" />
+    <Compile Include="Http\Hawk\Core\Bewit.cs" />
+    <Compile Include="Http\Hawk\Core\Credential.cs" />
+    <Compile Include="Http\Hawk\Core\Cryptographer.cs" />
+    <Compile Include="Http\Hawk\Core\Extensions\ByteExtension.cs" />
+    <Compile Include="Http\Hawk\Core\Extensions\DateTimeExtension.cs" />
+    <Compile Include="Http\Hawk\Core\Extensions\HttpRequestMessageExtension.cs" />
+    <Compile Include="Http\Hawk\Core\Extensions\StringBuilderExtension.cs" />
+    <Compile Include="Http\Hawk\Core\Extensions\StringExtension.cs" />
+    <Compile Include="Http\Hawk\Client\HawkClient.cs" />
+    <Compile Include="Http\Hawk\Core\HawkSchemeHeader.cs" />
+    <Compile Include="Http\Hawk\Core\HawkServer.cs" />
+    <Compile Include="Http\Hawk\Core\Helpers\HawkConstants.cs" />
+    <Compile Include="Http\Hawk\Core\Helpers\Hasher.cs" />
+    <Compile Include="Http\Hawk\Core\Helpers\NonceGenerator.cs" />
+    <Compile Include="Http\Hawk\Core\NormalizedPayload.cs" />
+    <Compile Include="Http\Hawk\Core\NormalizedRequest.cs" />
+    <Compile Include="Http\Hawk\Core\NormalizedTimestamp.cs" />
+    <Compile Include="Http\Hawk\WebApi\HawkAuthenticationHandler.cs" />
+    <Compile Include="Http\Hawk\WebApi\HawkSecurityTokenHandler.cs" />
+    <Compile Include="Tokens\Http\PluggableDelegatingHandler.cs" />
     <Compile Include="Principal.cs" />
     <Compile Include="Clients\AccessControlService\IdentityProviderDiscoveryClient.cs" />
     <Compile Include="Clients\AccessControlService\IdentityProviderInformation.cs" />
@@ -310,6 +332,7 @@
     <Compile Include="Tokens\IssuerNameRegistry\MetadataBasedIssuerNameRegistry.cs" />
     <Compile Include="Tokens\JwtSecurityTokenHandlerWrapper.cs" />
     <Compile Include="Tokens\WrappedSecurityToken.cs" />
+    <Compile Include="Tokens\WrappedSecurityTokenHandler.cs" />
     <Compile Include="Web\Configuration\AppStart.cs" />
     <Compile Include="Web\Configuration\SecuritySessionSection.cs" />
     <Compile Include="Web\Configuration\SessionConfiguration.cs" />
@@ -389,6 +412,7 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

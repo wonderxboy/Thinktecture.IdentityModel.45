@@ -73,6 +73,14 @@
     <Compile Include="HttpAuthentication\BasicAuthentication.cs" />
     <Compile Include="HttpAuthentication\Configuration.cs" />
     <Compile Include="HttpAuthentication\General.cs" />
+    <Compile Include="HttpAuthentication\Hawk\IntegrationTests\BewitTests.cs" />
+    <Compile Include="HttpAuthentication\Hawk\IntegrationTests\Controllers\ValuesController.cs" />
+    <Compile Include="HttpAuthentication\Hawk\IntegrationTests\Helpers\ParameterChecker.cs" />
+    <Compile Include="HttpAuthentication\Hawk\IntegrationTests\Helpers\ServerFactory.cs" />
+    <Compile Include="HttpAuthentication\Hawk\IntegrationTests\SunnyDayTests.cs" />
+    <Compile Include="HttpAuthentication\Hawk\IntegrationTests\TamperTests.cs" />
+    <Compile Include="HttpAuthentication\Hawk\IntegrationTests\ValidationFailureTests.cs" />
+    <Compile Include="HttpAuthentication\Hawk\UnitTests\NormalizedRequestTests.cs" />
     <Compile Include="HttpAuthentication\SAML2.cs" />
     <Compile Include="Misc\PrincipalTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -89,6 +97,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
