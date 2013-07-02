@@ -16,6 +16,7 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
 using Thinktecture.IdentityModel.Diagnostics;
+using Thinktecture.IdentityModel.Http.Hawk.WebApi;
 
 namespace Thinktecture.IdentityModel.Tokens.Http
 {
@@ -70,6 +71,20 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             {
                 Tracing.Verbose(Area.HttpAuthentication, "Host client identity is inherited. Setting current principal");
                 SetPrincipal(request, ClaimsPrincipal.Current);
+            }
+
+            // If there is a handler to delegate the work to, do so.
+            var handler = _authN.GetDelegatingHandlers(request);
+            if (handler != null)
+            {
+                var handlerProperty = handler.GetType().GetProperties().FirstOrDefault(p => p.PropertyType.BaseType == typeof(PluggableDelegatingHandler));
+                if (handlerProperty != null)
+                {
+                    var delegatingHandler = handlerProperty.GetValue(handler) as PluggableDelegatingHandler;
+                    delegatingHandler.InnerHandler = this.InnerHandler;
+
+                    return await delegatingHandler.DelegatingSendAsync(request, cancellationToken);
+                }
             }
 
             ClaimsPrincipal principal;
@@ -134,7 +149,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             {
                 SetAuthenticateHeaders(response);
             }
-            
+
             return response;
         }
 

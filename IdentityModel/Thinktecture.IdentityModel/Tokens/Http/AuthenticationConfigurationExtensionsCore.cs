@@ -7,9 +7,12 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Selectors;
 using System.IdentityModel.Tokens;
+using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel.Security.Tokens;
 using Thinktecture.IdentityModel.Constants;
+using Thinktecture.IdentityModel.Http.Hawk.Core;
+using Thinktecture.IdentityModel.Http.Hawk.WebApi;
 
 namespace Thinktecture.IdentityModel.Tokens.Http
 {
@@ -275,6 +278,29 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                 TokenHandler = new SecurityTokenHandlerCollection { handler },
                 Options = options
             });
+        }
+
+        public static void AddHawkAuthentication(this AuthenticationConfiguration configuration, Func<string, Credential> credentialsCallback, bool allowBewit = false, Func<HttpResponseMessage, string> normalizationCallback = null, Func<HttpRequestMessage, string, bool> verificationCallback = null)
+        {
+            var handler = new HawkSecurityTokenHandler(
+                            new HawkAuthenticationHandler(credentialsCallback,
+                                                            normalizationCallback, verificationCallback));
+
+            configuration.AddMapping(new AuthenticationOptionMapping
+            {
+                TokenHandler = new SecurityTokenHandlerCollection { handler },
+                Options = AuthenticationOptions.ForAuthorizationHeader(scheme: "hawk"),
+                Scheme = AuthenticationScheme.SchemeOnly("hawk")
+            });
+
+            if (allowBewit)
+            {
+                configuration.AddMapping(new AuthenticationOptionMapping
+                {
+                    TokenHandler = new SecurityTokenHandlerCollection { handler },
+                    Options = AuthenticationOptions.ForQueryString("bewit")
+                });
+            }
         }
     }
 }
