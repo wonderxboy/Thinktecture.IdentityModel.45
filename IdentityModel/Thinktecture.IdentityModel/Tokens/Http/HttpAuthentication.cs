@@ -15,7 +15,6 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel.Security.Tokens;
-using Thinktecture.IdentityModel.Diagnostics;
 
 namespace Thinktecture.IdentityModel.Tokens.Http
 {
@@ -40,7 +39,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
                 if (principal.Identity.IsAuthenticated)
                 {
-                    Tracing.Information(Area.HttpAuthentication, "Client authenticated using session token");
+                    Tracing.Information("Client authenticated using session token");
                     return principal;
                 }
             }
@@ -51,13 +50,13 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                 var authZ = request.Headers.Authorization;
                 if (authZ != null)
                 {
-                    Tracing.Verbose(Area.HttpAuthentication, "Mapping for authorization header found: " + authZ.Scheme);
+                    Tracing.Verbose("Mapping for authorization header found: " + authZ.Scheme);
 
                     var principal = AuthenticateAuthorizationHeader(authZ.Scheme, authZ.Parameter);
 
                     if (principal.Identity.IsAuthenticated)
                     {
-                        Tracing.Information(Area.HttpAuthentication, "Client authenticated using authorization header mapping: " + authZ.Scheme);
+                        Tracing.Information("Client authenticated using authorization header mapping: " + authZ.Scheme);
                         identities.Add(principal.Identities.First());
                     }
                 }
@@ -68,13 +67,13 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             {
                 if (request.Headers != null)
                 {
-                    Tracing.Verbose(Area.HttpAuthentication, "Mapping for header header found.");
+                    Tracing.Verbose("Mapping for header header found.");
 
                     var principal = AuthenticateHeaders(request.Headers);
 
                     if (principal.Identity.IsAuthenticated)
                     {
-                        Tracing.Information(Area.HttpAuthentication, "Client authenticated using header mapping");
+                        Tracing.Information("Client authenticated using header mapping");
                         identities.Add(principal.Identities.First());
                     }
                 }
@@ -85,13 +84,13 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             {
                 if (request.RequestUri != null && !string.IsNullOrWhiteSpace(request.RequestUri.Query))
                 {
-                    Tracing.Verbose(Area.HttpAuthentication, "Mapping for query string found.");
+                    Tracing.Verbose("Mapping for query string found.");
 
                     var principal = AuthenticateQueryStrings(request.RequestUri);
 
                     if (principal.Identity.IsAuthenticated)
                     {
-                        Tracing.Information(Area.HttpAuthentication, "Client authenticated using query string mapping");
+                        Tracing.Information("Client authenticated using query string mapping");
                         identities.Add(principal.Identities.First());
                     }
                 }
@@ -104,13 +103,13 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
                 if (cert != null)
                 {
-                    Tracing.Verbose(Area.HttpAuthentication, "Mapping for client certificate found.");
+                    Tracing.Verbose("Mapping for client certificate found.");
 
                     var principal = AuthenticateClientCertificate(cert);
 
                     if (principal.Identity.IsAuthenticated)
                     {
-                        Tracing.Information(Area.HttpAuthentication, "Client authenticated using client certificate");
+                        Tracing.Information("Client authenticated using client certificate");
                         identities.Add(principal.Identities.First());
                     }
                 }
@@ -366,7 +365,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
             if (handler != null)
             {
-                Tracing.Information(Area.HttpAuthentication, "Invoking token handler: " + handler.GetType().FullName);
+                Tracing.Information("Invoking token handler: " + handler.GetType().FullName);
 
                 var token = handler.ReadToken(tokenString);
                 var principal = new ClaimsPrincipal(handler.ValidateToken(token));

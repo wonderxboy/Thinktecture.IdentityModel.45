@@ -269,7 +269,6 @@
     <Compile Include="Http\Cors\WebApi\WebApiCorsConfiguration.cs" />
     <Compile Include="Http\Cors\WebApi\WebApiHttpRequest.cs" />
     <Compile Include="Http\Cors\WebApi\WebApiHttpResponse.cs" />
-    <Compile Include="Diagnostics\Area.cs" />
     <Compile Include="Http\Hawk\Core\ArtifactsContainer.cs" />
     <Compile Include="Http\Hawk\Core\AuthenticationResult.cs" />
     <Compile Include="Http\Hawk\Core\Bewit.cs" />
@@ -324,7 +323,7 @@
     <Compile Include="Tokens\Http\HttpRequestSecurityToken.cs" />
     <Compile Include="Tokens\Http\HttpRequestSecurityTokenHandler.cs" />
     <Compile Include="Tokens\Http\SessionTokenConfiguration.cs" />
-    <Compile Include="Diagnostics\Tracing.cs" />
+    <Compile Include="Tracing.cs" />
     <Compile Include="Tokens\IssuerNameRegistry\CachingMetadataBasedIssuerNameRegistry.cs" />
     <Compile Include="Tokens\IssuerNameRegistry\FileBasedMetadataCache.cs" />
     <Compile Include="Tokens\IssuerNameRegistry\IMetadataCache.cs" />
