@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Net.Http;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Thinktecture.IdentityModel.Http.Hawk.Core;
 
 namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.UnitTests
 {
     [TestClass]
-    public class NormalizedRequestTests
+    public class Hawk_NormalizedRequestTests
     {
         [TestMethod]
         public void HostAndPortMustMatchWhatIsInRequestWhenHostAndXffHeadersAreAbsent()

@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Extensions;
-using Thinktecture.IdentityModel.Http.Hawk.Core.Helpers;
 
 namespace Thinktecture.IdentityModel.Http.Hawk.Core
 {

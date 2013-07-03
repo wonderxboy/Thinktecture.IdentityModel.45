@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -8,7 +9,6 @@ using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Client;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Helpers;
 using Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTests.Helpers;
@@ -16,7 +16,7 @@ using Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTests.
 namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTests
 {
     [TestClass]
-    public class TamperTests
+    public class Hawk_TamperTests
     {
         const string URI = "http://localhost/api/values";
 

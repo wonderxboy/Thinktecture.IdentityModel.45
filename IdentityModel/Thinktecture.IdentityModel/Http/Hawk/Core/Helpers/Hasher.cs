@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Extensions;
 
 namespace Thinktecture.IdentityModel.Http.Hawk.Core.Helpers

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Web;
 using Thinktecture.IdentityModel.Http.Hawk.Core;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Helpers;
-using Thinktecture.IdentityModel.Tokens.Http;
 
 namespace Thinktecture.IdentityModel.Http.Hawk.WebApi
 {
@@ -15,7 +14,7 @@ namespace Thinktecture.IdentityModel.Http.Hawk.WebApi
     /// The message handler that performs the authentication based on the authenticity of the HMAC.
     /// Add a new instance of this handler to config.MessageHandlers in WebApiConfig.Register().
     /// </summary>
-    internal class HawkAuthenticationHandler : PluggableDelegatingHandler
+    internal class HawkAuthenticationHandler : DelegatingHandler
     {
         private readonly Func<string, Credential> credentialsCallback = null;
         private readonly Func<HttpResponseMessage, string> normalizationCallback = null;

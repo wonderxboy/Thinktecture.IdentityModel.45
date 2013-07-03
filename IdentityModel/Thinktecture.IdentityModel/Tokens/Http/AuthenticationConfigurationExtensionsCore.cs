@@ -7,12 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Selectors;
 using System.IdentityModel.Tokens;
-using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel.Security.Tokens;
 using Thinktecture.IdentityModel.Constants;
-using Thinktecture.IdentityModel.Http.Hawk.Core;
-using Thinktecture.IdentityModel.Http.Hawk.WebApi;
 
 namespace Thinktecture.IdentityModel.Tokens.Http
 {

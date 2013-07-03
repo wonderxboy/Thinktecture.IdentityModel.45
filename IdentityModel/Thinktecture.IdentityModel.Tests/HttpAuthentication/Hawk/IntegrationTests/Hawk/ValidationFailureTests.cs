@@ -1,20 +1,20 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Linq;
-using System.Web.Http;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Net.Http;
-using System.Threading;
 using System.Net;
-using System.Security.Principal;
+using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Principal;
+using System.Threading;
 using System.Threading.Tasks;
-using Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTests.Helpers;
+using System.Web.Http;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Client;
+using Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTests.Helpers;
 
 namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTests
 {
     [TestClass]
-    public class ValidationFailureTests
+    public class Hawk_ValidationFailureTests
     {
         const string URI = "http://localhost/api/values";
 

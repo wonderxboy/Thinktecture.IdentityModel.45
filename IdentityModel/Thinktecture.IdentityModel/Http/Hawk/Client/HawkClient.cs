@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Configuration;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Configuration;
-using System.Net;
+using System.Threading.Tasks;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Extensions;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Helpers;
 

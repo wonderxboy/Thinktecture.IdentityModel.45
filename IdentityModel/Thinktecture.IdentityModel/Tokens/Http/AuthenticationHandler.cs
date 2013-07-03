@@ -16,7 +16,6 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
 using Thinktecture.IdentityModel.Diagnostics;
-using Thinktecture.IdentityModel.Http.Hawk.WebApi;
 
 namespace Thinktecture.IdentityModel.Tokens.Http
 {
