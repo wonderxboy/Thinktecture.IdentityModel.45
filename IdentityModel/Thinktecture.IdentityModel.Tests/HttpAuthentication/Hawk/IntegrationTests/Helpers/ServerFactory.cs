@@ -51,12 +51,12 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
 
             Func<string, Credential> callback = (id) => Credentials.FirstOrDefault(c => c.Id == id);
 
-            var authConfig = new AuthenticationConfiguration() { RequireSsl = false };
-            authConfig.AddHawkAuthentication(callback, allowBewit: true,
-                                                        normalizationCallback: normalizationCallback,
-                                                            verificationCallback: verificationCallback);
+            //var authConfig = new AuthenticationConfiguration() { RequireSsl = false };
+            //authConfig.AddHawkAuthentication(callback, allowBewit: true,
+            //                                            normalizationCallback: normalizationCallback,
+            //                                                verificationCallback: verificationCallback);
 
-            configuration.MessageHandlers.Add(new AuthenticationHandler(authConfig));
+            //configuration.MessageHandlers.Add(new AuthenticationHandler(authConfig));
 
             return new HttpServer(configuration);
         }
