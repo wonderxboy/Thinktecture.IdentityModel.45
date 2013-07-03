@@ -267,6 +267,7 @@
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Home\IdentityApi.cshtml" />
     <Content Include="Views\Home\IdentityMvc.cshtml" />
+    <Content Include="tracing.config" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

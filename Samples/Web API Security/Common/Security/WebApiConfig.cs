@@ -27,6 +27,8 @@ namespace Thinktecture.Samples.Security
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+
+            //config.EnableSystemDiagnosticsTracing();
         }
 
         private static AuthenticationConfiguration CreateAuthenticationConfiguration()

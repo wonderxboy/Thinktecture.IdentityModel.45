@@ -49,7 +49,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             {
                 if (request.RequestUri.Scheme != Uri.UriSchemeHttps)
                 {
-                    Tracing.Information("Request rejected because it is not over HTTPS.");
+                    Tracing.Warning("Request rejected because it is not over HTTPS.");
 
                     var forbiddenResponse =
                         request.CreateResponse(HttpStatusCode.Forbidden);
