@@ -72,21 +72,6 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                 SetPrincipal(request, ClaimsPrincipal.Current);
             }
 
-            // If there is a handler to delegate the work to, do so.
-            // todo: think about if this is the best integration strategy
-            //var handler = _authN.GetDelegatingHandlers(request);
-            //if (handler != null)
-            //{
-            //    var handlerProperty = handler.GetType().GetProperties().FirstOrDefault(p => p.PropertyType.BaseType == typeof(PluggableDelegatingHandler));
-            //    if (handlerProperty != null)
-            //    {
-            //        var delegatingHandler = handlerProperty.GetValue(handler) as PluggableDelegatingHandler;
-            //        delegatingHandler.InnerHandler = this.InnerHandler;
-
-            //        return await delegatingHandler.DelegatingSendAsync(request, cancellationToken);
-            //    }
-            //}
-
             ClaimsPrincipal principal;
             try
             {
