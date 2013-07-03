@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens;
 using System.IO;
 using System.Xml;
 using Thinktecture.IdentityModel.Constants;
+using Thinktecture.IdentityModel.Http;
 
 namespace Thinktecture.IdentityModel.Tokens.Http
 {
@@ -42,6 +43,12 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         public override SecurityToken ReadToken(string tokenString)
         {
+            // unbase64 header if necessary
+            if (HeaderEncoding.IsBase64Encoded(tokenString))
+            {
+                tokenString = HeaderEncoding.DecodeBase64(tokenString);
+            }
+
             return ContainingCollection.ReadToken(new XmlTextReader(new StringReader(tokenString)));
         }
 
