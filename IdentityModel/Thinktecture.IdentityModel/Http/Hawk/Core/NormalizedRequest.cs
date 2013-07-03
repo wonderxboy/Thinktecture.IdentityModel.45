@@ -50,9 +50,9 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
             this.hostName = this.GetHostName(firstPreference, out this.port) ??
                                 this.GetHostName(secondPreference, out this.port) ??
                                     request.RequestUri.Host;
-            
-            if(String.IsNullOrWhiteSpace(this.port))
-                this.port = (request.RequestUri.Scheme == Uri.UriSchemeHttps) ? HTTPS_PORT : HTTP_PORT;
+
+            if (String.IsNullOrWhiteSpace(this.port))
+                this.port = request.RequestUri.Port.ToString();
 
             this.method = request.Method.Method.ToUpper();
             this.path = request.RequestUri.PathAndQuery;

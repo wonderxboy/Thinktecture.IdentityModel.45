@@ -108,7 +108,7 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core.Client
             string parameter = String.Format("{0}={1}", HawkConstants.Bewit, bewitString);
 
             string queryString = request.RequestUri.Query;
-            queryString = String.IsNullOrWhiteSpace(queryString) ? parameter : parameter + "&" + queryString;
+            queryString = String.IsNullOrWhiteSpace(queryString) ? parameter : queryString.Substring(1) + "&" + parameter;
 
             var builder = new UriBuilder(request.RequestUri);
             builder.Query = queryString;
