@@ -229,6 +229,7 @@
     <Content Include="Views\XFrameOptions\SameOrigin.cshtml" />
     <Content Include="Views\XFrameOptions\CustomOrigin1.cshtml" />
     <Content Include="Views\XFrameOptions\CustomOrigin2.cshtml" />
+    <Content Include="Views\XFrameOptions\DenyImplicit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

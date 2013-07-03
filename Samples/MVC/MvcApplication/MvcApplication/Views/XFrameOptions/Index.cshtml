@@ -3,7 +3,12 @@
 }
 
 <div>
-    <p>Deny Frame (should not work)</p>
+    <p>Deny Implicit Frame (should not work)</p>
+    <p><iframe src="@Url.Action("DenyImplicit")"></iframe></p>
+</div>
+
+<div>
+    <p>Deny Explicit Frame (should not work)</p>
     <p><iframe src="@Url.Action("Deny")"></iframe></p>
 </div>
 

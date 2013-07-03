@@ -16,8 +16,14 @@ namespace MvcApplication.Controllers
         {
             return View();
         }
-        
+
         [FrameOptions]
+        public ActionResult DenyImplicit()
+        {
+            return View();
+        }
+        
+        [FrameOptions(FrameOptions.Deny)]
         public ActionResult Deny()
         {
             return View();
