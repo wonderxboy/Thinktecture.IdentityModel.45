@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Thinktecture.IdentityModel.Http.Hawk.Core;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Helpers;
+using Thinktecture.IdentityModel.Http.Hawk.WebApi;
 
 namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTests.Helpers
 {
@@ -46,14 +47,10 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
                 defaults: new { id = RouteParameter.Optional }
             );
 
-            Func<string, Credential> callback = (id) => Credentials.FirstOrDefault(c => c.Id == id);
+            Func<string, Credential> credentialsCallback = (id) => Credentials.FirstOrDefault(c => c.Id == id);
 
-            //var authConfig = new AuthenticationConfiguration() { RequireSsl = false };
-            //authConfig.AddHawkAuthentication(callback, allowBewit: true,
-            //                                            normalizationCallback: normalizationCallback,
-            //                                                verificationCallback: verificationCallback);
-
-            //configuration.MessageHandlers.Add(new AuthenticationHandler(authConfig));
+            var hawkHandler = new HawkAuthenticationHandler(credentialsCallback, normalizationCallback, verificationCallback);
+            configuration.MessageHandlers.Add(hawkHandler);
 
             return new HttpServer(configuration);
         }

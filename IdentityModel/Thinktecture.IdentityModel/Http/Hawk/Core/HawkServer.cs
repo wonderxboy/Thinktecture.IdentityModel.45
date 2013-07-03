@@ -91,12 +91,7 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
         {
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
-                string challengeParameter = request.GetChallengeParameter();
-
-                var header = String.IsNullOrWhiteSpace(challengeParameter) ?
-                                new AuthenticationHeaderValue(HawkConstants.Scheme) :
-                                    new AuthenticationHeaderValue(HawkConstants.Scheme, challengeParameter);
-
+                var header = new AuthenticationHeaderValue(HawkConstants.Scheme, request.GetChallengeParameter());
                 response.Headers.WwwAuthenticate.Add(header);
             }
             else

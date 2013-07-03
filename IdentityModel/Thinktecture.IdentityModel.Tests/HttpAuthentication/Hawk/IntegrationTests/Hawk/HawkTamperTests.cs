@@ -16,7 +16,7 @@ using Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTests.
 namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTests
 {
     [TestClass]
-    public class Hawk_TamperTests
+    public class HawkTamperTests
     {
         const string URI = "http://localhost/api/values";
 

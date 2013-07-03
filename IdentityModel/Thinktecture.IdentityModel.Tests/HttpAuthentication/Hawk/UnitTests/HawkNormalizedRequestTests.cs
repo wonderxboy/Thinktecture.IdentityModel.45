@@ -6,7 +6,7 @@ using Thinktecture.IdentityModel.Http.Hawk.Core;
 namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.UnitTests
 {
     [TestClass]
-    public class Hawk_NormalizedRequestTests
+    public class HawkNormalizedRequestTests
     {
         [TestMethod]
         public void HostAndPortMustMatchWhatIsInRequestWhenHostAndXffHeadersAreAbsent()
