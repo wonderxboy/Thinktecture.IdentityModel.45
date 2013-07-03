@@ -9,8 +9,8 @@ namespace Thinktecture.IdentityModel.Http
         public static bool IsBase64Encoded(string token)
         {
             token = token.Trim();
-            return (token.Length % 4 == 0)
-            && Regex.IsMatch(token, @"^[a-zA-Z0-9+/]*={0,3}$", RegexOptions.None);
+            return (token.Length % 4 == 0) &&
+                   (Regex.IsMatch(token, @"^[a-zA-Z0-9+/]*={0,3}$", RegexOptions.None));
         }
 
         public static string EncodeBase64(string token)
