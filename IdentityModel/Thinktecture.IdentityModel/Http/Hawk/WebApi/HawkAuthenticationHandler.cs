@@ -14,7 +14,7 @@ namespace Thinktecture.IdentityModel.Http.Hawk.WebApi
     /// The message handler that performs the authentication based on the authenticity of the HMAC.
     /// Add a new instance of this handler to config.MessageHandlers in WebApiConfig.Register().
     /// </summary>
-    internal class HawkAuthenticationHandler : DelegatingHandler
+    public class HawkAuthenticationHandler : DelegatingHandler
     {
         private readonly Func<string, Credential> credentialsCallback = null;
         private readonly Func<HttpResponseMessage, string> normalizationCallback = null;
@@ -26,7 +26,7 @@ namespace Thinktecture.IdentityModel.Http.Hawk.WebApi
         /// <param name="credentialsCallback">The callback function that returns a Credential object corresponding to the identifier passed in.</param>
         /// <param name="normalizationCallback">The callback function that returns the application specific data that the web api can send in the response.</param>
         /// <param name="verificationCallback">The callback function that returns true, if the application specific data in the request is valid.</param>
-        internal HawkAuthenticationHandler(Func<string, Credential> credentialsCallback,
+        public HawkAuthenticationHandler(Func<string, Credential> credentialsCallback,
                                                 Func<HttpResponseMessage, string> normalizationCallback = null,
                                                     Func<HttpRequestMessage, string, bool> verificationCallback = null)
         {

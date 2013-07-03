@@ -26,7 +26,7 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core.Extensions
                 return (string)request.Properties[PARAMETER_KEY];
             }
 
-            return String.Empty;
+            return null;
         }
 
         /// <summary>
