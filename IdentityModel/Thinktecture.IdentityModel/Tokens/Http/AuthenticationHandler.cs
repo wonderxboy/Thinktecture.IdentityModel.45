@@ -134,7 +134,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             {
                 SetAuthenticateHeaders(response);
             }
-            
+
             return response;
         }
 

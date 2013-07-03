@@ -136,50 +136,6 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             });
         }
 
-        //public static void AddJsonWebToken(this AuthenticationConfiguration configuration, string issuer, string audience, string signingKey, AuthenticationOptions options, AuthenticationScheme scheme)
-        //{
-        //    var config = new SecurityTokenHandlerConfiguration();
-        //    var registry = new WebTokenIssuerNameRegistry();
-        //    registry.AddTrustedIssuer(issuer, issuer);
-        //    config.IssuerNameRegistry = registry;
-
-        //    var issuerResolver = new WebTokenIssuerTokenResolver();
-        //    issuerResolver.AddSigningKey(issuer, signingKey);
-        //    config.IssuerTokenResolver = issuerResolver;
-
-        //    config.AudienceRestriction.AllowedAudienceUris.Add(new Uri(audience));
-
-        //    var handler = new JsonWebTokenHandler();
-        //    handler.Configuration = config;
-
-        //    configuration.AddMapping(new AuthenticationOptionMapping
-        //    {
-        //        TokenHandler = new SecurityTokenHandlerCollection { handler },
-        //        Options = options,
-        //        Scheme = scheme
-        //    });
-        //}
-
-        //public static void AddJsonWebToken(this AuthenticationConfiguration configuration, string issuer, string audience, string signingKey, string scheme)
-        //{
-        //    configuration.AddJsonWebToken(
-        //        issuer,
-        //        audience,
-        //        signingKey,
-        //        AuthenticationOptions.ForAuthorizationHeader(scheme),
-        //        AuthenticationScheme.SchemeOnly(scheme));
-        //}
-
-        //public static void AddJsonWebToken(this AuthenticationConfiguration configuration, string issuer, string audience, string signingKey)
-        //{
-        //    configuration.AddJsonWebToken(
-        //        issuer, 
-        //        audience, 
-        //        signingKey, 
-        //        AuthenticationOptions.ForAuthorizationHeader(JwtConstants.Bearer),
-        //        AuthenticationScheme.SchemeOnly(JwtConstants.Bearer));
-        //}
-
         public static void AddBasicAuthentication(this AuthenticationConfiguration configuration, BasicAuthenticationSecurityTokenHandler.ValidateUserNameCredentialDelegate validationDelegate, string realm = "localhost", bool retainPassword = false)
         {
             var handler = new BasicAuthenticationSecurityTokenHandler(validationDelegate);
@@ -276,5 +232,29 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                 Options = options
             });
         }
+
+        // todo: think about integration strategy
+        //public static void AddHawkAuthentication(this AuthenticationConfiguration configuration, Func<string, Credential> credentialsCallback, bool allowBewit = false, Func<HttpResponseMessage, string> normalizationCallback = null, Func<HttpRequestMessage, string, bool> verificationCallback = null)
+        //{
+        //    var handler = new HawkSecurityTokenHandler(
+        //                    new HawkAuthenticationHandler(credentialsCallback,
+        //                                                    normalizationCallback, verificationCallback));
+
+        //    configuration.AddMapping(new AuthenticationOptionMapping
+        //    {
+        //        TokenHandler = new SecurityTokenHandlerCollection { handler },
+        //        Options = AuthenticationOptions.ForAuthorizationHeader(scheme: "hawk"),
+        //        Scheme = AuthenticationScheme.SchemeOnly("hawk")
+        //    });
+
+        //    if (allowBewit)
+        //    {
+        //        configuration.AddMapping(new AuthenticationOptionMapping
+        //        {
+        //            TokenHandler = new SecurityTokenHandlerCollection { handler },
+        //            Options = AuthenticationOptions.ForQueryString("bewit")
+        //        });
+        //    }
+        //}
     }
 }
