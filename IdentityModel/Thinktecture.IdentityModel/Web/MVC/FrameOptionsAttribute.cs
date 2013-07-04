@@ -26,6 +26,7 @@ namespace Thinktecture.IdentityModel.Web.Mvc
     /// <summary>
     ///  FrameOptionsAttribute allows you to set the X-Frame-Options HTTP response header to prevent clickjacking attacks. See https://developer.mozilla.org/en-US/docs/HTTP/X-Frame-Options for more information.
     /// </summary>
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple=false)]
     public class FrameOptionsAttribute : ActionFilterAttribute
     {
         const string HeaderName = "X-Frame-Options";
@@ -68,6 +69,8 @@ namespace Thinktecture.IdentityModel.Web.Mvc
         public override void OnResultExecuting(ResultExecutingContext filterContext)
         {
             if (filterContext == null) throw new ArgumentNullException("filterContext");
+
+            if (filterContext.IsChildAction) return;
 
             string value = null;
             switch (this.options)
