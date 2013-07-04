@@ -25,7 +25,7 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
             ArtifactsContainer artifacts = null;
             Credential credential = null;
 
-            if(request.HasValidHawkScheme())
+            if (request.HasValidHawkScheme())
             {
                 if (ArtifactsContainer.TryParse(request.Headers.Authorization.Parameter, out artifacts))
                 {
@@ -72,12 +72,29 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
         /// </summary>
         private static bool IsTimestampFresh(ulong now, ArtifactsContainer artifacts)
         {
-            now = now + UInt64.Parse(ConfigurationManager.AppSettings["LocalTimeOffsetMillis"]);
+            string offset = ConfigurationManager.AppSettings["LocalTimeOffsetMillis"];
+            string skew = ConfigurationManager.AppSettings["ClockSkewSeconds"];
 
-            ulong shelfLife = (UInt64.Parse(ConfigurationManager.AppSettings["ClockSkewSeconds"]) * 1000);
+            if (offset == null || skew == null)
+            {
+                string message = "Required config settings of LocalTimeOffsetMillis or ClockSkewSeconds missing.";
+                Tracing.Error(message);
+
+                throw new Exception(message);
+            }
+
+            now = now + UInt64.Parse(offset);
+
+            ulong shelfLife = (UInt64.Parse(skew) * 1000);
             var age = Math.Abs((artifacts.Timestamp * 1000.0) - now);
 
-            return (age <= shelfLife);
+            bool isFresh = (age <= shelfLife);
+
+            if (!isFresh)
+                Tracing.Information(
+                            String.Format("Stale Timestamp: Age {0} is more than shelf life of {1}", age, shelfLife));
+
+            return isFresh;
         }
     }
 }

@@ -237,6 +237,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authorization\MVC\ClaimsAuthorizeAttribute.cs" />
+    <Compile Include="Http\Hawk\Client\HawkValidatingHandler.cs" />
     <Compile Include="Tokens\FederationMetadata.cs" />
     <Compile Include="Web\MVC\FrameOptionsAttribute.cs" />
     <Compile Include="Authorization\WebApi\ClaimsAuthorizeAttribute.cs" />

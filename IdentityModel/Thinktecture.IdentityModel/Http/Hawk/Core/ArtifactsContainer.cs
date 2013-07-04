@@ -22,7 +22,7 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
         private const string MAC = "mac";
         private const string HASH = "hash";
         private const string TSM = "tsm";
-        
+
         /// <summary>
         /// Hawk credentials identifier.
         /// </summary>
@@ -132,6 +132,8 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
                 return true;
             }
 
+            Tracing.Error("Unable to parse the artifacts.");
+
             container = null;
             return false;
         }
@@ -152,7 +154,7 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
         internal string ToServerAuthorizationHeaderParameter()
         {
             return this.ToHeaderParameter(
-                                includeClientArtifacts:false); // Do not need the client supplied id, ts, and nonce
+                                includeClientArtifacts: false); // Do not need the client supplied id, ts, and nonce
         }
 
         /// <summary>
@@ -183,4 +185,3 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
         }
     }
 }
-

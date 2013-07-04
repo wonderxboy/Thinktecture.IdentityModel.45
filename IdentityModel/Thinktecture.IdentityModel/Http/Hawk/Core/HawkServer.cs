@@ -52,6 +52,9 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
             string bewit;
             bool isBewit = Bewit.TryGetBewit(this.request, out bewit);
 
+            if (isBewit)
+                Tracing.Information("Bewit Found");
+
             var authentication = isBewit ?
                                         Bewit.AuthenticateAsync(bewit, now, request, credentialsFunc) :
                                             HawkSchemeHeader.AuthenticateAsync(now, request, credentialsFunc);
@@ -65,7 +68,7 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
                 // The application specific data is considered verified, if the callback is not set or it returns true.
                 bool isAppSpecificDataVerified = this.verificationCallback == null ||
                                                     this.verificationCallback(request, result.ApplicationSpecificData);
-                
+
                 if (isAppSpecificDataVerified)
                 {
                     // Set the flag so that Server-Authorization header is not sent for bewit requests.
@@ -73,14 +76,16 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
 
                     var idClaim = new Claim(ClaimTypes.NameIdentifier, result.Credential.Id);
                     var nameClaim = new Claim(ClaimTypes.Name, result.Credential.User);
-                    
+
                     var identity = new ClaimsIdentity(new[] { idClaim, nameClaim }, HawkConstants.Scheme);
 
                     return new ClaimsPrincipal(identity);
                 }
+                else
+                    Tracing.Information("Invalid Application Specific Data, though authentication is successful.");
             }
-            
-            return null;
+
+            return Principal.Anonymous;
         }
 
         /// <summary>

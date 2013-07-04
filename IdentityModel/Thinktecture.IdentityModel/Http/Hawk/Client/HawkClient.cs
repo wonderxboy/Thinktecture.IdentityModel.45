@@ -36,10 +36,20 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core.Client
             if (credentialFunc == null)
                 throw new ArgumentNullException("Credential callback is null");
 
+            string enableValidation = ConfigurationManager.AppSettings["EnableResponseValidation"];
+            string enableAutoCompensation = ConfigurationManager.AppSettings["EnableAutoCompensationForClockSkew"];
+
+            if (enableValidation == null || enableAutoCompensation == null)
+            {
+                string message = "Required config settings of EnableResponseValidation or EnableAutoCompensationForClockSkew missing.";
+                Tracing.Error(message);
+
+                throw new Exception(message);
+            }
+
             this.credentialFunc = credentialFunc;
-            this.enableResponseValidation = ConfigurationManager.AppSettings["EnableResponseValidation"].ToBool();
-            this.enableAutoCompensationForClockSkew = 
-                                    ConfigurationManager.AppSettings["EnableAutoCompensationForClockSkew"].ToBool();
+            this.enableResponseValidation = enableValidation.ToBool();
+            this.enableAutoCompensationForClockSkew = enableAutoCompensation.ToBool();
         }
 
         /// <summary>
@@ -144,7 +154,7 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core.Client
                                                 HawkConstants.Scheme,
                                                 this.artifacts.ToAuthorizationHeaderParameter());
         }
-        
+
         /// <summary>
         /// Returns true if the server response HMAC cannot be validated, indicating possible tampering.
         /// </summary>
@@ -170,7 +180,7 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core.Client
 
                         bool isValid = await crypto.IsSignatureValidAsync(response.Content);
 
-                        if(isValid)
+                        if (isValid)
                             this.WebApiSpecificData = serverAuthorizationArtifacts.ApplicationSpecificData;
 
                         return !isValid;
@@ -208,6 +218,8 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core.Client
 
                         lock (myPrecious)
                             HawkClient.CompensatorySeconds = (int)(timestampArtifacts.Timestamp - DateTime.UtcNow.ToUnixTime());
+
+                        Tracing.Information("HawkClient.CompensatorySeconds set to " + HawkClient.CompensatorySeconds);
                     }
                 }
             }

@@ -1,6 +1,9 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Helpers;
+using Thinktecture.IdentityModel.Http.Hawk.Core.Extensions;
+using System.Text;
 
 namespace Thinktecture.IdentityModel.Http.Hawk.Core
 {
@@ -44,11 +47,17 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
                 var payload = new NormalizedPayload(newContent);
                 byte[] data = await payload.ToBytesAsync();
 
+                Tracing.Verbose("Normalized payload: " + Encoding.UTF8.GetString(data));
+
                 responsePayloadHash = hasher.ComputeHash(data);
             }
 
             artifacts.PayloadHash = responsePayloadHash;
-            artifacts.Mac = hasher.ComputeHmac(this.normalizedRequest.ToBytes(), credential.Key);
+
+            byte[] normalizedRequest = this.normalizedRequest.ToBytes();
+            artifacts.Mac = hasher.ComputeHmac(normalizedRequest, credential.Key);
+
+            Tracing.Verbose("Normalized request: " + Encoding.UTF8.GetString(normalizedRequest));
         }
 
         private bool IsMacValid()
@@ -57,7 +66,13 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
             // data, at this point has the hash coming in over the wire and hence mac computed is based 
             // on the hash over the wire and not over the computed hash
 
-            return this.hasher.IsValidMac(data, credential.Key, artifacts.Mac);
+            bool isMacValid = this.hasher.IsValidMac(data, credential.Key, artifacts.Mac);
+
+            if (!isMacValid)
+                Tracing.Information(
+                    String.Format("Invalid Mac {0} for data {1}", artifacts.Mac.ToBase64String(),
+                                                                            Encoding.UTF8.GetString(data)));
+            return isMacValid;
         }
 
         private bool IsHashNotPresent()
@@ -70,7 +85,14 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
             var normalizedPayload = new NormalizedPayload(payload);
             byte[] data = await normalizedPayload.ToBytesAsync();
 
-            return this.hasher.IsValidHash(data, artifacts.PayloadHash);
+            bool isHashValid = this.hasher.IsValidHash(data, artifacts.PayloadHash);
+
+            if (!isHashValid)
+                Tracing.Information(
+                    String.Format("Invalid payload hash {0} for data {1}", artifacts.PayloadHash.ToBase64String(),
+                                                                            Encoding.UTF8.GetString(data)));
+
+            return isHashValid;
         }
     }
 }

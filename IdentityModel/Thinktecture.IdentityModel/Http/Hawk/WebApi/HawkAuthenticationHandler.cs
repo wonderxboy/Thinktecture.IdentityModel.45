@@ -41,18 +41,22 @@ namespace Thinktecture.IdentityModel.Http.Hawk.WebApi
         protected async override Task<HttpResponseMessage> SendAsync(
                                         HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            Tracing.Start("HawkAuthenticationHandler");
+
             try
             {
                 HawkServer server = new HawkServer(request, credentialsCallback, verificationCallback);
 
                 var principal = await server.AuthenticateAsync();
 
-                if (principal != null)
+                if (principal != null && principal.Identity.IsAuthenticated)
                 {
                     Thread.CurrentPrincipal = principal;
 
                     if (HttpContext.Current != null)
                         HttpContext.Current.User = principal;
+
+                    Tracing.Verbose("Authentication Successful and principal set for " + principal.Identity.Name);
                 }
 
                 var response = await base.SendAsync(request, cancellationToken);
@@ -61,8 +65,10 @@ namespace Thinktecture.IdentityModel.Http.Hawk.WebApi
 
                 return response;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Tracing.Error("Exception: " + ex.ToString());
+
                 var response = request.CreateResponse(HttpStatusCode.Unauthorized);
                 response.Headers.WwwAuthenticate.Add(new AuthenticationHeaderValue(HawkConstants.Scheme));
 
