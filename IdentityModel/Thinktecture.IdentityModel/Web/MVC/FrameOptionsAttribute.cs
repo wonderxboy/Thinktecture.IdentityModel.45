@@ -67,6 +67,8 @@ namespace Thinktecture.IdentityModel.Web.Mvc
 
         public override void OnResultExecuting(ResultExecutingContext filterContext)
         {
+            if (filterContext == null) throw new ArgumentNullException("filterContext");
+
             string value = null;
             switch (this.options)
             {   
@@ -88,10 +90,13 @@ namespace Thinktecture.IdentityModel.Web.Mvc
 
         string GetCustomOriginHeaderValue(HttpRequestBase request)
         {
+            if (request == null) throw new ArgumentNullException("request");
+
             var origin = this.GetCustomOrigin(request);
             if (String.IsNullOrWhiteSpace(origin))
             {
-                throw new Exception(String.Format("Invalid Origin: '{0}'", origin));
+                // if they return null, we default to safe mode
+                return Deny;
             }
             return String.Format(AllowFrom, origin);
         }
