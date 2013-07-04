@@ -33,6 +33,8 @@ Helper library for identity & access control in .NET 4.5 and MVC4/Web API.
 - Extensible authentication framework for Web API that supports SAML 1.1/2.0, JWT, Access Keys, Basic Authentication
 - Claims transformation
 - Implementation of the Hawk authentication scheme
+- Scope-based authorization
+- OAuth2 client library
 
 **Web**
 
