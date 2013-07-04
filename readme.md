@@ -43,6 +43,18 @@ Helper library for identity & access control in .NET 4.5 and MVC4/Web API.
 - CORS
 - Anti-clickjacking
 
+**ASP.NET Passive Federation**
+
+- Configuring session token lifetime
+- Sliding sessions
+- Overriding WS-Federation token lifetime
+- Configuring persistent session token cookies
+- Configuring machine key protection of session tokens
+- Suppress login redirects for API clients
+- Suppressing session token validation exceptions
+- Server-side session token caching
+- Dynamic issuer name registry direct from STS federation metadata
+
 **WS-Trust**
 
 - Helper classes for WCF
