@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
+using Thinktecture.IdentityModel.Http.Hawk.Client;
 using Thinktecture.IdentityModel.Http.Hawk.Core;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Client;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Helpers;
@@ -11,6 +13,9 @@ namespace Hawk.Samples.Client.ConsoleApp
     {
         static void Main(string[] args)
         {
+            string uri = "http://localhost:12345/api/values";
+            string headerName = "X-Response-Header-To-Protect";
+
             var credential = new Credential()
             {
                 Id = "dh37fgj492je",
@@ -18,25 +23,21 @@ namespace Hawk.Samples.Client.ConsoleApp
                 User = "Steve",
                 Key = "werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn"
             };
+            
+            // GET and POST using the Authorization header
+            var handler = new HawkValidationHandler(credentialsCallback: () => credential,
+                                                        verificationCallback: (r, ext) =>
+                                                            ext.Equals(headerName + ":" + r.Headers.GetValues(headerName).First()));
+            HttpClient client = HttpClientFactory.Create(handler);
+            
+            var response = client.GetAsync(uri).Result;
+            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
 
-            string uri = "http://localhost:12345/api/values";
-
-            var client = new HttpClient();
-
-            // GET using the Authorization header
-            var request = new HttpRequestMessage(HttpMethod.Get, uri);
-            request.Headers.Add("X-Request-Header-To-Protect", "Swoosh");
-
-            var hawkClient = new HawkClient(() => credential);
-            hawkClient.ApplicationSpecificData = "X-Request-Header-To-Protect:Swoosh"; // Normalized header
-            hawkClient.CreateClientAuthorizationAsync(request).Wait();
-
-            var response = client.SendAsync(request).Result;
-            var isAuthentic = hawkClient.AuthenticateAsync(response).Result;
-            Console.WriteLine(isAuthentic ? response.Content.ReadAsStringAsync().Result : "Response is Tampered");
+            response = client.PostAsJsonAsync(uri, credential.User).Result;
+            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
 
             // GET using Bewit
-            hawkClient = new HawkClient(() => credential);
+            var hawkClient = new HawkClient(() => credential);
             string bewit = hawkClient.CreateBewitAsync(new HttpRequestMessage() { RequestUri = new Uri(uri) },
                                                         lifeSeconds:60).Result;
 

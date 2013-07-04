@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hawk.Samples.WebApi.SelfHos
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hawk.Samples.Client.ConsoleApp", "Hawk.Samples.Client.ConsoleApp\Hawk.Samples.Client.ConsoleApp.csproj", "{934EE59D-8E1C-496B-B0B5-AB3F420E37E8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{9FDA0FD8-0E0C-4CFE-8C7B-2DF209B4865F}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{C276FE3F-487D-4981-966F-6FC9FA3A66DC}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
 		.nuget\NuGet.exe = .nuget\NuGet.exe
@@ -14,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{9FDA0F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thinktecture.IdentityModel.45", "..\..\IdentityModel\Thinktecture.IdentityModel\Thinktecture.IdentityModel.45.csproj", "{AC9A74DF-4AAB-43C8-B0ED-B7602721E545}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{C25B95D8-3E06-4FC6-B60D-10A5AA1B16A8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{C0F2B3C6-4834-4143-B8FA-C2009B974728}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +53,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{AC9A74DF-4AAB-43C8-B0ED-B7602721E545} = {C25B95D8-3E06-4FC6-B60D-10A5AA1B16A8}
+		{AC9A74DF-4AAB-43C8-B0ED-B7602721E545} = {C0F2B3C6-4834-4143-B8FA-C2009B974728}
 	EndGlobalSection
 EndGlobal
