@@ -239,6 +239,8 @@
     <Compile Include="Authorization\MVC\ClaimsAuthorizeAttribute.cs" />
     <Compile Include="Http\Hawk\Client\HawkValidatingHandler.cs" />
     <Compile Include="Tokens\FederationMetadata.cs" />
+    <Compile Include="Tokens\SimpleWebToken.cs" />
+    <Compile Include="Tokens\SimpleWebTokenHandler.cs" />
     <Compile Include="Web\MVC\FrameOptionsAttribute.cs" />
     <Compile Include="Authorization\WebApi\ClaimsAuthorizeAttribute.cs" />
     <Compile Include="Authorization\WebApi\ScopeAttribute.cs" />
