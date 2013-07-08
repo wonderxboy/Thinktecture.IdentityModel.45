@@ -194,7 +194,7 @@ namespace Thinktecture.IdentityModel.Tokens
             writer.WriteEndElement();
         }
 
-        public string WriteToken(SecurityToken token)
+        public override string WriteToken(SecurityToken token)
         {
             var swt = token as SimpleWebToken;
 
