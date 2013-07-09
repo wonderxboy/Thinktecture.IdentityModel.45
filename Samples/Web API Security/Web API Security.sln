@@ -40,7 +40,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OAuth2 Implicit Flow", "Cli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicAuthAndClientCert", "Clients\BasicAuthAndClientCert\BasicAuthAndClientCert.csproj", "{63D78D60-F064-4042-A077-A4368068677C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleHttpClient", "Clients\SimpleHttpClient\SimpleHttpClient.csproj", "{F9C26160-85D2-4484-94B3-E75CA159796D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleHttpClient (SWT)", "Clients\SimpleHttpClient\SimpleHttpClient (SWT).csproj", "{F9C26160-85D2-4484-94B3-E75CA159796D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

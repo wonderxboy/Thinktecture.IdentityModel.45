@@ -35,7 +35,6 @@
             public const string SigningKey = "fWUU28oBOIcaQuwUKiL01KztD/CsZX83C3I0M1MOYN4=";
             public const string SigningCertThumbprint = "a1eed7897e55388fce60fef1a1eed81ff1cbaec6";
 
-
             public const string OAuthClientName = "client"; 
             public const string Win8OAuthClientName = "win8client";
             public const string OAuthClientSecret = "secret";
