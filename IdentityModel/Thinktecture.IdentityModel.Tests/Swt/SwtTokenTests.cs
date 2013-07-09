@@ -18,8 +18,8 @@ namespace Thinktecture.IdentityModel.Tests.Swt
         [TestMethod]
         public void GetTokenClaimsAsEncodedArrayString()
         {
-            byte[] key;
-            var token = this.GetToken(out key);
+            byte[] key = GetKey();
+            var token = this.CreateToken(key);
             var builder = new StringBuilder();
             SimpleWebTokenHandler.CreateClaims(token, builder);
 
@@ -32,8 +32,8 @@ namespace Thinktecture.IdentityModel.Tests.Swt
         {
             var handler = new SimpleWebTokenHandler();
 
-            byte[] key;
-            var token = this.GetToken(out key);
+            byte[] key = GetKey();
+            var token = this.CreateToken(key);
             var tokenString = TokenToString(token);
             var signedToken = handler.ReadToken(new XmlTextReader(new StringReader(tokenString)));
 
@@ -42,11 +42,11 @@ namespace Thinktecture.IdentityModel.Tests.Swt
             var symmetricKey = new InMemorySymmetricSecurityKey(key);
             
             handler.Configuration.AudienceRestriction.AllowedAudienceUris.Add(
-                new Uri("http://audience.com"));
+                new Uri("http://audience"));
 
             var resolverTable = new Dictionary<string, IList<SecurityKey>>
             {
-                { "http://test.com", new SecurityKey[] { symmetricKey } }
+                { "http://issuer", new SecurityKey[] { symmetricKey } }
             };
 
             handler.Configuration.IssuerTokenResolver = new NamedKeyIssuerTokenResolver(resolverTable);
@@ -92,22 +92,21 @@ namespace Thinktecture.IdentityModel.Tests.Swt
             return CryptoRandom.CreateRandomKey(32);
         }
 
-        public SimpleWebToken GetToken(out byte[] key)
+        public SimpleWebToken CreateToken(byte[] key)
         {
-            key = GetKey();
+            var descripter = new SecurityTokenDescriptor
+            {
+                TokenIssuerName = "http://issuer",
+                AppliesToAddress = "http://audience",
 
-            var descripter = new SecurityTokenDescriptor();
-            descripter.Lifetime = new Lifetime(DateTime.Now, DateTime.Now.AddMinutes(5));
-            descripter.TokenIssuerName = "http://test.com";
-            descripter.SigningCredentials = new HmacSigningCredentials(key);
-            descripter.Subject = new ClaimsIdentity(this.GetClaims());
-            descripter.AppliesToAddress = "http://audience.com";
+                Lifetime = new Lifetime(DateTime.Now, DateTime.Now.AddMinutes(5)),
+                Subject = new ClaimsIdentity(GetClaims()),
 
-            var output = new SimpleWebTokenHandler().CreateToken(descripter) as SimpleWebToken;
+                SigningCredentials = new HmacSigningCredentials(key),
+            };
 
-            return output;
+            var handler = new SimpleWebTokenHandler();
+            return handler.CreateToken(descripter) as SimpleWebToken;
         }
-
-       
     }
 }

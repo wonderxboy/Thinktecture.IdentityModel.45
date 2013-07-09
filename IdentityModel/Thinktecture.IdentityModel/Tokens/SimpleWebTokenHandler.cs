@@ -253,17 +253,8 @@ namespace Thinktecture.IdentityModel.Tokens
             }
 
             // check issuer name registry for allowed issuers
-            string issuerName = "foo"; //null;
+            string issuerName = swt.Issuer;
             
-            //if (base.Configuration.IssuerNameRegistry != null)
-            //{
-            //    issuerName = base.Configuration.IssuerNameRegistry.GetIssuerName(token);
-            //    if (string.IsNullOrEmpty(issuerName))
-            //    {
-            //        throw new SecurityTokenValidationException("Invalid issuer");
-            //    }
-            //}
-
             // check expiration
             if (DateTime.Compare(swt.ValidTo, DateTime.UtcNow) <= 0)
             {
@@ -290,7 +281,6 @@ namespace Thinktecture.IdentityModel.Tokens
                 throw new SecurityTokenValidationException("No signing key found");
             }
 
-            // TODO
             // check signature
             if (!swt.VerifySignature(securityKey.GetSymmetricKey()))
             {
