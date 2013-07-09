@@ -40,10 +40,7 @@ namespace Thinktecture.IdentityModel.Tests.Swt
             handler.Configuration = new SecurityTokenHandlerConfiguration();
 
             var symmetricKey = new InMemorySymmetricSecurityKey(key);
-            var namedKey = new NamedKeySecurityToken(
-                "http://test.com",
-                new SecurityKey[] { symmetricKey });
-
+            
             handler.Configuration.AudienceRestriction.AllowedAudienceUris.Add(
                 new Uri("http://audience.com"));
 
