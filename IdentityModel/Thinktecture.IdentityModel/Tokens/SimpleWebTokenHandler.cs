@@ -204,13 +204,16 @@ namespace Thinktecture.IdentityModel.Tokens
             }
 
             var unsignedToken = CreateUnsignedToken(swt);
+            byte[] signature;
 
-            var hmac = new HMACSHA256((swt.SecurityKeys.First() as InMemorySymmetricSecurityKey).GetSymmetricKey());
-            var sig = hmac.ComputeHash(Encoding.ASCII.GetBytes(unsignedToken));
+            using (var hmac = new HMACSHA256((swt.SecurityKeys.First() as InMemorySymmetricSecurityKey).GetSymmetricKey()))
+            {
+                signature = hmac.ComputeHash(Encoding.ASCII.GetBytes(unsignedToken));
+            }
 
             var signedToken = String.Format("{0}&HMACSHA256={1}",
                 unsignedToken,
-                HttpUtility.UrlEncode(Convert.ToBase64String(sig)));
+                HttpUtility.UrlEncode(Convert.ToBase64String(signature)));
 
             return signedToken;
         }
