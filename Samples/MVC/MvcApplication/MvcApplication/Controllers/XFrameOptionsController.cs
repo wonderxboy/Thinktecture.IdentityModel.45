@@ -40,12 +40,41 @@ namespace MvcApplication.Controllers
         {
             return View();
         }
-        
+
         [FrameOptions("http://foo.com")]
         public ActionResult CustomOrigin2()
         {
             return View();
         }
 
+        [MyDynamicFrameOptions]
+        public ActionResult CustomDynamic()
+        {
+            return View();
+        }
+
     }
+
+    public class MyDynamicFrameOptionsAttribute : FrameOptionsAttribute
+    {
+        public MyDynamicFrameOptionsAttribute()
+            : base(FrameOptions.CustomOrigin)
+        {
+        }
+
+        protected override string GetCustomOrigin(HttpRequestBase request)
+        {
+            // do your DB lookup here
+            if (request.Url.Host == "someHostITrust" || request.Url.Host == "localhost")
+            {
+                var origin =
+                    request.Url.Scheme +
+                    "://" +
+                    request.Url.Host + (request.Url.Port == 80 ? "" : ":" + request.Url.Port);
+                return origin;
+            }
+            return null;
+        }
+    }
+
 }

@@ -230,6 +230,7 @@
     <Content Include="Views\XFrameOptions\CustomOrigin1.cshtml" />
     <Content Include="Views\XFrameOptions\CustomOrigin2.cshtml" />
     <Content Include="Views\XFrameOptions\DenyImplicit.cshtml" />
+    <Content Include="Views\XFrameOptions\CustomDynamic.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
