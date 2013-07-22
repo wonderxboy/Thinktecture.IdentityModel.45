@@ -12,6 +12,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel.Security;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Thinktecture.IdentityModel.Tokens
@@ -66,9 +67,13 @@ namespace Thinktecture.IdentityModel.Tokens
 
         protected virtual Stream GetMetadataStream()
         {
+            return GetMetadataStreamAsync().Result;
+        }
+
+        protected async virtual Task<Stream> GetMetadataStreamAsync()
+        {
             var client = new HttpClient { BaseAddress = metadataAddress };
-            var stream = client.GetStreamAsync("").Result;
-            return stream;
+            return await client.GetStreamAsync("");
         }
 
         protected virtual void LoadMetadata()
