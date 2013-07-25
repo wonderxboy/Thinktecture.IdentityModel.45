@@ -67,7 +67,8 @@ namespace Thinktecture.IdentityModel.Tokens
 
         protected virtual Stream GetMetadataStream()
         {
-            return GetMetadataStreamAsync().Result;
+            var client = new HttpClient { BaseAddress = metadataAddress };
+            return client.GetStreamAsync("").Result;
         }
 
         protected async virtual Task<Stream> GetMetadataStreamAsync()
