@@ -20,13 +20,13 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 {
     public class AuthenticationHandler : DelegatingHandler
     {
-        HttpAuthentication _authN;
+        protected HttpAuthentication AuthN;
 
         public const string PrincipalKey = "TT_Principal";
 
         public AuthenticationHandler(AuthenticationConfiguration configuration, HttpConfiguration httpConfiguration = null)
         {
-            _authN = new HttpAuthentication(configuration);
+            AuthN = new HttpAuthentication(configuration);
 
             if (httpConfiguration != null)
             {
@@ -36,7 +36,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         public AuthenticationHandler(AuthenticationConfiguration configuration, HttpMessageHandler innerHandler)
         {
-            _authN = new HttpAuthentication(configuration);
+            AuthN = new HttpAuthentication(configuration);
             InnerHandler = innerHandler;
         }
 
@@ -45,7 +45,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             Tracing.Start("Web API AuthenticationHandler");
 
             // check SSL requirement
-            if (_authN.Configuration.RequireSsl)
+            if (AuthN.Configuration.RequireSsl)
             {
                 if (request.RequestUri.Scheme != Uri.UriSchemeHttps)
                 {
@@ -60,7 +60,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             }
 
             // check if reuse of host client identity is allowed
-            if (_authN.Configuration.InheritHostClientIdentity == false)
+            if (AuthN.Configuration.InheritHostClientIdentity == false)
             {
                 Tracing.Verbose("Host client identity is not inherited. Setting anonymous principal");
                 SetPrincipal(request, Principal.Anonymous);
@@ -76,7 +76,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             {
                 // try to authenticate
                 // returns an anonymous principal if no credential was found
-                principal = _authN.Authenticate(request);
+                principal = AuthN.Authenticate(request);
 
                 if (principal == null)
                 {
@@ -103,7 +103,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                 Tracing.Verbose("Authentication successful.");
 
                 // check for token request - if yes send token back and return
-                if (_authN.IsSessionTokenRequest(request))
+                if (AuthN.IsSessionTokenRequest(request))
                 {
                     Tracing.Information("Request for session token.");
                     return SendSessionTokenResponse(principal, request);
@@ -149,7 +149,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         private HttpResponseMessage SendSessionTokenResponse(ClaimsPrincipal principal, HttpRequestMessage request)
         {
-            var tokenResponse = _authN.CreateSessionTokenResponse(principal);
+            var tokenResponse = AuthN.CreateSessionTokenResponse(principal);
 
             var response = request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(tokenResponse, Encoding.UTF8, "application/json");
@@ -159,9 +159,9 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         protected virtual void SetAuthenticateHeaders(HttpResponseMessage response)
         {
-            if (_authN.Configuration.SendWwwAuthenticateResponseHeaders)
+            if (AuthN.Configuration.SendWwwAuthenticateResponseHeaders)
             {
-                foreach (var mapping in _authN.Configuration.Mappings)
+                foreach (var mapping in AuthN.Configuration.Mappings)
                 {
                     if (mapping.Scheme != null && !string.IsNullOrEmpty(mapping.Scheme.Scheme))
                     {
@@ -201,7 +201,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                 HttpContext.Current.User = principal;
             }
 
-            if (_authN.Configuration.SetPrincipalOnRequestInstance)
+            if (AuthN.Configuration.SetPrincipalOnRequestInstance)
             {
                 request.Properties[PrincipalKey] = principal;
             }
