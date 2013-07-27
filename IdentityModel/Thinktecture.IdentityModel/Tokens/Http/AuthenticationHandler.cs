@@ -20,13 +20,15 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 {
     public class AuthenticationHandler : DelegatingHandler
     {
-        protected HttpAuthentication AuthN;
+        HttpAuthentication _authN;
 
         public const string PrincipalKey = "TT_Principal";
 
-        public AuthenticationHandler(AuthenticationConfiguration configuration, HttpConfiguration httpConfiguration = null)
+        public AuthenticationHandler(AuthenticationConfiguration configuration, HttpConfiguration httpConfiguration = null) : this(new HttpAuthentication(configuration), httpConfiguration) {}
+
+        public AuthenticationHandler(HttpAuthentication authentication, HttpConfiguration httpConfiguration = null)
         {
-            AuthN = new HttpAuthentication(configuration);
+            _authN = authentication;
 
             if (httpConfiguration != null)
             {
@@ -34,9 +36,11 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             }
         }
 
-        public AuthenticationHandler(AuthenticationConfiguration configuration, HttpMessageHandler innerHandler)
+        public AuthenticationHandler(AuthenticationConfiguration configuration, HttpMessageHandler innerHandler) : this(new HttpAuthentication(configuration), innerHandler) {}
+
+        public AuthenticationHandler(HttpAuthentication authentication, HttpMessageHandler innerHandler)
         {
-            AuthN = new HttpAuthentication(configuration);
+            _authN = authentication;
             InnerHandler = innerHandler;
         }
 
@@ -45,7 +49,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             Tracing.Start("Web API AuthenticationHandler");
 
             // check SSL requirement
-            if (AuthN.Configuration.RequireSsl)
+            if (_authN.Configuration.RequireSsl)
             {
                 if (request.RequestUri.Scheme != Uri.UriSchemeHttps)
                 {
@@ -60,7 +64,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             }
 
             // check if reuse of host client identity is allowed
-            if (AuthN.Configuration.InheritHostClientIdentity == false)
+            if (_authN.Configuration.InheritHostClientIdentity == false)
             {
                 Tracing.Verbose("Host client identity is not inherited. Setting anonymous principal");
                 SetPrincipal(request, Principal.Anonymous);
@@ -76,7 +80,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             {
                 // try to authenticate
                 // returns an anonymous principal if no credential was found
-                principal = AuthN.Authenticate(request);
+                principal = _authN.Authenticate(request);
 
                 if (principal == null)
                 {
@@ -103,7 +107,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                 Tracing.Verbose("Authentication successful.");
 
                 // check for token request - if yes send token back and return
-                if (AuthN.IsSessionTokenRequest(request))
+                if (_authN.IsSessionTokenRequest(request))
                 {
                     Tracing.Information("Request for session token.");
                     return SendSessionTokenResponse(principal, request);
@@ -149,7 +153,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         private HttpResponseMessage SendSessionTokenResponse(ClaimsPrincipal principal, HttpRequestMessage request)
         {
-            var tokenResponse = AuthN.CreateSessionTokenResponse(principal);
+            var tokenResponse = _authN.CreateSessionTokenResponse(principal);
 
             var response = request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(tokenResponse, Encoding.UTF8, "application/json");
@@ -159,9 +163,9 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         protected virtual void SetAuthenticateHeaders(HttpResponseMessage response)
         {
-            if (AuthN.Configuration.SendWwwAuthenticateResponseHeaders)
+            if (_authN.Configuration.SendWwwAuthenticateResponseHeaders)
             {
-                foreach (var mapping in AuthN.Configuration.Mappings)
+                foreach (var mapping in _authN.Configuration.Mappings)
                 {
                     if (mapping.Scheme != null && !string.IsNullOrEmpty(mapping.Scheme.Scheme))
                     {
@@ -201,7 +205,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                 HttpContext.Current.User = principal;
             }
 
-            if (AuthN.Configuration.SetPrincipalOnRequestInstance)
+            if (_authN.Configuration.SetPrincipalOnRequestInstance)
             {
                 request.Properties[PrincipalKey] = principal;
             }
