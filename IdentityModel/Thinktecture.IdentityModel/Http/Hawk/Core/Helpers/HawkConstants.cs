@@ -15,6 +15,18 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core.Helpers
         /// <summary>"Server-Authorization"</summary>
         public const string ServerAuthorizationHeaderName = "Server-Authorization";
 
+        /// <summary>"WWW-Authenticate"</summary>
+        public const string WwwAuthenticateHeaderName = "WWW-Authenticate";
+
+        /// <summary>X-Forwarded-For</summary>
+        public const string XffHeaderName = "X-Forwarded-For";
+
+        /// <summary>"Content-Type"</summary>
+        public const string ContentTypeHeaderName = "Content-Type";
+
+        /// <summary>"Authorization"</summary>
+        public const string AuthorizationHeaderName = "Authorization";
+
         /// <summary>"bewit"</summary>
         public const string Bewit = "bewit";
     }

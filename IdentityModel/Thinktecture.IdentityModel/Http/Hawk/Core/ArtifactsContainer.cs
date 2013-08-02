@@ -14,6 +14,7 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
     {
         private const string VALUE_MATCH_PATTERN = @"^[ \w\!#\$%&'\(\)\*\+,\-\.\/\:;<\=>\?@\[\]\^`\{\|\}~]+$";
         private const string PARAMETER_MATCH_PATTERN = @"(\w+)=""([^""\\]*)""\s*(?:,\s*|$)";
+        private const string SPECIFIC_PARAMETER_MATCH_PATTERN = @"({0})=""([^""\\]*)""\s*(?:,\s*|$)";
 
         private const string ID = "id";
         private const string TS = "ts";
@@ -75,6 +76,7 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
             }
         }
 
+
         /// <summary>
         /// Attempts to convert the passed in header parameter (string) into the CLR equivalent, which is an
         /// instance of ArtifactsContainer. The return value indicates whether the conversion succeeded.
@@ -135,6 +137,20 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
             Tracing.Error("Unable to parse the artifacts.");
 
             container = null;
+            return false;
+        }
+
+        /// <summary>
+        /// Returns true, if the passed in header parameter contains the hash field.
+        /// </summary>
+        internal static bool IsPayloadHashPresent(string headerParameter)
+        {
+            string pattern = String.Format(SPECIFIC_PARAMETER_MATCH_PATTERN, HASH);
+
+            if (!String.IsNullOrWhiteSpace(headerParameter))
+                if (Regex.IsMatch(headerParameter, pattern))
+                    return true;
+
             return false;
         }
 

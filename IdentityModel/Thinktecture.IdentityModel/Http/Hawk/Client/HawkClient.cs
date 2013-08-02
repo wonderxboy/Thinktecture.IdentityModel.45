@@ -2,13 +2,14 @@
 using System.Configuration;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Thinktecture.IdentityModel.Http.Hawk.Core;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Extensions;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Helpers;
+using Thinktecture.IdentityModel.Http.Hawk.Core.MessageContracts;
 
-namespace Thinktecture.IdentityModel.Http.Hawk.Core.Client
+namespace Thinktecture.IdentityModel.Http.Hawk.Client
 {
     /// <summary>
     /// The counterpart of HawkServer in the client side that creates the HTTP Authorization header in hawk scheme
@@ -19,9 +20,7 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core.Client
     {
         private static readonly object myPrecious = new object();
 
-        private readonly Func<Credential> credentialFunc = null;
-        private readonly bool enableResponseValidation;
-        private readonly bool enableAutoCompensationForClockSkew;
+        private readonly ClientOptions options = null;
 
         private ArtifactsContainer artifacts = null;
         private Cryptographer crypto = null;
@@ -30,26 +29,13 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core.Client
         /// Authenticates the server response by reading the Server-Authorization header and creates 
         /// the the HTTP Authorization header in hawk scheme.
         /// </summary>
-        /// <param name="credentialFunc">A callback to receive the Hawk credential</param>
-        public HawkClient(Func<Credential> credentialFunc)
+        /// <param name="options">Hawk authentication options</param>
+        public HawkClient(ClientOptions options)
         {
-            if (credentialFunc == null)
-                throw new ArgumentNullException("Credential callback is null");
+            if (options == null || options.CredentialsCallback == null)
+                throw new ArgumentNullException("Invalid Hawk authentication options. Credentials callback cannot be null.");
 
-            string enableValidation = ConfigurationManager.AppSettings["EnableResponseValidation"];
-            string enableAutoCompensation = ConfigurationManager.AppSettings["EnableAutoCompensationForClockSkew"];
-
-            if (enableValidation == null || enableAutoCompensation == null)
-            {
-                string message = "Required config settings of EnableResponseValidation or EnableAutoCompensationForClockSkew missing.";
-                Tracing.Error(message);
-
-                throw new Exception(message);
-            }
-
-            this.credentialFunc = credentialFunc;
-            this.enableResponseValidation = enableValidation.ToBool();
-            this.enableAutoCompensationForClockSkew = enableAutoCompensation.ToBool();
+            this.options = options;
         }
 
         /// <summary>
@@ -60,28 +46,18 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core.Client
         public static int CompensatorySeconds { get; private set; }
 
         /// <summary>
-        /// Application specific data that the client sends along in the request.
-        /// </summary>
-        public string ApplicationSpecificData { get; set; }
-
-        /// <summary>
-        /// Application specific data that the web API has sent along in the response.
-        /// </summary>
-        public string WebApiSpecificData { get; private set; }
-
-        /// <summary>
         /// Returns true, if the HMAC computed for the response payload matches the HMAC in the
         /// Server-Authorization response header. This method also sets the compensation field so 
         /// that the timestamp in the subsequent requests are adjusted to reduce the clock skew.
         /// </summary>
-        public async Task<bool> AuthenticateAsync(HttpResponseMessage response)
+        public async Task<bool> AuthenticateAsync(IResponseMessage response)
         {
             if (response.StatusCode != HttpStatusCode.Unauthorized &&
-                    this.enableResponseValidation &&
+                    this.options.EnableResponseValidation &&
                         await this.IsResponseTamperedAsync(artifacts, crypto, response))
                 return false;
 
-            if (this.enableAutoCompensationForClockSkew &&
+            if (this.options.EnableAutoCompensationForClockSkew &&
                     this.IsTimestampResponseTampered(artifacts, response))
                 return false;
 
@@ -92,7 +68,9 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core.Client
         /// Creates the HTTP Authorization header in hawk scheme.
         /// The counterpart of the CreateServerAuthorization method in HawkServer.
         /// </summary>
-        public async Task CreateClientAuthorizationAsync(HttpRequestMessage request)
+        /// <param name="request">Request object</param>
+        /// <returns></returns>
+        public async Task CreateClientAuthorizationAsync(IRequestMessage request)
         {
             await CreateClientAuthorizationInternalAsync(request, DateTime.UtcNow);
         }
@@ -101,29 +79,30 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core.Client
         /// Adds the bewit to the query string of the specified HttpRequestMessage object and
         /// returns the bewit string.
         /// </summary>
-        public async Task<string> CreateBewitAsync(HttpRequestMessage request, int lifeSeconds)
+        public string CreateBewit(IRequestMessage request, int lifeSeconds)
         {
-            return await CreateBewitInternalAsync(request, DateTime.UtcNow, lifeSeconds);
+            return CreateBewitInternal(request, DateTime.UtcNow, lifeSeconds);
         }
 
         /// <summary>
         /// Adds the bewit to the query string of the specified HttpRequestMessage object and 
         /// returns the bewit string.
         /// </summary>
-        internal async Task<string> CreateBewitInternalAsync(HttpRequestMessage request, DateTime utcNow, int lifeSeconds)
+        internal string CreateBewitInternal(IRequestMessage request, DateTime utcNow, int lifeSeconds)
         {
-            var bewit = new Bewit(request, credentialFunc(), utcNow, lifeSeconds, this.ApplicationSpecificData);
-            string bewitString = await bewit.ToBewitStringAsync();
+            string appData = null;
+            if (options.NormalizationCallback != null)
+                appData = options.NormalizationCallback(request);
+
+            var bewit = new Bewit(request, options.CredentialsCallback(),
+                                    utcNow, lifeSeconds, appData, options.LocalTimeOffsetMillis);
+            string bewitString = bewit.ToBewitString();
 
             string parameter = String.Format("{0}={1}", HawkConstants.Bewit, bewitString);
 
-            string queryString = request.RequestUri.Query;
+            string queryString = request.Uri.Query;
             queryString = String.IsNullOrWhiteSpace(queryString) ? parameter : queryString.Substring(1) + "&" + parameter;
-
-            var builder = new UriBuilder(request.RequestUri);
-            builder.Query = queryString;
-
-            request.RequestUri = builder.Uri;
+            request.QueryString = queryString;
 
             return bewitString;
         }
@@ -131,9 +110,9 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core.Client
         /// <summary>
         /// Creates the HTTP Authorization header in hawk scheme.
         /// </summary>
-        internal async Task CreateClientAuthorizationInternalAsync(HttpRequestMessage request, DateTime utcNow)
+        internal async Task CreateClientAuthorizationInternalAsync(IRequestMessage request, DateTime utcNow)
         {
-            var credential = credentialFunc();
+            var credential = options.CredentialsCallback();
             this.artifacts = new ArtifactsContainer()
             {
                 Id = credential.Id,
@@ -141,17 +120,20 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core.Client
                 Nonce = NonceGenerator.Generate()
             };
 
-            if (!String.IsNullOrWhiteSpace(this.ApplicationSpecificData))
-                this.artifacts.ApplicationSpecificData = this.ApplicationSpecificData;
+            if (options.NormalizationCallback != null)
+                this.artifacts.ApplicationSpecificData = options.NormalizationCallback(request);
 
             var normalizedRequest = new NormalizedRequest(request, this.artifacts);
             this.crypto = new Cryptographer(normalizedRequest, this.artifacts, credential);
 
             // Sign the request
-            await crypto.SignAsync(request.Content);
+            bool includePayloadHash = options.RequestPayloadHashabilityCallback != null &&
+                                            options.RequestPayloadHashabilityCallback(request);
 
-            request.Headers.Authorization = new AuthenticationHeaderValue(
-                                                HawkConstants.Scheme,
+            string payload = includePayloadHash ? await request.ReadBodyAsStringAsync() : null;
+            crypto.Sign(payload, request.ContentType);
+
+            request.Authorization = new AuthenticationHeaderValue(HawkConstants.Scheme,
                                                 this.artifacts.ToAuthorizationHeaderParameter());
         }
 
@@ -159,11 +141,11 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core.Client
         /// Returns true if the server response HMAC cannot be validated, indicating possible tampering.
         /// </summary>
         private async Task<bool> IsResponseTamperedAsync(ArtifactsContainer artifacts, Cryptographer crypto,
-                                                        HttpResponseMessage response)
+                                                        IResponseMessage response)
         {
-            if (response.Headers.Contains(HawkConstants.ServerAuthorizationHeaderName))
+            if (response.Headers.ContainsKey(HawkConstants.ServerAuthorizationHeaderName))
             {
-                string header = response.Headers.GetValues(HawkConstants.ServerAuthorizationHeaderName).FirstOrDefault();
+                string header = response.Headers[HawkConstants.ServerAuthorizationHeaderName].FirstOrDefault();
 
                 if (!String.IsNullOrWhiteSpace(header) &&
                                     header.Substring(0, HawkConstants.Scheme.Length).ToLower() == HawkConstants.Scheme)
@@ -178,10 +160,22 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core.Client
                         artifacts.PayloadHash = serverAuthorizationArtifacts.PayloadHash;
                         artifacts.Mac = serverAuthorizationArtifacts.Mac;
 
-                        bool isValid = await crypto.IsSignatureValidAsync(response.Content);
+                        // Response body is needed only if payload hash is present in the server response.
+                        string body = null;
+                        if (artifacts.PayloadHash != null && artifacts.PayloadHash.Length > 0)
+                        {
+                            body = await response.ReadBodyAsStringAsync();
+                        }
+
+                        bool isValid = crypto.IsSignatureValid(body, response.ContentType);
 
                         if (isValid)
-                            this.WebApiSpecificData = serverAuthorizationArtifacts.ApplicationSpecificData;
+                        {
+                            string appSpecificData = serverAuthorizationArtifacts.ApplicationSpecificData;
+
+                            isValid = options.VerificationCallback == null ||
+                                                    options.VerificationCallback(response, appSpecificData);
+                        }
 
                         return !isValid;
                     }
@@ -197,30 +191,27 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core.Client
         /// This method also sets the compensation field so that the timestamp in the subsequent requests
         /// are adjusted to reduce the clock skew.
         /// </summary>
-        private bool IsTimestampResponseTampered(ArtifactsContainer artifacts, HttpResponseMessage response)
+        private bool IsTimestampResponseTampered(ArtifactsContainer artifacts, IResponseMessage response)
         {
-            if (response.Headers.WwwAuthenticate != null)
+            var wwwHeader = response.WwwAuthenticate;
+
+            if (wwwHeader != null)
             {
-                var wwwHeader = response.Headers.WwwAuthenticate.FirstOrDefault();
+                string parameter = wwwHeader.Parameter;
 
-                if (wwwHeader != null && wwwHeader.Scheme.ToLower() == HawkConstants.Scheme)
+                ArtifactsContainer timestampArtifacts;
+                if (!String.IsNullOrWhiteSpace(parameter) &&
+                                ArtifactsContainer.TryParse(parameter, out timestampArtifacts))
                 {
-                    string parameter = wwwHeader.Parameter;
+                    var ts = new NormalizedTimestamp(timestampArtifacts.Timestamp, options.CredentialsCallback(), options.LocalTimeOffsetMillis);
 
-                    ArtifactsContainer timestampArtifacts;
-                    if (!String.IsNullOrWhiteSpace(parameter) &&
-                                    ArtifactsContainer.TryParse(parameter, out timestampArtifacts))
-                    {
-                        var ts = new NormalizedTimestamp(timestampArtifacts.Timestamp, credentialFunc());
+                    if (!ts.IsValid(timestampArtifacts.TimestampMac))
+                        return true;
 
-                        if (!ts.IsValid(timestampArtifacts.TimestampMac))
-                            return true;
+                    lock (myPrecious)
+                        HawkClient.CompensatorySeconds = (int)(timestampArtifacts.Timestamp - DateTime.UtcNow.ToUnixTime());
 
-                        lock (myPrecious)
-                            HawkClient.CompensatorySeconds = (int)(timestampArtifacts.Timestamp - DateTime.UtcNow.ToUnixTime());
-
-                        Tracing.Information("HawkClient.CompensatorySeconds set to " + HawkClient.CompensatorySeconds);
-                    }
+                    Tracing.Information("HawkClient.CompensatorySeconds set to " + HawkClient.CompensatorySeconds);
                 }
             }
 

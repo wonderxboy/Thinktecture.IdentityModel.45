@@ -8,7 +8,7 @@ using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
-using Thinktecture.IdentityModel.Http.Hawk.Core.Client;
+using Thinktecture.IdentityModel.Http.Hawk.WebApi;
 using Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTests.Helpers;
 
 namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTests
@@ -127,8 +127,8 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Get, URI))
                 {
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
-                    await client.CreateClientAuthorizationAsync(request);
+                    var client = ClientFactory.Create();
+                    await client.CreateClientAuthorizationAsync(new WebApiRequestMessage(request));
 
                     string goodParameter = request.Headers.Authorization.Parameter;
                     string duplicates = goodParameter + "," + goodParameter;
@@ -157,8 +157,8 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
                     var badCredential = ServerFactory.Credentials.First();
                     badCredential.Id = "SomeIdOtherThan-dh37fgj492je"; // Some id other than dh37fgj492je
 
-                    var client = new HawkClient(() => badCredential);
-                    await client.CreateClientAuthorizationAsync(request);
+                    var client = ClientFactory.Create(() => badCredential);
+                    await client.CreateClientAuthorizationAsync(new WebApiRequestMessage(request));
 
                     using (var response = await invoker.SendAsync(request, CancellationToken.None))
                     {
@@ -178,9 +178,10 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Get, URI))
                 {
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
+                    var client = ClientFactory.Create();
 
-                    await client.CreateClientAuthorizationInternalAsync(request, DateTime.UtcNow.AddMinutes(-2));
+                    await client.CreateClientAuthorizationInternalAsync(new WebApiRequestMessage(request),
+                                                                            DateTime.UtcNow.AddMinutes(-2));
 
                     using (var response = await invoker.SendAsync(request, CancellationToken.None))
                     {
@@ -195,7 +196,7 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
                         Assert.IsTrue(ParameterChecker.IsFieldPresent(tsParameter, "ts"));
                         Assert.IsTrue(ParameterChecker.IsFieldPresent(tsParameter, "tsm"));
 
-                        Assert.IsTrue(await client.AuthenticateAsync(response));
+                        Assert.IsTrue(await client.AuthenticateAsync(new WebApiResponseMessage(response)));
 
                     }
                 }
@@ -208,8 +209,8 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Get, URI))
                 {
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
-                    await client.CreateClientAuthorizationAsync(request);
+                    var client = ClientFactory.Create();
+                    await client.CreateClientAuthorizationAsync(new WebApiRequestMessage(request));
 
                     string goodParameter = request.Headers.Authorization.Parameter;
                     string incompleteParameter = goodParameter.Split(',')

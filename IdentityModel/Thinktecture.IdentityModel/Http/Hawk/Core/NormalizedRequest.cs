@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Extensions;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Helpers;
+using Thinktecture.IdentityModel.Http.Hawk.Core.MessageContracts;
 
 namespace Thinktecture.IdentityModel.Http.Hawk.Core
 {
@@ -38,24 +39,24 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
         private readonly string hostName = null;
         private readonly string port = null;
 
-        internal NormalizedRequest(HttpRequestMessage request, ArtifactsContainer artifacts)
+        internal NormalizedRequest(IRequestMessage request, ArtifactsContainer artifacts)
         {
             this.artifacts = artifacts;
 
             // Determine host and port - take the host name from X-Forwarded-For header, if present, or from
             // the Host header, if present, or from the HttpRequestMessage object. For bewit, it is always from URI.
-            string firstPreference = IsBewit? null : this.GetXForwardedForHeaderValue(request);
-            string secondPreference = IsBewit ? null : request.Headers.Host;
+            string firstPreference = IsBewit? null : request.ForwardedFor;
+            string secondPreference = IsBewit ? null : request.Host;
 
             this.hostName = this.GetHostName(firstPreference, out this.port) ??
                                 this.GetHostName(secondPreference, out this.port) ??
-                                    request.RequestUri.Host;
+                                    request.Uri.Host;
 
             if (String.IsNullOrWhiteSpace(this.port))
-                this.port = request.RequestUri.Port.ToString();
+                this.port = request.Uri.Port.ToString();
 
             this.method = request.Method.Method.ToUpper();
-            this.path = request.RequestUri.PathAndQuery;
+            this.path = request.Uri.PathAndQuery;
         }
 
         /// <summary>
@@ -89,19 +90,6 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
         internal byte[] ToBytes()
         {
             return this.ToString().ToBytesFromUtf8();
-        }
-
-        private string GetXForwardedForHeaderValue(HttpRequestMessage request)
-        {
-            string value = String.Empty;
-
-            if (request.Headers.Contains(XFF_HEADER_NAME))
-                value = request.Headers.GetValues(XFF_HEADER_NAME).FirstOrDefault();
-
-            if (!String.IsNullOrWhiteSpace(value))
-                value = value.Split(',')[0].Trim();
-
-            return value;
         }
 
         private string GetHostName(string hostHeader, out string port)

@@ -237,7 +237,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authorization\MVC\ClaimsAuthorizeAttribute.cs" />
+    <Compile Include="Http\Hawk\Client\ClientOptions.cs" />
     <Compile Include="Http\Hawk\Client\HawkValidatingHandler.cs" />
+    <Compile Include="Http\Hawk\Core\Extensions\IRequestMessageExtension.cs" />
+    <Compile Include="Http\Hawk\Core\MessageContracts\IMessage.cs" />
+    <Compile Include="Http\Hawk\Core\MessageContracts\IRequestMessage.cs" />
+    <Compile Include="Http\Hawk\Core\MessageContracts\IResponseMessage.cs" />
+    <Compile Include="Http\Hawk\Core\Options.cs" />
+    <Compile Include="Http\Hawk\WebApi\WebApiMessage.cs" />
+    <Compile Include="Http\Hawk\WebApi\WebApiRequestMessage.cs" />
+    <Compile Include="Http\Hawk\WebApi\WebApiResponseMessage.cs" />
     <Compile Include="Tokens\FederationMetadata.cs" />
     <Compile Include="Tokens\SimpleWebToken.cs" />
     <Compile Include="Tokens\SimpleWebTokenHandler.cs" />
@@ -280,7 +289,6 @@
     <Compile Include="Http\Hawk\Core\Cryptographer.cs" />
     <Compile Include="Http\Hawk\Core\Extensions\ByteExtension.cs" />
     <Compile Include="Http\Hawk\Core\Extensions\DateTimeExtension.cs" />
-    <Compile Include="Http\Hawk\Core\Extensions\HttpRequestMessageExtension.cs" />
     <Compile Include="Http\Hawk\Core\Extensions\StringBuilderExtension.cs" />
     <Compile Include="Http\Hawk\Core\Extensions\StringExtension.cs" />
     <Compile Include="Http\Hawk\Client\HawkClient.cs" />

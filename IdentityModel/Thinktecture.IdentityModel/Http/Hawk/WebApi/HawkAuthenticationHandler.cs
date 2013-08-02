@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Web;
 using Thinktecture.IdentityModel.Http.Hawk.Core;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Helpers;
+using Thinktecture.IdentityModel.Http.Hawk.Core.MessageContracts;
 
 namespace Thinktecture.IdentityModel.Http.Hawk.WebApi
 {
@@ -16,26 +17,18 @@ namespace Thinktecture.IdentityModel.Http.Hawk.WebApi
     /// </summary>
     public class HawkAuthenticationHandler : DelegatingHandler
     {
-        private readonly Func<string, Credential> credentialsCallback = null;
-        private readonly Func<HttpResponseMessage, string> normalizationCallback = null;
-        private readonly Func<HttpRequestMessage, string, bool> verificationCallback = null;
+        private readonly Options options = null;
 
         /// <summary>
         /// The message handler that authenticates the request using Hawk.
         /// </summary>
-        /// <param name="credentialsCallback">The callback function that returns a Credential object corresponding to the identifier passed in.</param>
-        /// <param name="normalizationCallback">The callback function that returns the application specific data that the web api can send in the response.</param>
-        /// <param name="verificationCallback">The callback function that returns true, if the application specific data in the request is valid.</param>
-        public HawkAuthenticationHandler(Func<string, Credential> credentialsCallback,
-                                                Func<HttpResponseMessage, string> normalizationCallback = null,
-                                                    Func<HttpRequestMessage, string, bool> verificationCallback = null)
+        /// <param name="options">Hawk authentication options</param>
+        public HawkAuthenticationHandler(Options options)
         {
-            if (credentialsCallback == null)
-                throw new ArgumentNullException("Credentials callback is null");
+            if (options == null || options.CredentialsCallback == null)
+                throw new ArgumentNullException("Invalid Hawk authentication options. Credentials callback cannot be null.");
 
-            this.credentialsCallback = credentialsCallback;
-            this.normalizationCallback = normalizationCallback;
-            this.verificationCallback = verificationCallback;
+            this.options = options;
         }
 
         protected async override Task<HttpResponseMessage> SendAsync(
@@ -45,7 +38,7 @@ namespace Thinktecture.IdentityModel.Http.Hawk.WebApi
 
             try
             {
-                HawkServer server = new HawkServer(request, credentialsCallback, verificationCallback);
+                HawkServer server = new HawkServer(new WebApiRequestMessage(request), options);
 
                 var principal = await server.AuthenticateAsync();
 
@@ -61,7 +54,9 @@ namespace Thinktecture.IdentityModel.Http.Hawk.WebApi
 
                 var response = await base.SendAsync(request, cancellationToken);
 
-                await server.CreateServerAuthorizationAsync(response, this.normalizationCallback);
+                var header = await server.CreateServerAuthorizationAsync(new WebApiResponseMessage(response));
+                if (header != null)
+                    response.Headers.Add(header.Item1, header.Item2);
 
                 return response;
             }

@@ -24,16 +24,16 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
 
         private readonly double fresh;
 
-        internal NormalizedTimestamp(ulong unixTime, Credential credential)
+        internal NormalizedTimestamp(ulong unixTime, Credential credential, int localOffset = 0)
         {
             this.unixTimeMillis = unixTime * 1000;
             this.credential = credential;
 
-            var localOffset = UInt64.Parse(ConfigurationManager.AppSettings["LocalTimeOffsetMillis"]);
-            fresh = Math.Floor((this.unixTimeMillis + localOffset) / 1000.0);
+            fresh = Math.Floor((this.unixTimeMillis + Convert.ToUInt64(localOffset)) / 1000.0);
         }
 
-        internal NormalizedTimestamp(DateTime utcNow, Credential credential) : this(utcNow.ToUnixTime(), credential) { }
+        internal NormalizedTimestamp(DateTime utcNow, Credential credential, int localOffset = 0) :
+            this(utcNow.ToUnixTime(), credential, localOffset) { }
 
         /// <summary>
         /// Returns the normalized representation of the timestamp data.
