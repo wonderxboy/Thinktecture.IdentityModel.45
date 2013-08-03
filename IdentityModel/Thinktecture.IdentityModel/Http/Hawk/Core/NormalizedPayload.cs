@@ -17,34 +17,28 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
     {
         private const string PREAMBLE = HawkConstants.Scheme + "." + HawkConstants.Version + ".payload"; // hawk.1.payload
 
-        private readonly HttpContent content = null;
+        private readonly string body = null;
+        private readonly string contentType = null;
 
-        internal NormalizedPayload(HttpContent content)
+        internal NormalizedPayload(string body, string contentType)
         {
-            this.content = content;
+            this.body = body;
+            this.contentType = contentType;
         }
 
         /// <summary>
         /// Returns the normalized payload bytes.
         /// </summary>
-        internal async Task<byte[]> ToBytesAsync()
+        internal byte[] ToBytes()
         {
-            if (this.content != null)
+            if (this.body != null)
             {
-                string contentType = String.Empty;
-                if (content.Headers.ContentType != null)
-                {
-                    contentType = content.Headers.ContentType.MediaType.ToLower();
-                }
-
-                string body = await content.ReadAsStringAsync();
-
                 StringBuilder builder = new StringBuilder();
 
                 builder
                     .AppendNewLine(PREAMBLE)
-                    .AppendNewLine(contentType)
-                    .AppendNewLine(body ?? String.Empty);
+                    .AppendNewLine(contentType == null ? String.Empty : contentType.ToLower())
+                    .AppendNewLine(this.body);
 
                 return builder.ToString().ToBytesFromUtf8();
             }

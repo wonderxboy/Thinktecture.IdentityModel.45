@@ -79,6 +79,7 @@
     <Compile Include="HttpAuthentication\General.cs" />
     <Compile Include="HttpAuthentication\Hawk\IntegrationTests\Hawk\HawkBewitTests.cs" />
     <Compile Include="HttpAuthentication\Hawk\IntegrationTests\Controllers\ValuesController.cs" />
+    <Compile Include="HttpAuthentication\Hawk\IntegrationTests\Helpers\ClientFactory.cs" />
     <Compile Include="HttpAuthentication\Hawk\IntegrationTests\Helpers\ParameterChecker.cs" />
     <Compile Include="HttpAuthentication\Hawk\IntegrationTests\Helpers\ServerFactory.cs" />
     <Compile Include="HttpAuthentication\Hawk\IntegrationTests\Hawk\HawkSunnyDayTests.cs" />
@@ -102,7 +103,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

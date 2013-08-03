@@ -31,21 +31,22 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
         /// sent in by the client (ArtifactsContainer.Mac) and if a payload hash is present,
         /// it matches the hash computed for the normalized payload as well.
         /// </summary>
-        internal async Task<bool> IsSignatureValidAsync(HttpContent content)
+        internal bool IsSignatureValid(string body = null, string contentType = null)
         {
-            return this.IsMacValid() && (this.IsHashNotPresent() || await this.IsHashValidAsync(content));
+            return this.IsMacValid() && (this.IsHashNotPresent() || this.IsHashValid(body, contentType));
         }
 
         /// <summary>
-        /// Creates the payload hash and the corresponding HMAC, and updates the artifacts object with these new values.
+        /// Creates the payload hash and the corresponding HMAC, and updates the artifacts object
+        /// with these new values.
         /// </summary>
-        internal async Task SignAsync(HttpContent newContent)
+        internal void Sign(string body = null, string contentType = null)
         {
             byte[] responsePayloadHash = null;
-            if (newContent != null)
+            if (body != null && contentType != null)
             {
-                var payload = new NormalizedPayload(newContent);
-                byte[] data = await payload.ToBytesAsync();
+                var payload = new NormalizedPayload(body, contentType);
+                byte[] data = payload.ToBytes();
 
                 Tracing.Verbose("Normalized payload: " + Encoding.UTF8.GetString(data));
 
@@ -63,8 +64,8 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
         private bool IsMacValid()
         {
             byte[] data = this.normalizedRequest.ToBytes();
-            // data, at this point has the hash coming in over the wire and hence mac computed is based 
-            // on the hash over the wire and not over the computed hash
+            // data, at this point has the hash coming in over the wire and hence mac computed is
+            // based on the hash over the wire and not over the computed hash
 
             bool isMacValid = this.hasher.IsValidMac(data, credential.Key, artifacts.Mac);
 
@@ -80,10 +81,10 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
             return artifacts.PayloadHash == null || artifacts.PayloadHash.Length == 0;
         }
 
-        private async Task<bool> IsHashValidAsync(HttpContent payload)
+        private bool IsHashValid(string body, string contentType)
         {
-            var normalizedPayload = new NormalizedPayload(payload);
-            byte[] data = await normalizedPayload.ToBytesAsync();
+            var normalizedPayload = new NormalizedPayload(body, contentType);
+            byte[] data = normalizedPayload.ToBytes();
 
             bool isHashValid = this.hasher.IsValidHash(data, artifacts.PayloadHash);
 

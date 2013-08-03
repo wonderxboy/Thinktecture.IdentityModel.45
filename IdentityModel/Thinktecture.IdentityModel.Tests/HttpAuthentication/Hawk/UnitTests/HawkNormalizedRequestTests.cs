@@ -2,6 +2,7 @@
 using System;
 using System.Net.Http;
 using Thinktecture.IdentityModel.Http.Hawk.Core;
+using Thinktecture.IdentityModel.Http.Hawk.WebApi;
 
 namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.UnitTests
 {
@@ -14,7 +15,7 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.UnitTests
             var request = new HttpRequestMessage();
             request.RequestUri = new Uri("http://server/api/values");
 
-            var normalizedRequest = new NormalizedRequest(request, null);
+            var normalizedRequest = new NormalizedRequest(new WebApiRequestMessage(request), null);
 
             PrivateObject po = new PrivateObject(normalizedRequest);
 
@@ -31,7 +32,7 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.UnitTests
             var request = new HttpRequestMessage();
             request.RequestUri = new Uri("https://server/api/values");
 
-            var normalizedRequest = new NormalizedRequest(request, null);
+            var normalizedRequest = new NormalizedRequest(new WebApiRequestMessage(request), null);
 
             PrivateObject po = new PrivateObject(normalizedRequest);
 
@@ -47,7 +48,7 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.UnitTests
             request.RequestUri = new Uri("http://server/api/values");
             request.Headers.Host = "myhost:899";
 
-            var normalizedRequest = new NormalizedRequest(request, null);
+            var normalizedRequest = new NormalizedRequest(new WebApiRequestMessage(request), null);
 
             PrivateObject po = new PrivateObject(normalizedRequest);
 
@@ -65,7 +66,7 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.UnitTests
             request.RequestUri = new Uri("http://server/api/values");
             request.Headers.Host = "myhost";
 
-            var normalizedRequest = new NormalizedRequest(request, null);
+            var normalizedRequest = new NormalizedRequest(new WebApiRequestMessage(request), null);
 
             PrivateObject po = new PrivateObject(normalizedRequest);
 
@@ -83,7 +84,7 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.UnitTests
             request.RequestUri = new Uri("https://server/api/values");
             request.Headers.Host = "myhost";
 
-            var normalizedRequest = new NormalizedRequest(request, null);
+            var normalizedRequest = new NormalizedRequest(new WebApiRequestMessage(request), null);
 
             PrivateObject po = new PrivateObject(normalizedRequest);
 
@@ -100,7 +101,7 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.UnitTests
             request.Headers.Host = "myhost:899";
             request.Headers.Add("X-Forwarded-For", "xffhost:4444");
 
-            var normalizedRequest = new NormalizedRequest(request, null);
+            var normalizedRequest = new NormalizedRequest(new WebApiRequestMessage(request), null);
 
             PrivateObject po = new PrivateObject(normalizedRequest);
 
@@ -119,7 +120,7 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.UnitTests
             request.Headers.Host = "myhost:899";
             request.Headers.Add("X-Forwarded-For", "[111:111:111]:4444");
 
-            var normalizedRequest = new NormalizedRequest(request, null);
+            var normalizedRequest = new NormalizedRequest(new WebApiRequestMessage(request), null);
 
             PrivateObject po = new PrivateObject(normalizedRequest);
 
@@ -139,7 +140,7 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.UnitTests
             request.Headers.Add("X-Forwarded-For", "xffhost1:1111");
             request.Headers.Add("X-Forwarded-For", "xffhost2:2222"); // Same as "xffhost1:1111, xffhost2:2222"
 
-            var normalizedRequest = new NormalizedRequest(request, null);
+            var normalizedRequest = new NormalizedRequest(new WebApiRequestMessage(request), null);
 
             PrivateObject po = new PrivateObject(normalizedRequest);
 
@@ -159,7 +160,7 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.UnitTests
             request.Headers.Add("X-Forwarded-For", "[111:111:111]:1111");
             request.Headers.Add("X-Forwarded-For", "[222:222:222]:2222"); // Same as "[111:111:111]:1111, [222:222:222]:2222"
 
-            var normalizedRequest = new NormalizedRequest(request, null);
+            var normalizedRequest = new NormalizedRequest(new WebApiRequestMessage(request), null);
 
             PrivateObject po = new PrivateObject(normalizedRequest);
 

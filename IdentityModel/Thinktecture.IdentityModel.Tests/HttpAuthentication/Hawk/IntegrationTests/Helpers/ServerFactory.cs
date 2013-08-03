@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Thinktecture.IdentityModel.Http.Hawk.Core;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Helpers;
+using Thinktecture.IdentityModel.Http.Hawk.Core.MessageContracts;
 using Thinktecture.IdentityModel.Http.Hawk.WebApi;
 
 namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTests.Helpers
@@ -36,8 +37,8 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
             }
         }
 
-        internal static HttpServer Create(Func<HttpResponseMessage, string> normalizationCallback = null,
-                                            Func<HttpRequestMessage, string, bool> verificationCallback = null)
+        internal static HttpServer Create(Func<IResponseMessage, string> normalizationCallback = null,
+                                            Func<IRequestMessage, string, bool> verificationCallback = null)
         {
             var configuration = new HttpConfiguration();
 
@@ -47,9 +48,17 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
                 defaults: new { id = RouteParameter.Optional }
             );
 
-            Func<string, Credential> credentialsCallback = (id) => Credentials.FirstOrDefault(c => c.Id == id);
+            var options = new Options()
+            {
+                ClockSkewSeconds = 60,
+                LocalTimeOffsetMillis = 0,
+                CredentialsCallback = (id) => Credentials.FirstOrDefault(c => c.Id == id),
+                NormalizationCallback = normalizationCallback,
+                VerificationCallback = verificationCallback,
+                ResponsePayloadHashabilityCallback = (req) => true
+            };
 
-            var hawkHandler = new HawkAuthenticationHandler(credentialsCallback, normalizationCallback, verificationCallback);
+            var hawkHandler = new HawkAuthenticationHandler(options);
             configuration.MessageHandlers.Add(hawkHandler);
 
             return new HttpServer(configuration);

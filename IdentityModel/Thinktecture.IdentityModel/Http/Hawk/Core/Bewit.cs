@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Web;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Extensions;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Helpers;
+using Thinktecture.IdentityModel.Http.Hawk.Core.MessageContracts;
 
 namespace Thinktecture.IdentityModel.Http.Hawk.Core
 {
@@ -14,27 +15,30 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
     internal class Bewit
     {
         private readonly Credential credential = null;
-        private readonly HttpRequestMessage request = null;
+        private readonly IRequestMessage request = null;
         private readonly DateTime utcNow = DateTime.UtcNow;
         private readonly int lifeSeconds = 60;
         private readonly string applicationSpecificData = String.Empty;
+        private readonly int localOffset = 0;
 
         /// <summary>
         /// Represents the query parameter bewit used by Hawk for granting temporary access.
         /// </summary>
         /// <param name="request">Request object</param>
         /// <param name="credential">Hawk credential to use for creating and validating bewit.</param>
-        /// <param name="utcNow">Current date and time in UTC</param>
-        /// <param name="lifeSeconds">Bewit life time (time to live in seconds)</param>
+        /// <param name="utcNow">Current date and time in UTC.</param>
+        /// <param name="lifeSeconds">Bewit life time (time to live in seconds).</param>
         /// <param name="applicationSpecificData">Application specific data to be sent in the bewit</param>
-        internal Bewit(HttpRequestMessage request, Credential credential,
-                            DateTime utcNow, int lifeSeconds, string applicationSpecificData)
+        /// <param name="localOffset">Local offset in milliseconds.</param>
+        internal Bewit(IRequestMessage request, Credential credential,
+                            DateTime utcNow, int lifeSeconds, string applicationSpecificData, int localOffset = 0)
         {
             this.credential = credential;
             this.request = request;
             this.utcNow = utcNow;
             this.lifeSeconds = lifeSeconds;
             this.applicationSpecificData = applicationSpecificData;
+            this.localOffset = localOffset;
         }
 
         /// <summary>
@@ -42,13 +46,12 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
         /// id\exp\mac\ext, where id is the user identifier, exp is the UNIX time until which bewit is
         /// valid, mac is the HMAC of the bewit to protect integrity, and ext is the application specific data.
         /// </summary>
-        public async Task<string> ToBewitStringAsync()
+        public string ToBewitString()
         {
             if (request.Method != HttpMethod.Get) // Not supporting HEAD
                 throw new InvalidOperationException("Bewit not allowed for methods other than GET");
 
-            ulong now = utcNow.ToUnixTime() +
-                                UInt64.Parse(ConfigurationManager.AppSettings["LocalTimeOffsetMillis"]);
+            ulong now = utcNow.ToUnixTime() + Convert.ToUInt64(this.localOffset);
 
             var artifacts = new ArtifactsContainer()
             {
@@ -62,7 +65,7 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
             var crypto = new Cryptographer(normalizedRequest, artifacts, credential);
 
             // Sign the request
-            await crypto.SignAsync(null);
+            crypto.Sign(); // Bewit is for GET and GET must have no request body
 
             // bewit: id\exp\mac\ext
             string bewit = String.Format(@"{0}\{1}\{2}\{3}",
@@ -79,12 +82,12 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
         /// is no HTTP Authorization header present in the request. Also, returns the value of the
         /// bewit parameter from the query string.
         /// </summary>
-        internal static bool TryGetBewit(HttpRequestMessage request, out string bewit)
+        internal static bool TryGetBewit(IRequestMessage request, out string bewit)
         {
-            bewit = HttpUtility.ParseQueryString(request.RequestUri.Query)[HawkConstants.Bewit];
+            bewit = HttpUtility.ParseQueryString(request.Uri.Query)[HawkConstants.Bewit];
             
             return !String.IsNullOrWhiteSpace(bewit) &&
-                        (request.Headers.Authorization == null);
+                        (request.Authorization == null);
         }
 
         /// <summary>
@@ -94,15 +97,14 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
         /// <param name="bewit">Value of the query string parameter with the name of 'bewit'.</param>
         /// <param name="now">Date and time in UTC to be used as the base for computing bewit life.</param>
         /// <param name="request">Request object.</param>
-        /// <param name="callback">The callback function that returns a Credential object corresponding to the identifier passed in.</param>
-        internal static async Task<AuthenticationResult> AuthenticateAsync(string bewit, ulong now, HttpRequestMessage request,
-                                            Func<string, Credential> callback)
+        /// <param name="options">Hawk authentication options</param>
+        internal static AuthenticationResult Authenticate(string bewit, ulong now, IRequestMessage request, Options options)
         {
             if (!String.IsNullOrWhiteSpace(bewit))
             {
                 if (request.Method == HttpMethod.Get)
                 {
-                    if (callback != null)
+                    if (options != null && options.CredentialsCallback != null)
                     {
                         var parts = bewit.ToUtf8StringFromBase64Url().Split('\\');
 
@@ -119,7 +121,7 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
                                 {
                                     RemoveBewitFromUri(request);
 
-                                    Credential credential = callback(id);
+                                    Credential credential = options.CredentialsCallback(id);
                                     if (credential != null && credential.IsValid)
                                     {
                                         var artifacts = new ArtifactsContainer()
@@ -134,7 +136,7 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
                                         var normalizedRequest = new NormalizedRequest(request, artifacts) { IsBewit = true };
                                         var crypto = new Cryptographer(normalizedRequest, artifacts, credential);
 
-                                        if (await crypto.IsSignatureValidAsync(null)) // Bewit is for GET and GET must have no request body
+                                        if (crypto.IsSignatureValid()) // Bewit is for GET and GET must have no request body
                                         {
                                             return new AuthenticationResult()
                                             {
@@ -156,22 +158,19 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Core
         }
 
         /// <summary>
-        /// Removes the bewit parameter from the URI of the specified HttpRequestMessage object.
+        /// Removes the bewit parameter from the URI of the specified IRequestMessage object.
         /// </summary>
-        private static void RemoveBewitFromUri(HttpRequestMessage request)
+        private static void RemoveBewitFromUri(IRequestMessage request)
         {
-            string query = request.RequestUri.Query;
-            string bewit = HttpUtility.ParseQueryString(request.RequestUri.Query)[HawkConstants.Bewit];
+            string query = request.Uri.Query;
+            string bewit = HttpUtility.ParseQueryString(request.Uri.Query)[HawkConstants.Bewit];
 
             query = query.Replace(HawkConstants.Bewit + "=" + bewit, String.Empty)
                             .Replace("&&", "&")
                             .Replace("?&", "?")
                             .Trim('&').Trim('?');
 
-            UriBuilder builder = new UriBuilder(request.RequestUri);
-            builder.Query = query;
-
-            request.RequestUri = builder.Uri;
+            request.QueryString = query;
         }
     }
 }

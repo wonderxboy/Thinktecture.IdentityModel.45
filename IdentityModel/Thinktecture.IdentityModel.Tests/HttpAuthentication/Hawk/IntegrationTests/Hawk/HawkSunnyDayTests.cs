@@ -9,9 +9,11 @@ using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Thinktecture.IdentityModel.Http.Hawk.Client;
 using Thinktecture.IdentityModel.Http.Hawk.Core;
-using Thinktecture.IdentityModel.Http.Hawk.Core.Client;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Extensions;
+using Thinktecture.IdentityModel.Http.Hawk.Core.MessageContracts;
+using Thinktecture.IdentityModel.Http.Hawk.WebApi;
 using Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTests.Helpers;
 
 namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTests
@@ -47,14 +49,14 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Get, URI))
                 {
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
-                    await client.CreateClientAuthorizationAsync(request);
+                    var client = ClientFactory.Create();
+                    await client.CreateClientAuthorizationAsync(new WebApiRequestMessage(request));
 
                     using (var response = await invoker.SendAsync(request, CancellationToken.None))
                     {
                         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
                         Assert.AreEqual("Thanks for flying Hawk", await response.Content.ReadAsAsync<string>());
-                        Assert.IsTrue(await client.AuthenticateAsync(response));
+                        Assert.IsTrue(await client.AuthenticateAsync(new WebApiResponseMessage(response)));
                     }
                 }
             }
@@ -69,14 +71,14 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
                 {
                     request.Headers.Host = "server:99";
 
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
-                    await client.CreateClientAuthorizationAsync(request);
+                    var client = ClientFactory.Create();
+                    await client.CreateClientAuthorizationAsync(new WebApiRequestMessage(request));
 
                     using (var response = await invoker.SendAsync(request, CancellationToken.None))
                     {
                         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
                         Assert.AreEqual("Thanks for flying Hawk", await response.Content.ReadAsAsync<string>());
-                        Assert.IsTrue(await client.AuthenticateAsync(response));
+                        Assert.IsTrue(await client.AuthenticateAsync(new WebApiResponseMessage(response)));
                     }
                 }
             }
@@ -91,14 +93,14 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
                 {
                     request.Headers.Add("X-Forwarded-For", "[ipv6]:99");
 
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
-                    await client.CreateClientAuthorizationAsync(request);
+                    var client = ClientFactory.Create();
+                    await client.CreateClientAuthorizationAsync(new WebApiRequestMessage(request));
 
                     using (var response = await invoker.SendAsync(request, CancellationToken.None))
                     {
                         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
                         Assert.AreEqual("Thanks for flying Hawk", await response.Content.ReadAsAsync<string>());
-                        Assert.IsTrue(await client.AuthenticateAsync(response));
+                        Assert.IsTrue(await client.AuthenticateAsync(new WebApiResponseMessage(response)));
                     }
                 }
             }
@@ -111,14 +113,14 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Get, URI + "?firstname=Louis&&lastname=Phillipe"))
                 {
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
-                    await client.CreateClientAuthorizationAsync(request);
+                    var client = ClientFactory.Create();
+                    await client.CreateClientAuthorizationAsync(new WebApiRequestMessage(request));
 
                     using (var response = await invoker.SendAsync(request, CancellationToken.None))
                     {
                         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
                         Assert.AreEqual("Hello, Louis Phillipe. Thanks for flying Hawk", await response.Content.ReadAsAsync<string>());
-                        Assert.IsTrue(await client.AuthenticateAsync(response));
+                        Assert.IsTrue(await client.AuthenticateAsync(new WebApiResponseMessage(response)));
                     }
                 }
             }
@@ -127,16 +129,16 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
         [TestMethod]
         public async Task MustReturn200WhenValidHawkSchemeHeaderWithAppSpecifiDataIsPresentInGetAndServerSendsAppSpecificData()
         {
-            Func<HttpResponseMessage, string> normalizationCallback = (response) =>
+            Func<IResponseMessage, string> normalizationCallback = (response) =>
             {
                 // Simulate service adding a sensitive header
-                response.Headers.Add("X-Header-To-Protect", "Swoop"); // Sensitive header to protect
+                response.AddHeader("X-Header-To-Protect", "Swoop"); // Sensitive header to protect
 
                 // return the status code and the sensitive header in the agreed format
                 return (int)response.StatusCode + ":X-Header-To-Protect:Swoop";
             };
 
-            Func<HttpRequestMessage, string, bool> verificationCallback = (request, appSpecificData) =>
+            Func<IRequestMessage, string, bool> verificationCallback = (request, appSpecificData) =>
             {
                 // Client and server decided that appSpecificData will be in the form of
                 // header name and header value separated by a colon, like so: X-Header-To-Protect:Swoosh.
@@ -148,8 +150,8 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
                 string headerName = parts[0];
                 string value = parts[1];
 
-                if (request.Headers.Contains(headerName) &&
-                    request.Headers.GetValues(headerName).First().Equals(value))
+                if (request.Headers.ContainsKey(headerName) &&
+                    request.Headers[headerName].First().Equals(value))
                     return true;
 
                 return false;
@@ -163,21 +165,29 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
                 {
                     request.Headers.Add("X-Header-To-Protect", "Swoosh"); // Sensitive header to protect
 
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
-                    client.ApplicationSpecificData = "X-Header-To-Protect:Swoosh"; // Put the sensitive header in the format agreed
+                    string appSpecificData = String.Empty;
+                    Func<IResponseMessage, string, bool> clientVerificationCallback = (r, s) =>
+                        {
+                            appSpecificData = s;
+                            return true;
+                        };
 
-                    await client.CreateClientAuthorizationAsync(request);
+                    var client = ClientFactory.Create(
+                        normalizationCallback: (r) => "X-Header-To-Protect:Swoosh",
+                        verificationCallback: clientVerificationCallback); // Put the sensitive header in the format agreed
+
+                    await client.CreateClientAuthorizationAsync(new WebApiRequestMessage(request));
 
                     using (var response = await invoker.SendAsync(request, CancellationToken.None))
                     {
                         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
                         Assert.AreEqual("Thanks for flying Hawk", await response.Content.ReadAsAsync<string>());
-                        Assert.IsTrue(await client.AuthenticateAsync(response));
+                        Assert.IsTrue(await client.AuthenticateAsync(new WebApiResponseMessage(response)));
 
-                        Assert.IsNotNull(client.WebApiSpecificData);
-                        Assert.IsFalse(String.IsNullOrWhiteSpace(client.WebApiSpecificData));
+                        Assert.IsNotNull(appSpecificData);
+                        Assert.IsFalse(String.IsNullOrWhiteSpace(appSpecificData));
 
-                        var parts = client.WebApiSpecificData.Split(':');
+                        var parts = appSpecificData.Split(':');
 
                         HttpStatusCode status = (HttpStatusCode)Enum.Parse(typeof(HttpStatusCode), parts[0]);
                         string headerName = parts[1];
@@ -198,15 +208,16 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Post, URI))
                 {
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
-
+                    var client = ClientFactory.Create(requestPayloadHashabilityCallback: (r) => true);
+                    
                     request.Content = new ObjectContent<string>("Steve", new JsonMediaTypeFormatter());
 
-                    await client.CreateClientAuthorizationAsync(request);
+                    await client.CreateClientAuthorizationAsync(new WebApiRequestMessage(request));
 
                     string parameter = request.Headers.Authorization.Parameter;
 
                     // hash must be present, since POST contains a request body
+                    // and that we specify requestPayloadHashabilityCallback
                     Assert.IsTrue(ParameterChecker.IsFieldPresent(parameter, "hash"));
 
                     request.Headers.Authorization =
@@ -216,7 +227,7 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
                     {
                         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
                         Assert.AreEqual("Hello, Steve. Thanks for flying Hawk", await response.Content.ReadAsAsync<string>());
-                        Assert.IsTrue(await client.AuthenticateAsync(response));
+                        Assert.IsTrue(await client.AuthenticateAsync(new WebApiResponseMessage(response)));
                     }
                 }
             }
@@ -229,14 +240,15 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Put, URI))
                 {
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
+                    var client = ClientFactory.Create(requestPayloadHashabilityCallback: (r) => true);
 
                     request.Content = new ObjectContent<string>("Steve", new JsonMediaTypeFormatter());
-                    await client.CreateClientAuthorizationAsync(request);
+                    await client.CreateClientAuthorizationAsync(new WebApiRequestMessage(request));
 
                     string parameter = request.Headers.Authorization.Parameter;
 
                     // hash must be present, since PUT contains a request body
+                    // and that we specify requestPayloadHashabilityCallback
                     Assert.IsTrue(ParameterChecker.IsFieldPresent(parameter, "hash"));
 
                     request.Headers.Authorization = new AuthenticationHeaderValue("hawk", parameter);
@@ -253,7 +265,7 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
                         // Since there is no response body, no hash must be present in Server-Authorization
                         Assert.IsFalse(ParameterChecker.IsFieldPresent(authorization, "hash"));
 
-                        Assert.IsTrue(await client.AuthenticateAsync(response));
+                        Assert.IsTrue(await client.AuthenticateAsync(new WebApiResponseMessage(response)));
                     }
                 }
             }
@@ -266,8 +278,8 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Get, URI))
                 {
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
-                    await client.CreateClientAuthorizationAsync(request);
+                    var client = ClientFactory.Create();
+                    await client.CreateClientAuthorizationAsync(new WebApiRequestMessage(request));
 
                     using (var response = await invoker.SendAsync(request, CancellationToken.None))
                     {
@@ -281,13 +293,13 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
                         response.Headers.WwwAuthenticate.Add(new AuthenticationHeaderValue("hawk", timestampHeader));
 
                         // Client must have now calculated an offset of -300 seconds approx
-                        Assert.IsTrue(await client.AuthenticateAsync(response));
+                        Assert.IsTrue(await client.AuthenticateAsync(new WebApiResponseMessage(response)));
                         Assert.IsTrue(HawkClient.CompensatorySeconds <= -299 && HawkClient.CompensatorySeconds >= -301);
 
                         // Create a fresh request and see if this offset is applied to the timestamp
                         using (var subsequentRequest = new HttpRequestMessage(HttpMethod.Get, URI))
                         {
-                            await client.CreateClientAuthorizationAsync(subsequentRequest);
+                            await client.CreateClientAuthorizationAsync(new WebApiRequestMessage(subsequentRequest));
 
                             string header = subsequentRequest.Headers.Authorization.Parameter;
 

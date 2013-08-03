@@ -6,9 +6,10 @@ using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
-using Thinktecture.IdentityModel.Http.Hawk.Core.Client;
+using Thinktecture.IdentityModel.Http.Hawk.Client;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Extensions;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Helpers;
+using Thinktecture.IdentityModel.Http.Hawk.WebApi;
 using Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTests.Helpers;
 
 namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTests
@@ -38,8 +39,8 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Get, URI))
                 {
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
-                    await client.CreateBewitAsync(request, 10);
+                    var client = ClientFactory.Create();
+                    client.CreateBewit(new WebApiRequestMessage(request), 10);
 
                     using (var response = await invoker.SendAsync(request, CancellationToken.None))
                     {
@@ -58,9 +59,8 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Get, URI))
                 {
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
-                    client.ApplicationSpecificData = "Humpty Dumpty";
-                    await client.CreateBewitAsync(request, 10);
+                    var client = ClientFactory.Create(normalizationCallback: (r) => "Humpty Dumpty");
+                    client.CreateBewit(new WebApiRequestMessage(request), 10);
 
                     using (var response = await invoker.SendAsync(request, CancellationToken.None))
                     {
@@ -81,8 +81,8 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Get, uriWithQueryString))
                 {
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
-                    await client.CreateBewitAsync(request, 10);
+                    var client = ClientFactory.Create();
+                    client.CreateBewit(new WebApiRequestMessage(request), 10);
 
                     using (var response = await invoker.SendAsync(request, CancellationToken.None))
                     {
@@ -101,8 +101,8 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Get, URI))
                 {
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
-                    string bewit = await client.CreateBewitAsync(request, 10);
+                    var client = ClientFactory.Create();
+                    string bewit = client.CreateBewit(new WebApiRequestMessage(request), 10);
 
                     using (var freshRequest = new HttpRequestMessage())
                     {
@@ -126,8 +126,8 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Get, URI))
                 {
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
-                    await client.CreateBewitAsync(request, 0); // no life in it
+                    var client = ClientFactory.Create();
+                    client.CreateBewit(new WebApiRequestMessage(request), 0); // no life in it
 
                     using (var response = await invoker.SendAsync(request, CancellationToken.None))
                     {
@@ -145,8 +145,8 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Post, URI))
                 {
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
-                    await client.CreateBewitAsync(request, 10);
+                    var client = ClientFactory.Create();
+                    client.CreateBewit(new WebApiRequestMessage(request), 10);
 
                     await invoker.SendAsync(request, CancellationToken.None);
                 }
@@ -160,8 +160,8 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Get, URI))
                 {
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
-                    string bewit = await client.CreateBewitAsync(request, 10);
+                    var client = ClientFactory.Create();
+                    string bewit = client.CreateBewit(new WebApiRequestMessage(request), 10);
 
                     var parts = bewit.ToUtf8StringFromBase64Url().Split('\\');
                     string id = parts[0];
@@ -192,8 +192,8 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Get, URI))
                 {
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
-                    string bewit = await client.CreateBewitAsync(request, 10);
+                    var client = ClientFactory.Create();
+                    string bewit = client.CreateBewit(new WebApiRequestMessage(request), 10);
 
                     var parts = bewit.ToUtf8StringFromBase64Url().Split('\\');
                     string id = parts[0];

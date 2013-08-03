@@ -9,8 +9,11 @@ using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
-using Thinktecture.IdentityModel.Http.Hawk.Core.Client;
+using Thinktecture.IdentityModel.Http.Hawk.Client;
+using Thinktecture.IdentityModel.Http.Hawk.Core;
 using Thinktecture.IdentityModel.Http.Hawk.Core.Helpers;
+using Thinktecture.IdentityModel.Http.Hawk.Core.MessageContracts;
+using Thinktecture.IdentityModel.Http.Hawk.WebApi;
 using Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTests.Helpers;
 
 namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTests
@@ -36,12 +39,12 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
         [TestMethod]
         public async Task MustReturn401WhenHawkParameterHasTamperedIdOrNonceOrTsOrMacOrHashOrExt()
         {
-            await MustReturn401WhenHawParameterIsTampered(tamperedAttribute: "id");
-            await MustReturn401WhenHawParameterIsTampered(tamperedAttribute: "nonce");
-            await MustReturn401WhenHawParameterIsTampered(tamperedAttribute: "ts");
-            await MustReturn401WhenHawParameterIsTampered(tamperedAttribute: "mac");
-            await MustReturn401WhenHawParameterIsTampered(tamperedAttribute: "hash");
-            await MustReturn401WhenHawParameterIsTampered(tamperedAttribute: "ext");
+            await MustReturn401WhenHawkParameterIsTampered(tamperedAttribute: "id");
+            await MustReturn401WhenHawkParameterIsTampered(tamperedAttribute: "nonce");
+            await MustReturn401WhenHawkParameterIsTampered(tamperedAttribute: "ts");
+            await MustReturn401WhenHawkParameterIsTampered(tamperedAttribute: "mac");
+            await MustReturn401WhenHawkParameterIsTampered(tamperedAttribute: "hash");
+            await MustReturn401WhenHawkParameterIsTampered(tamperedAttribute: "ext");
         }
 
         [TestMethod]
@@ -54,8 +57,8 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
                     var badCredential = ServerFactory.Credentials.First();
                     badCredential.Key = "werxhqb98"; // Some key other than werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn
 
-                    var client = new HawkClient(() => badCredential);
-                    await client.CreateClientAuthorizationAsync(request);
+                    var client = ClientFactory.Create(() => badCredential);
+                    await client.CreateClientAuthorizationAsync(new WebApiRequestMessage(request));
 
                     using (var response = await invoker.SendAsync(request, CancellationToken.None))
                     {
@@ -76,8 +79,8 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
                 {
                     request.Content = new ObjectContent<string>("Steve", new JsonMediaTypeFormatter());
 
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
-                    await client.CreateClientAuthorizationAsync(request); // Hash is now based on "Steve"
+                    var client = ClientFactory.Create(requestPayloadHashabilityCallback: (r) => true);
+                    await client.CreateClientAuthorizationAsync(new WebApiRequestMessage(request)); // Hash is now based on "Steve"
 
                     // Changing body to "Stephen"
                     request.Content = new ObjectContent<string>("Stephen", new JsonMediaTypeFormatter());
@@ -99,8 +102,8 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Get, URI + "?firstname=Louis&&lastname=Phillipe"))
                 {
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
-                    await client.CreateClientAuthorizationAsync(request); // Hash is now based on ?firstname=Louis&&lastname=Phillipe
+                    var client = ClientFactory.Create();
+                    await client.CreateClientAuthorizationAsync(new WebApiRequestMessage(request)); // Hash is now based on ?firstname=Louis&&lastname=Phillipe
 
                     // Changing query string to ?firstname=Luis&&lastname=Phillip
                     request.RequestUri = new Uri(URI + "?firstname=Luis&&lastname=Phillip");
@@ -122,25 +125,25 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Get, URI))
                 {
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
-                    await client.CreateClientAuthorizationAsync(request);
+                    var client = ClientFactory.Create();
+                    await client.CreateClientAuthorizationAsync(new WebApiRequestMessage(request));
 
                     using (var response = await invoker.SendAsync(request, CancellationToken.None))
                     {
                         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 
                         string header = response.Headers.GetValues(HawkConstants.ServerAuthorizationHeaderName).FirstOrDefault();
-                        Assert.IsTrue(await client.AuthenticateAsync(response));
+                        Assert.IsTrue(await client.AuthenticateAsync(new WebApiResponseMessage(response)));
 
                         string tamperedHeader = header.Replace("mac=\"", "mac=\"1234"); // mac="abc" => mac = "1234abc"
                         response.Headers.Remove(HawkConstants.ServerAuthorizationHeaderName);
                         response.Headers.Add(HawkConstants.ServerAuthorizationHeaderName, tamperedHeader);
-                        Assert.IsFalse(await client.AuthenticateAsync(response));
+                        Assert.IsFalse(await client.AuthenticateAsync(new WebApiResponseMessage(response)));
 
                         tamperedHeader = header.Replace("hash=\"", "hash=\"1234"); // hash="abc" => hash = "1234abc"
                         response.Headers.Remove(HawkConstants.ServerAuthorizationHeaderName);
                         response.Headers.Add(HawkConstants.ServerAuthorizationHeaderName, tamperedHeader);
-                        Assert.IsFalse(await client.AuthenticateAsync(response));
+                        Assert.IsFalse(await client.AuthenticateAsync(new WebApiResponseMessage(response)));
                     }
                 }
             }
@@ -153,9 +156,10 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Get, URI))
                 {
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
+                    var client = ClientFactory.Create();
 
-                    await client.CreateClientAuthorizationInternalAsync(request, DateTime.UtcNow.AddMinutes(-2));
+                    await client.CreateClientAuthorizationInternalAsync(new WebApiRequestMessage(request),
+                                                                            DateTime.UtcNow.AddMinutes(-2));
 
                     using (var response = await invoker.SendAsync(request, CancellationToken.None))
                     {
@@ -170,12 +174,12 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
                         // ts and tsm must be present
                         Assert.IsTrue(ParameterChecker.IsFieldPresent(tsParameter, "ts"));
                         Assert.IsTrue(ParameterChecker.IsFieldPresent(tsParameter, "tsm"));
-                        Assert.IsTrue(await client.AuthenticateAsync(response));
+                        Assert.IsTrue(await client.AuthenticateAsync(new WebApiResponseMessage(response)));
 
                         string tamperedtsParameter = tsParameter.Replace("tsm=\"", "tsm=\"1234"); // tsm="abc" => tsm = "1234abc"
                         response.Headers.WwwAuthenticate.Remove(wwwheader);
                         response.Headers.WwwAuthenticate.Add(new AuthenticationHeaderValue("hawk", tamperedtsParameter));
-                        Assert.IsFalse(await client.AuthenticateAsync(response));
+                        Assert.IsFalse(await client.AuthenticateAsync(new WebApiResponseMessage(response)));
                     }
                 }
             }
@@ -184,7 +188,7 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
         [TestMethod]
         public async Task MustReturn401WhenProtectedCustomHeaderIsTampered()
         {
-            Func<HttpRequestMessage, string, bool> verificationCallback = (request, appSpecificData) =>
+            Func<IRequestMessage, string, bool> verificationCallback = (request, appSpecificData) =>
             {
                 // Client and server decided that appSpecificData will be
                 // header name:header value, like so: X-Request-Header:Swoosh
@@ -196,8 +200,8 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
                 string headerName = parts[0];
                 string value = parts[1];
 
-                if (request.Headers.Contains(headerName) &&
-                    request.Headers.GetValues(headerName).First().Equals(value))
+                if (request.Headers.ContainsKey(headerName) &&
+                    request.Headers[headerName].First().Equals(value))
                     return true;
 
                 return false;
@@ -212,12 +216,10 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
                     // Sensitive header to protect but simulate tampering by changing the value
                     request.Headers.Add("X-Request-Header", "Tampered Swoosh");
 
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
+                    var client = ClientFactory.Create(
+                        normalizationCallback: (r) => "X-Request-Header:Swoosh"); // Put the sensitive header in the earlier decided format
 
-                    // Put the sensitive header in the earlier decided format in the ApplicationSpecificData property
-                    client.ApplicationSpecificData = "X-Request-Header:Swoosh";
-
-                    await client.CreateClientAuthorizationAsync(request);
+                    await client.CreateClientAuthorizationAsync(new WebApiRequestMessage(request));
 
                     using (var response = await invoker.SendAsync(request, CancellationToken.None))
                     {
@@ -229,7 +231,7 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
             }
         }
 
-        private static async Task MustReturn401WhenHawParameterIsTampered(string tamperedAttribute)
+        private static async Task MustReturn401WhenHawkParameterIsTampered(string tamperedAttribute)
         {
             using (var invoker = new HttpMessageInvoker(ServerFactory.Create()))
             {
@@ -237,10 +239,11 @@ namespace Thinktecture.IdentityModel.Tests.HttpAuthentication.Hawk.IntegrationTe
                 {
                     request.Content = new ObjectContent<string>("Steve", new JsonMediaTypeFormatter());
 
-                    var client = new HawkClient(() => ServerFactory.DefaultCredential);
-                    client.ApplicationSpecificData = "world peace";
+                    var client = ClientFactory.Create(
+                        normalizationCallback: (r) => "world peace",
+                        requestPayloadHashabilityCallback: (r) => true);
 
-                    await client.CreateClientAuthorizationAsync(request);
+                    await client.CreateClientAuthorizationAsync(new WebApiRequestMessage(request));
 
                     string goodParameter = request.Headers.Authorization.Parameter;
 
