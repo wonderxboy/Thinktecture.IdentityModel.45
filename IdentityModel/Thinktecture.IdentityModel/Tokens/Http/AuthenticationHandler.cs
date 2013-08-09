@@ -24,9 +24,11 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         public const string PrincipalKey = "TT_Principal";
 
-        public AuthenticationHandler(AuthenticationConfiguration configuration, HttpConfiguration httpConfiguration = null)
+        public AuthenticationHandler(AuthenticationConfiguration configuration, HttpConfiguration httpConfiguration = null) : this(new HttpAuthentication(configuration), httpConfiguration) {}
+
+        public AuthenticationHandler(HttpAuthentication authentication, HttpConfiguration httpConfiguration = null)
         {
-            _authN = new HttpAuthentication(configuration);
+            _authN = authentication;
 
             if (httpConfiguration != null)
             {
@@ -34,9 +36,11 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             }
         }
 
-        public AuthenticationHandler(AuthenticationConfiguration configuration, HttpMessageHandler innerHandler)
+        public AuthenticationHandler(AuthenticationConfiguration configuration, HttpMessageHandler innerHandler) : this(new HttpAuthentication(configuration), innerHandler) {}
+
+        public AuthenticationHandler(HttpAuthentication authentication, HttpMessageHandler innerHandler)
         {
-            _authN = new HttpAuthentication(configuration);
+            _authN = authentication;
             InnerHandler = innerHandler;
         }
 

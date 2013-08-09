@@ -27,7 +27,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             Configuration = configuration;
         }
 
-        public ClaimsPrincipal Authenticate(HttpRequestMessage request)
+        public virtual ClaimsPrincipal Authenticate(HttpRequestMessage request)
         {
             string resourceName = request.RequestUri.AbsoluteUri;
             var identities = new List<ClaimsIdentity>();
