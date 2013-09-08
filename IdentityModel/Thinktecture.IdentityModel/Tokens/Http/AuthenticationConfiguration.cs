@@ -72,7 +72,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             var hit = from m in Mappings
                       where m.Options.RequestType == mapping.Options.RequestType &&
                             m.Options.Name == mapping.Options.Name &&
-                            m.Options.Scheme == mapping.Options.Scheme
+                            m.Options.Scheme.Equals(mapping.Options.Scheme, StringComparison.OrdinalIgnoreCase)
                       select m;
 
             if (hit.FirstOrDefault() != null)
@@ -110,7 +110,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             handler = (from m in Mappings
                        where m.Options.RequestType == HttpRequestType.AuthorizationHeader &&
                              m.Options.Name == "Authorization" &&
-                             m.Options.Scheme == scheme
+                             m.Options.Scheme.Equals(scheme, StringComparison.OrdinalIgnoreCase)
                        select m.TokenHandler).SingleOrDefault();
 
             return (handler != null);
