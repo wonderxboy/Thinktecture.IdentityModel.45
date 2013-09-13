@@ -237,6 +237,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authorization\MVC\ClaimsAuthorizeAttribute.cs" />
+    <Compile Include="Clients\OpenIdConnect\OidcAuthorizeResponse.cs" />
+    <Compile Include="Clients\OpenIdConnect\OidcClient.cs" />
+    <Compile Include="Clients\OpenIdConnect\OidcTokenResponse.cs" />
     <Compile Include="Http\Hawk\Client\ClientOptions.cs" />
     <Compile Include="Http\Hawk\Client\HawkValidatingHandler.cs" />
     <Compile Include="Http\Hawk\Core\Extensions\IRequestMessageExtension.cs" />
