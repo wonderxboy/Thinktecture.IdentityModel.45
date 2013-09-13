@@ -1,4 +1,9 @@
-﻿using Newtonsoft.Json.Linq;
+﻿/*
+ * Copyright (c) Dominick Baier, Brock Allen.  All rights reserved.
+ * see license.txt
+ */
+
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -8,7 +13,6 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using Thinktecture.IdentityModel.Clients;
 
 namespace Thinktecture.IdentityModel.Clients
 {
