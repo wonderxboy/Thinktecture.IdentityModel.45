@@ -7,8 +7,10 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IdentityModel.Selectors;
 using System.IdentityModel.Tokens;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
@@ -21,10 +23,10 @@ namespace Thinktecture.IdentityModel.Clients
         public static Uri GetAuthorizeUrl(Uri authorizeEndpoint, Uri redirectUri, string clientId, string scopes, string state, string responseType = "code")
         {
             var queryString = string.Format("?client_id={0}&scope={1}&redirect_uri={2}&state={3}&response_type={4}",
-                clientId,
-                scopes,
-                redirectUri,
-                state,
+                WebUtility.UrlEncode(clientId),
+                WebUtility.UrlEncode(scopes),
+                WebUtility.UrlEncode(redirectUri.AbsoluteUri),
+                WebUtility.UrlEncode(state),
                 responseType);
 
             return new Uri(authorizeEndpoint.AbsoluteUri + queryString);
@@ -107,11 +109,23 @@ namespace Thinktecture.IdentityModel.Clients
             };
         }
 
-        public static IEnumerable<Claim> ValidateIdentityToken(string token, string issuer, string audience, X509Certificate2 signingCertificate)
+        public static IEnumerable<Claim> ValidateIdentityToken(string token, string issuer, string audience, X509Certificate2 signingCertificate, X509CertificateValidator certificateValidator = null)
         {
-            var idToken = new JwtSecurityToken(token);
-            var handler = new JwtSecurityTokenHandler();
-            
+            if (certificateValidator == null)
+            {
+                certificateValidator = X509CertificateValidator.None;
+            }
+
+            var configuration = new SecurityTokenHandlerConfiguration
+            {
+                CertificateValidator = certificateValidator
+            };
+
+            var handler = new JwtSecurityTokenHandler
+            {
+                Configuration = configuration
+            };
+
             var parameters = new TokenValidationParameters
             {
                 ValidIssuer = issuer,
