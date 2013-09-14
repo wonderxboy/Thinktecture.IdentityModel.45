@@ -15,12 +15,13 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Thinktecture.IdentityModel.Constants;
 
 namespace Thinktecture.IdentityModel.Clients
 {
     public class OidcClient
     {
-        public static Uri GetAuthorizeUrl(Uri authorizeEndpoint, Uri redirectUri, string clientId, string scopes, string state, string responseType = "code")
+        public static Uri CreateAuthorizeUrl(Uri authorizeEndpoint, Uri redirectUri, string clientId, string scopes, string state, string responseType = "code")
         {
             var queryString = string.Format("?client_id={0}&scope={1}&redirect_uri={2}&state={3}&response_type={4}",
                 WebUtility.UrlEncode(clientId),
@@ -32,7 +33,7 @@ namespace Thinktecture.IdentityModel.Clients
             return new Uri(authorizeEndpoint.AbsoluteUri + queryString);
         }
 
-        public static OidcAuthorizeResponse HandleAuthorizeResponse(NameValueCollection query)
+        public static OidcAuthorizeResponse ParseAuthorizeResponse(NameValueCollection query)
         {
             var response = new OidcAuthorizeResponse
             {
@@ -45,29 +46,6 @@ namespace Thinktecture.IdentityModel.Clients
             return response;
         }
 
-        public static OidcTokenResponse CallTokenEndpoint(Uri tokenEndpoint, Uri redirectUri, string code, string clientId, string clientSecret)
-        {
-            var client = new HttpClient
-            {
-                BaseAddress = tokenEndpoint
-            };
-
-            client.SetBasicAuthentication(clientId, clientSecret);
-
-            var parameter = new Dictionary<string, string>
-                {
-                    { "grant_type", "authorization_code" },
-                    { "code", code },
-                    { "redirect_uri", redirectUri.AbsoluteUri }
-                };
-
-            var response = client.PostAsync("", new FormUrlEncodedContent(parameter)).Result;
-            response.EnsureSuccessStatusCode();
-
-            var json = JObject.Parse(response.Content.ReadAsStringAsync().Result);
-            return json.ToObject<OidcTokenResponse>();
-        }
-        
         public async static Task<OidcTokenResponse> CallTokenEndpointAsync(Uri tokenEndpoint, Uri redirectUri, string code, string clientId, string clientSecret)
         {
             var client = new HttpClient
@@ -79,9 +57,9 @@ namespace Thinktecture.IdentityModel.Clients
 
             var parameter = new Dictionary<string, string>
                 {
-                    { "grant_type", "authorization_code" },
-                    { "code", code },
-                    { "redirect_uri", redirectUri.AbsoluteUri }
+                    { OAuth2Constants.GrantType, OAuth2Constants.GrantTypes.AuthorizationCode },
+                    { OAuth2Constants.Code, code },
+                    { OAuth2Constants.RedirectUri, redirectUri.AbsoluteUri }
                 };
 
             var response = await client.PostAsync("", new FormUrlEncodedContent(parameter));
@@ -149,38 +127,6 @@ namespace Thinktecture.IdentityModel.Clients
             response.EnsureSuccessStatusCode();
 
             var dictionary = await response.Content.ReadAsAsync<Dictionary<string, string>>();
-
-            var claims = new List<Claim>();
-            foreach (var pair in dictionary)
-            {
-                if (pair.Value.Contains(','))
-                {
-                    foreach (var item in pair.Value.Split(','))
-                    {
-                        claims.Add(new Claim(pair.Key, item));
-                    }
-                }
-                else
-                {
-                    claims.Add(new Claim(pair.Key, pair.Value));
-                }
-            }
-
-            return claims;
-        }
-        public static IEnumerable<Claim> GetUserInfoClaims(Uri userInfoEndpoint, string accessToken)
-        {
-            var client = new HttpClient
-            {
-                BaseAddress = userInfoEndpoint
-            };
-
-            client.SetBearerToken(accessToken);
-
-            var response = client.GetAsync("").Result;
-            response.EnsureSuccessStatusCode();
-
-            var dictionary = response.Content.ReadAsAsync<Dictionary<string, string>>().Result;
 
             var claims = new List<Claim>();
             foreach (var pair in dictionary)
