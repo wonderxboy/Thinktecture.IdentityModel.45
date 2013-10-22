@@ -17,7 +17,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         private static string EncodeCredential(string userName, string password)
         {
-            Encoding encoding = Encoding.GetEncoding("iso-8859-1");
+            Encoding encoding = Encoding.UTF8;
             string credential = String.Format("{0}:{1}", userName, password);
 
             return Convert.ToBase64String(encoding.GetBytes(credential));

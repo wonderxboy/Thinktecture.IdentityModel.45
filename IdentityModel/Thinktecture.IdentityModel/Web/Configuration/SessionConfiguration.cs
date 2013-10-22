@@ -1,11 +1,6 @@
 ﻿using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Thinktecture.IdentityModel.Web;
 
 namespace Thinktecture.IdentityModel.Web.Configuration
 {

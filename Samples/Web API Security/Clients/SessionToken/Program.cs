@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.IdentityModel.Tokens;
 using System.Net.Http;
 using Thinktecture.IdentityModel.Extensions;
 using Thinktecture.Samples;
@@ -39,6 +40,7 @@ namespace SessionToken
             "\nExpiration:".ConsoleRed();
             Console.WriteLine(expiration.ToLongDateString() + " " + expiration.ToLongTimeString());
 
+            DecodeSessionToken(token);
             return token;
         }
 
@@ -65,6 +67,18 @@ namespace SessionToken
                 });
 
                 Console.ReadLine();
+            }
+        }
+
+        private static void DecodeSessionToken(string sessionToken)
+        {
+            var token = new JwtSecurityToken(sessionToken);
+
+            "\nSession token claims:".ConsoleYellow();
+            foreach (var claim in token.Claims)
+            {
+                Console.WriteLine(" " + claim.Type);
+                string.Format("  {0}\n", claim.Value).ConsoleGreen();
             }
         }
     }

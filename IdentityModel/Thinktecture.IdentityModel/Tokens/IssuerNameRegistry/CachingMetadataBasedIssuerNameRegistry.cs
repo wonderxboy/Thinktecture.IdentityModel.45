@@ -67,6 +67,18 @@ namespace Thinktecture.IdentityModel.Tokens
             }
         }
 
+        async Task<byte[]> GetMetadataFromSourceAsync()
+        {
+            using (var stream = await base.GetMetadataStreamAsync())
+            {
+                using (var ms = new MemoryStream())
+                {
+                    stream.CopyTo(ms);
+                    return ms.ToArray();
+                }
+            }
+        }
+
         protected override System.IO.Stream GetMetadataStream()
         {
             byte[] bytes = null;
@@ -83,34 +95,51 @@ namespace Thinktecture.IdentityModel.Tokens
                 bytes = GetMetadataFromSource();
                 this.cache.Save(bytes);
             }
-            else
-            {
-                // check to see if we can eager-reload the cache
-                // if we're more than half-way to expiration, then reload
-                var halfTime = this.cacheDuration/2;
-                var age = cache.Age.TotalDays;
-                if (age > halfTime)
-                {
-                    // reload on background thread
-                    Task.Factory.StartNew(
-                        delegate
-                        {
-                            var data = GetMetadataFromSource();
-                            this.cache.Save(data);
-                        })
-                    .ContinueWith(task =>
-                        {
-                            // don't take down process if this fails 
-                            // if ThrowUnobservedTaskExceptions is enabled
-                            if (task.IsFaulted)
-                            {
-                                var ex = task.Exception;
-                            }
-                        });
-                }
-            }
-            
+
+            // reload cache from source periodically
+            SetupCacheReloadTimer();
+
             return new MemoryStream(bytes);
+        }
+
+        private void SetupCacheReloadTimer()
+        {
+            Action loadCache = async () =>
+            {
+                try
+                {
+                    var bytes = await GetMetadataFromSourceAsync();
+                    if (bytes != null)
+                    {
+                        this.cache.Save(bytes);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Tracing.Error(String.Format("CachingMetadataBasedIssuerNameRegistry metadata polling: {0}", ex.Message));
+                }
+            };
+
+            // this will check every day for an updated metadata document
+            // reload on background thread
+            Task.Factory.StartNew(async () =>
+            {
+                var timerInterval = (int)TimeSpan.FromDays(1).TotalMilliseconds;
+                while (true)
+                {
+                    await Task.Delay(timerInterval);
+                    loadCache();
+                }
+            });
+
+            // check to see if we can eager-reload the cache
+            // if we're more than half-way to expiration, then reload
+            var halfTime = this.cacheDuration/2;
+            var age = cache.Age.TotalDays;
+            if (age > halfTime)
+            {
+                Task.Factory.StartNew(loadCache);
+            }
         }
 
         public override void LoadCustomConfiguration(XmlNodeList nodeList)

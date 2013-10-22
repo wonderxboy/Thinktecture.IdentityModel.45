@@ -1,0 +1,32 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<div>
+    <p>Deny Implicit Frame (should not work)</p>
+    <p><iframe src="@Url.Action("DenyImplicit")"></iframe></p>
+</div>
+
+<div>
+    <p>Deny Explicit Frame (should not work)</p>
+    <p><iframe src="@Url.Action("Deny")"></iframe></p>
+</div>
+
+<div>
+    <p>Same Origin Frame (should work)</p>
+    <p><iframe src="@Url.Action("SameOrigin")"></iframe></p>
+</div>
+
+<div>
+    <p>Custom Origin 1 Frame (should work)</p>
+    <p><iframe src="@Url.Action("CustomOrigin1")"></iframe></p>
+</div>
+
+<div>
+    <p>Custom Origin 2 Frame (should not work)</p>
+    <p><iframe src="@Url.Action("CustomOrigin2")"></iframe></p>
+</div>
+<div>
+    <p>Custom Dynamic</p>
+    <p><iframe src="@Url.Action("CustomDynamic")"></iframe></p>
+</div>

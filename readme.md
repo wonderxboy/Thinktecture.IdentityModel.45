@@ -10,16 +10,15 @@ Helper library for identity & access control in .NET 4.5 and MVC4/Web API.
 - Epoch Date Time conversion
 - Random number generation
 - Time-constant string comparison
+- Certificate Store Access
+- Useful constants when dealing with algorithms, date time formats, JWT, SWT, WS-Security & WS-Trust
 
 **Claims**
 
 - Anoynmous claims principal
 - Authentication instant claim
 - Claims-based authorization
-
-**Constant**
-
-- Useful constants when dealing with algorithms, date time formats, JWT, SWT, WS-Security & WS-Trust
+- ClaimsPrincipal factory
 
 **Extension Methods**
 
@@ -28,21 +27,33 @@ Helper library for identity & access control in .NET 4.5 and MVC4/Web API.
 - Security token conversion
 - X.509 Certificates
 
-**Tokens**
 
-- SWT and JWT support
-- Access key support
-- Low level helpers
+**Web API and HTTP Security**
 
-**Web API**
-
-- HTTP-friendly security token handlers
-- Extensible authentication framework for Web API that supports SAML 1.1/2.0, JWT, SWT, Access Keys, Basic Authentication
+- Extensible authentication framework for Web API that supports SAML 1.1/2.0, JWT, Access Keys, Basic Authentication
+- Embeddable token endpoint
+- Claims transformation
+- Implementation of the Hawk authentication scheme
+- Scope-based authorization
+- OAuth2 client library
 
 **Web**
 
 - Cookie protection
 - CORS
+- Anti-clickjacking
+
+**ASP.NET Passive Federation**
+
+- Configuring session token lifetime
+- Sliding sessions
+- Overriding WS-Federation token lifetime
+- Configuring persistent session token cookies
+- Configuring machine key protection of session tokens
+- Suppress login redirects for API clients
+- Suppressing session token validation exceptions
+- Server-side session token caching
+- Dynamic issuer name registry direct from STS federation metadata
 
 **WS-Trust**
 
@@ -52,10 +63,4 @@ Helper library for identity & access control in .NET 4.5 and MVC4/Web API.
 
 ## Resources ##
 
-- [HTTP Authentication](http://leastprivilege.com/2012/05/26/thinktecture-identitymodel-and-asp-net-web-api/)
-- [Web API Integration](http://leastprivilege.com/2012/06/03/thinktecture-identitymodel-and-asp-net-web-api-the-messagehandler/)
-- [Self Hosting](http://leastprivilege.com/2012/06/12/thinktecture-identitymodel-45-and-asp-net-web-api-self-hosting/) 
-- [JWT Support](http://leastprivilege.com/2012/05/25/json-web-token-jwt-support-in-thinktecture-identitymodel/) 
-- [Access Token Support](http://leastprivilege.com/2012/06/03/the-simplest-securitytoken-handler-you-can-write/)
-- [CORS Support](http://brockallen.com/2012/06/28/cors-support-in-webapi-mvc-and-iis-with-thinktecture-identitymodel/)
-- [Session Token Support](http://leastprivilege.com/2012/06/19/session-token-support-for-asp-net-web-api/)
+see the [wiki] (https://github.com/thinktecture/Thinktecture.IdentityModel.45/wiki) for more resources. 

@@ -13,6 +13,7 @@ namespace Thinktecture.IdentityModel.Constants
         public const string Assertion = "assertion";
         public const string Password  = "password";
         public const string Code = "code";
+        public const string RedirectUri = "redirect_uri";
 
         public static class GrantTypes
         {
