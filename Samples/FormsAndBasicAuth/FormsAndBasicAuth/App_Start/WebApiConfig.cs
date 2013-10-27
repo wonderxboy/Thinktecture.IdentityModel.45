@@ -18,7 +18,6 @@ namespace FormsAndBasicAuth
 
             var authConfig = new AuthenticationConfiguration
             {
-                EnableSessionToken = true,
                 InheritHostClientIdentity = true,
                 ClaimsAuthenticationManager = FederatedAuthentication.FederationConfiguration.IdentityConfiguration.ClaimsAuthenticationManager,
                 RequireSsl = false
