@@ -167,7 +167,7 @@ namespace Thinktecture.IdentityModel.Http.Hawk.Client
                             body = await response.ReadBodyAsStringAsync();
                         }
 
-                        bool isValid = crypto.IsSignatureValid(body, response.ContentType);
+                        bool isValid = crypto.IsSignatureValid(body, response.ContentType, isServerAuthorization: true);
 
                         if (isValid)
                         {
