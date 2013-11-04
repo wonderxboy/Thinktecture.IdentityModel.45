@@ -350,10 +350,8 @@
     <Compile Include="Web\Configuration\SecuritySessionSection.cs" />
     <Compile Include="Web\Configuration\SessionConfiguration.cs" />
     <Compile Include="Web\Configuration\SessionConfigurationModule.cs" />
-    <Compile Include="Web\IReplayTokenCacheRepository.cs" />
     <Compile Include="Web\ITokenCacheRepository.cs" />
     <Compile Include="Web\PassiveModuleConfiguration.cs" />
-    <Compile Include="Web\PassiveRepositoryReplayTokenCache.cs" />
     <Compile Include="Web\PassiveRepositorySessionSecurityTokenCache.cs" />
     <Compile Include="Web\PassiveSessionConfiguration.cs" />
     <Compile Include="Web\ProtectionMode.cs" />
