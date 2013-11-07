@@ -195,7 +195,19 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             });
         }
 
-        public static void AddSaml2(this AuthenticationConfiguration configuration, string issuerThumbprint, string issuerName, string audienceUri, X509CertificateValidator certificateValidator, AuthenticationOptions options, AuthenticationScheme scheme)
+        private static SecurityTokenHandlerConfiguration CreateSaml2SecurityTokenHandlerConfiguration(string issuerThumbprint, string issuerName, string audienceUri, X509CertificateValidator certificateValidator, X509Certificate2 encryptingCertificate)
+        {
+            var handlerConfig = CreateSaml2SecurityTokenHandlerConfiguration(issuerThumbprint, issuerName, audienceUri, certificateValidator);
+
+            var serviceTokens = new List<SecurityToken> { new X509SecurityToken(encryptingCertificate) };
+
+            handlerConfig.ServiceTokenResolver =
+               SecurityTokenResolver.CreateDefaultSecurityTokenResolver(serviceTokens.AsReadOnly(), true);
+
+            return handlerConfig;
+        }
+
+        private static SecurityTokenHandlerConfiguration CreateSaml2SecurityTokenHandlerConfiguration(string issuerThumbprint, string issuerName, string audienceUri, X509CertificateValidator certificateValidator)
         {
             var registry = new ConfigurationBasedIssuerNameRegistry();
             registry.AddTrustedIssuer(issuerThumbprint, issuerName);
@@ -204,6 +216,19 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             handlerConfig.AudienceRestriction.AllowedAudienceUris.Add(new Uri(audienceUri));
             handlerConfig.IssuerNameRegistry = registry;
             handlerConfig.CertificateValidator = certificateValidator;
+            return handlerConfig;
+        }
+
+        public static void AddSaml2(this AuthenticationConfiguration configuration, string issuerThumbprint, string issuerName, string audienceUri, X509CertificateValidator certificateValidator, AuthenticationOptions options, AuthenticationScheme scheme, X509Certificate2 encryptingCertificate)
+        {
+            var handlerConfig = CreateSaml2SecurityTokenHandlerConfiguration(issuerThumbprint, issuerName, audienceUri, certificateValidator, encryptingCertificate);
+
+            configuration.AddSaml2(handlerConfig, options, scheme);
+        }
+
+        public static void AddSaml2(this AuthenticationConfiguration configuration, string issuerThumbprint, string issuerName, string audienceUri, X509CertificateValidator certificateValidator, AuthenticationOptions options, AuthenticationScheme scheme)
+        {
+            var handlerConfig = CreateSaml2SecurityTokenHandlerConfiguration(issuerThumbprint, issuerName, audienceUri, certificateValidator);
 
             configuration.AddSaml2(handlerConfig, options, scheme);
         }
@@ -216,6 +241,28 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             configuration.AddMapping(new AuthenticationOptionMapping
             {
                 TokenHandler = new SecurityTokenHandlerCollection { handler },
+                Options = options,
+                Scheme = scheme
+            });
+        }
+
+        public static void AddSaml2AndJwt(this AuthenticationConfiguration configuration, string issuerThumbprint, X509Certificate2 signingCertificate, string issuerName, string audienceUri, X509CertificateValidator certificateValidator, AuthenticationOptions options, AuthenticationScheme scheme, X509Certificate2 encryptionCertificate)
+        {
+            var validationParameters = new TokenValidationParameters()
+            {
+                AllowedAudience = audienceUri,
+                SigningToken = new X509SecurityToken(signingCertificate),
+                ValidIssuer = issuerName,
+            };
+
+            var jwtHandler = new JwtSecurityTokenHandlerWrapper(validationParameters);
+
+            var samlHandlerConfig = CreateSaml2SecurityTokenHandlerConfiguration(issuerThumbprint, issuerName, audienceUri, certificateValidator, encryptionCertificate);
+            var saml2Handler = new HttpSaml2SecurityTokenHandler() { Configuration = samlHandlerConfig };
+
+            configuration.AddMapping(new AuthenticationOptionMapping
+            {
+                TokenHandler = new SecurityTokenHandlerCollection { jwtHandler, saml2Handler },
                 Options = options,
                 Scheme = scheme
             });
