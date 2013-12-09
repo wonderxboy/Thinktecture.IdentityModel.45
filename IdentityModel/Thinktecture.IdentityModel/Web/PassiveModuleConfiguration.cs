@@ -107,7 +107,7 @@ namespace Thinktecture.IdentityModel.Web
                     delegate(object sender, AuthorizationFailedEventArgs e)
                     {
                         var ctx = HttpContext.Current;
-                        if (!ctx.User.Identity.IsAuthenticated)
+                        if (!ctx.Request.IsAuthenticated)
                         {
                             e.RedirectToIdentityProvider = !ctx.Response.SuppressFormsAuthenticationRedirect;
                         }
