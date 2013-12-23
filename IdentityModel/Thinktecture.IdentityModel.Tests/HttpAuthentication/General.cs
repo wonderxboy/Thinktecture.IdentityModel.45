@@ -1,10 +1,6 @@
-﻿using System.Net;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Security.Claims;
-using System.Threading;
-using System.Web.Http;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Tests
 {

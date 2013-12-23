@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) Dominick Baier.  All rights reserved.
+ * Copyright (c) Dominick Baier & Brock Allen.  All rights reserved.
  * see license.txt
  */
 
@@ -24,7 +24,6 @@ namespace Thinktecture.IdentityModel.Tokens
     /// <summary>
     /// Handles SWT tokens.
     /// </summary>
-    [Obsolete("Use JSON Web Token (JWT) instead")]
     public class SimpleWebTokenHandler : SecurityTokenHandler
     {
         private string[] _identifiers = new string[] { TokenTypes.SimpleWebToken, SwtConstants.SWT };
@@ -205,13 +204,16 @@ namespace Thinktecture.IdentityModel.Tokens
             }
 
             var unsignedToken = CreateUnsignedToken(swt);
+            byte[] signature;
 
-            var hmac = new HMACSHA256((swt.SecurityKeys.First() as InMemorySymmetricSecurityKey).GetSymmetricKey());
-            var sig = hmac.ComputeHash(Encoding.ASCII.GetBytes(unsignedToken));
+            using (var hmac = new HMACSHA256((swt.SecurityKeys.First() as InMemorySymmetricSecurityKey).GetSymmetricKey()))
+            {
+                signature = hmac.ComputeHash(Encoding.ASCII.GetBytes(unsignedToken));
+            }
 
             var signedToken = String.Format("{0}&HMACSHA256={1}",
                 unsignedToken,
-                HttpUtility.UrlEncode(Convert.ToBase64String(sig)));
+                HttpUtility.UrlEncode(Convert.ToBase64String(signature)));
 
             return signedToken;
         }
@@ -219,17 +221,7 @@ namespace Thinktecture.IdentityModel.Tokens
         private static string CreateUnsignedToken(SimpleWebToken swt)
         {
             var sb = new StringBuilder();
-            var claims = new Dictionary<string, string>();
-
-            foreach (var claim in swt.Claims)
-            {
-                claims.Add(claim.Type, claim.Value);
-            }
-
-            foreach (var kv in claims)
-            {
-                sb.AppendFormat("{0}={1}&", HttpUtility.UrlEncode(kv.Key), HttpUtility.UrlEncode(kv.Value));
-            }
+            CreateClaims(swt, sb);
 
             sb.AppendFormat("Issuer={0}&", HttpUtility.UrlEncode(swt.Issuer));
             sb.AppendFormat("Audience={0}&", HttpUtility.UrlEncode(swt.AudienceUri.AbsoluteUri));
@@ -246,10 +238,10 @@ namespace Thinktecture.IdentityModel.Tokens
             var key = (InMemorySymmetricSecurityKey)tokenDescriptor.SigningCredentials.SigningKey;
 
             var token = new SimpleWebToken(
-                new Uri(audience), 
-                issuer, 
-                tokenDescriptor.Lifetime.Expires.Value, 
-                claims.ToList(), 
+                new Uri(audience),
+                issuer,
+                tokenDescriptor.Lifetime.Expires.Value,
+                claims.ToList(),
                 key);
 
             return token;
@@ -264,16 +256,8 @@ namespace Thinktecture.IdentityModel.Tokens
             }
 
             // check issuer name registry for allowed issuers
-            string issuerName = null;
-            if (base.Configuration.IssuerNameRegistry != null)
-            {
-                issuerName = base.Configuration.IssuerNameRegistry.GetIssuerName(token);
-                if (string.IsNullOrEmpty(issuerName))
-                {
-                    throw new SecurityTokenValidationException("Invalid issuer");
-                }
-            }
-
+            string issuerName = swt.Issuer;
+            
             // check expiration
             if (DateTime.Compare(swt.ValidTo, DateTime.UtcNow) <= 0)
             {
@@ -292,7 +276,7 @@ namespace Thinktecture.IdentityModel.Tokens
             }
 
             // retrieve signing key
-            var clause = new WebTokenSecurityKeyClause(swt.Issuer);
+            var clause = new NamedKeySecurityKeyIdentifierClause(swt.Issuer, swt.Issuer);
             var securityKey = Configuration.IssuerTokenResolver.ResolveSecurityKey(clause) as InMemorySymmetricSecurityKey;
 
             if (securityKey == null)
@@ -300,40 +284,56 @@ namespace Thinktecture.IdentityModel.Tokens
                 throw new SecurityTokenValidationException("No signing key found");
             }
 
-
-            // TODO
             // check signature
             if (!swt.VerifySignature(securityKey.GetSymmetricKey()))
             {
                 throw new SecurityTokenValidationException("Signature verification of the incoming token failed.");
             }
 
-            
-
             var id = new ClaimsIdentity("SWT");
-
             foreach (var claim in swt.Claims)
             {
-                claim.Value.Split(',').ToList().ForEach(v => id.AddClaim(new Claim(claim.Type, v, ClaimValueTypes.String, issuerName)));
+                var value = claim.Value;
+                value.Split(',').ToList().ForEach(v => id.AddClaim(new Claim(claim.Type, HttpUtility.UrlDecode(v), ClaimValueTypes.String, issuerName)));
             }
 
-            return new List<ClaimsIdentity> { id }.AsReadOnly();
+            return new ReadOnlyCollection<ClaimsIdentity>(new ClaimsIdentity[] { id });
         }
 
-
-
-        private static void CreateClaims(SimpleWebToken swt, StringBuilder sb)
+        internal static void CreateClaims(SimpleWebToken swt, StringBuilder sb)
         {
-            var claims = new Dictionary<string, string>();
+            var claims = new Dictionary<string, List<string>>();
 
             foreach (var claim in swt.Claims)
             {
-                claims.Add(claim.Type, claim.Value);
+                if (claims.ContainsKey(claim.Type))
+                {
+                    claims[claim.Type].Add(claim.Value);
+                }
+                else
+                {
+                    claims.Add(claim.Type, new List<string>());
+                    claims[claim.Type].Add(claim.Value);
+                }
             }
 
             foreach (var kv in claims)
             {
-                sb.AppendFormat("{0}={1}&", HttpUtility.UrlEncode(kv.Key), HttpUtility.UrlEncode(kv.Value));
+                var values = kv.Value;
+                string s = null;
+
+                foreach (var val in values)
+                {
+                    if (string.IsNullOrEmpty(s))
+                    {
+                        s = HttpUtility.UrlEncode(val);
+                        continue;
+                    }
+
+                    s += string.Format(",{0}", HttpUtility.UrlEncode(val));
+                }
+
+                sb.AppendFormat("{0}={1}&", HttpUtility.UrlEncode(kv.Key), HttpUtility.UrlEncode(s));
             }
         }
 
@@ -454,6 +454,11 @@ namespace Thinktecture.IdentityModel.Tokens
             }
 
             return false;
+        }
+
+        public bool CanReadToken(string tokenString)
+        {
+            return true;
         }
     }
 }

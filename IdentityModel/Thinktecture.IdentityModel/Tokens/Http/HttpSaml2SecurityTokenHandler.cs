@@ -7,10 +7,11 @@ using System.IdentityModel.Tokens;
 using System.IO;
 using System.Xml;
 using Thinktecture.IdentityModel.Constants;
+using Thinktecture.IdentityModel.Http;
 
 namespace Thinktecture.IdentityModel.Tokens.Http
 {
-    class HttpSaml2SecurityTokenHandler : Saml2SecurityTokenHandler
+    public class HttpSaml2SecurityTokenHandler : Saml2SecurityTokenHandler
     {
         private string[] _identifier = new string[] 
             { 
@@ -37,7 +38,29 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         public override SecurityToken ReadToken(string tokenString)
         {
+            // unbase64 header if necessary
+            if (HeaderEncoding.IsBase64Encoded(tokenString))
+            {
+                tokenString = HeaderEncoding.DecodeBase64(tokenString);
+            }
+
             return ReadToken(new XmlTextReader(new StringReader(tokenString)));
+        }
+
+        public override bool CanReadToken(string tokenString)
+        {
+            // unbase64 header if necessary
+            if (HeaderEncoding.IsBase64Encoded(tokenString))
+            {
+                tokenString = HeaderEncoding.DecodeBase64(tokenString);
+            }
+
+            if (tokenString.StartsWith("<"))
+            {
+                return base.CanReadToken(new XmlTextReader(new StringReader(tokenString)));
+            }
+
+            return base.CanReadToken(tokenString);
         }
 
         public override string[] GetTokenTypeIdentifiers()

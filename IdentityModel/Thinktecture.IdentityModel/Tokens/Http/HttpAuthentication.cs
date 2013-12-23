@@ -14,7 +14,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
-using Thinktecture.IdentityModel.Diagnostics;
+using System.ServiceModel.Security.Tokens;
 
 namespace Thinktecture.IdentityModel.Tokens.Http
 {
@@ -27,9 +27,10 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             Configuration = configuration;
         }
 
-        public ClaimsPrincipal Authenticate(HttpRequestMessage request)
+        public virtual ClaimsPrincipal Authenticate(HttpRequestMessage request)
         {
             string resourceName = request.RequestUri.AbsoluteUri;
+            var identities = new List<ClaimsIdentity>();
 
             // if session feature is enabled (and this is not a token request), check for session token first
             if (Configuration.EnableSessionToken && !IsSessionTokenRequest(request))
@@ -38,7 +39,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
                 if (principal.Identity.IsAuthenticated)
                 {
-                    Tracing.Information(Area.HttpAuthentication, "Client authenticated using session token");
+                    Tracing.Information("Client authenticated using session token");
                     return principal;
                 }
             }
@@ -49,15 +50,14 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                 var authZ = request.Headers.Authorization;
                 if (authZ != null)
                 {
-                    Tracing.Verbose(Area.HttpAuthentication, "Mapping for authorization header found: " + authZ.Scheme);
+                    Tracing.Verbose("Mapping for authorization header found: " + authZ.Scheme);
 
                     var principal = AuthenticateAuthorizationHeader(authZ.Scheme, authZ.Parameter);
 
                     if (principal.Identity.IsAuthenticated)
                     {
-                        Tracing.Information(Area.HttpAuthentication, "Client authenticated using authorization header mapping: " + authZ.Scheme);
-
-                        return Transform(resourceName, principal);
+                        Tracing.Information("Client authenticated using authorization header mapping: " + authZ.Scheme);
+                        identities.Add(principal.Identities.First());
                     }
                 }
             }
@@ -67,15 +67,14 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             {
                 if (request.Headers != null)
                 {
-                    Tracing.Verbose(Area.HttpAuthentication, "Mapping for header header found.");
+                    Tracing.Verbose("Mapping for header header found.");
 
                     var principal = AuthenticateHeaders(request.Headers);
 
                     if (principal.Identity.IsAuthenticated)
                     {
-                        Tracing.Information(Area.HttpAuthentication, "Client authenticated using header mapping");
-
-                        return Transform(resourceName, principal);
+                        Tracing.Information("Client authenticated using header mapping");
+                        identities.Add(principal.Identities.First());
                     }
                 }
             }
@@ -85,14 +84,14 @@ namespace Thinktecture.IdentityModel.Tokens.Http
             {
                 if (request.RequestUri != null && !string.IsNullOrWhiteSpace(request.RequestUri.Query))
                 {
-                    Tracing.Verbose(Area.HttpAuthentication, "Mapping for query string found.");
+                    Tracing.Verbose("Mapping for query string found.");
 
                     var principal = AuthenticateQueryStrings(request.RequestUri);
 
                     if (principal.Identity.IsAuthenticated)
                     {
-                        Tracing.Information(Area.HttpAuthentication, "Client authenticated using query string mapping");
-                        return Transform(resourceName, principal);
+                        Tracing.Information("Client authenticated using query string mapping");
+                        identities.Add(principal.Identities.First());
                     }
                 }
             }
@@ -104,16 +103,21 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
                 if (cert != null)
                 {
-                    Tracing.Verbose(Area.HttpAuthentication, "Mapping for client certificate found.");
+                    Tracing.Verbose("Mapping for client certificate found.");
 
                     var principal = AuthenticateClientCertificate(cert);
 
                     if (principal.Identity.IsAuthenticated)
                     {
-                        Tracing.Information(Area.HttpAuthentication, "Client authenticated using client certificate");
-                        return Transform(resourceName, principal);
+                        Tracing.Information("Client authenticated using client certificate");
+                        identities.Add(principal.Identities.First());
                     }
                 }
+            }
+
+            if (identities.Count > 0)
+            {
+                return Transform(resourceName, new ClaimsPrincipal(identities));
             }
 
             // do claim transformation (if enabled), and return.
@@ -135,10 +139,17 @@ namespace Thinktecture.IdentityModel.Tokens.Http
                         // if configured scheme was sent, try to authenticate the session token
                         if (parts[0] == Configuration.SessionToken.Scheme)
                         {
-                            var handler = Configuration.SessionToken.SecurityTokenHandler;
+                            var token = new JwtSecurityToken(parts[1]);
 
-                            var token = handler.ReadToken(parts[1]);
-                            return new ClaimsPrincipal(handler.ValidateToken(token));
+                            var validationParameters = new TokenValidationParameters
+                            {
+                                ValidIssuer = Configuration.SessionToken.IssuerName,
+                                AllowedAudience = Configuration.SessionToken.Audience,
+                                SigningToken = new BinarySecretSecurityToken(Configuration.SessionToken.SigningKey),
+                            };
+
+                            var handler = new JwtSecurityTokenHandler();
+                            return handler.ValidateToken(token, validationParameters);
                         }
                     }
                 }
@@ -259,19 +270,26 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         public virtual string CreateSessionToken(ClaimsPrincipal principal)
         {
-            var handler = Configuration.SessionToken.SecurityTokenHandler;
+            var claims = FilterInternalClaims(principal);
 
-            var descriptor = new SecurityTokenDescriptor
-            {
-                AppliesToAddress = Configuration.SessionToken.Audience.AbsoluteUri,
-                TokenIssuerName = Configuration.SessionToken.IssuerName,
-                SigningCredentials = new HmacSigningCredentials(Configuration.SessionToken.SigningKey),
-                Lifetime = new Lifetime(DateTime.UtcNow, DateTime.UtcNow.Add(Configuration.SessionToken.DefaultTokenLifetime)),
-                Subject = principal.Identities.First()
-            };
+            var token = new JwtSecurityToken(
+                issuer: Configuration.SessionToken.IssuerName,
+                audience: Configuration.SessionToken.Audience,
+                claims: claims,
+                lifetime: new Lifetime(DateTime.UtcNow, DateTime.UtcNow.Add(Configuration.SessionToken.DefaultTokenLifetime)),
+                signingCredentials: new HmacSigningCredentials(Configuration.SessionToken.SigningKey));
 
-            var token = handler.CreateToken(descriptor);
+            var handler = new JwtSecurityTokenHandler();
             return handler.WriteToken(token);
+        }
+
+        private IEnumerable<Claim> FilterInternalClaims(ClaimsPrincipal principal)
+        {
+            return principal.FindAll(c => 
+                c.Type != "exp" && 
+                c.Type != "nbf" && 
+                c.Type != "iss" && 
+                c.Type != "aud");
         }
 
         public virtual string CreateSessionTokenResponse(ClaimsPrincipal principal)
@@ -347,7 +365,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
             if (handler != null)
             {
-                Tracing.Information(Area.HttpAuthentication, "Invoking token handler: " + handler.GetType().FullName);
+                Tracing.Information("Invoking token handler: " + handler.GetType().FullName);
 
                 var token = handler.ReadToken(tokenString);
                 var principal = new ClaimsPrincipal(handler.ValidateToken(token));

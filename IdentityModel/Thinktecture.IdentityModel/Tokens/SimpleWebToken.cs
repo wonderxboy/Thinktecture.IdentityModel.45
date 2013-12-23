@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) Dominick Baier.  All rights reserved.
+ * Copyright (c) Dominick Baier & Brock Allen.  All rights reserved.
  * see license.txt
  */
 
@@ -16,7 +16,6 @@ namespace Thinktecture.IdentityModel.Tokens
     /// <summary>
     /// This class represents the token format for the SimpleWebToken.
     /// </summary>
-    [Obsolete("Use JSON Web Token (JWT) instead")]
     public class SimpleWebToken : SecurityToken
     {
         string _id;
@@ -55,15 +54,15 @@ namespace Thinktecture.IdentityModel.Tokens
 
         public override ReadOnlyCollection<SecurityKey> SecurityKeys
         {
-            get 
+            get
             {
                 if (_signingKey != null)
                 {
-                    return new ReadOnlyCollection<SecurityKey>(new List<SecurityKey> { _signingKey });
+                    return new ReadOnlyCollection<SecurityKey>(new List<System.IdentityModel.Tokens.SecurityKey> { _signingKey });
                 }
                 else
                 {
-                    return new ReadOnlyCollection<SecurityKey>(new List<SecurityKey>());
+                    return new ReadOnlyCollection<SecurityKey>(new List<System.IdentityModel.Tokens.SecurityKey>());
                 }
             }
         }
@@ -124,5 +123,5 @@ namespace Thinktecture.IdentityModel.Tokens
 
             return (ObfuscatingComparer.IsEqual(verifySignature, _signature));
         }
-    }    
+    }
 }

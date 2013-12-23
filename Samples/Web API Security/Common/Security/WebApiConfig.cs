@@ -2,6 +2,7 @@
 using System.Web.Http;
 using Thinktecture.IdentityModel.Http.Cors;
 using Thinktecture.IdentityModel.Http.Cors.WebApi;
+using Thinktecture.IdentityModel.Tokens;
 using Thinktecture.IdentityModel.Tokens.Http;
 using Thinktecture.Samples.Security;
 
@@ -26,6 +27,8 @@ namespace Thinktecture.Samples.Security
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+
+            //config.EnableSystemDiagnosticsTracing();
         }
 
         private static AuthenticationConfiguration CreateAuthenticationConfiguration()
@@ -42,12 +45,7 @@ namespace Thinktecture.Samples.Security
             #endregion
 
             #region IdentityServer JWT
-            //authentication.AddJsonWebToken(
-            //    issuer: Constants.IdSrv.IssuerUri,
-            //    audience: Constants.Audience,
-            //    signingKey: Constants.IdSrv.SigningKey);
-
-            authentication.AddMsftJsonWebToken(
+            authentication.AddJsonWebToken(
                 issuer: Constants.IdSrv.IssuerUri,
                 audience: Constants.Audience,
                 signingKey: Constants.IdSrv.SigningKey);
@@ -69,6 +67,10 @@ namespace Thinktecture.Samples.Security
                 certificateValidator: X509CertificateValidator.None,
                 options: AuthenticationOptions.ForAuthorizationHeader(Constants.IdSrv.SamlScheme),
                 scheme: AuthenticationScheme.SchemeOnly(Constants.IdSrv.SamlScheme));
+            #endregion
+
+            #region Client Certificates
+            authentication.AddClientCertificate(ClientCertificateMode.ChainValidation);
             #endregion
 
             return authentication;

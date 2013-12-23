@@ -151,7 +151,7 @@ namespace Thinktecture.IdentityModel.Tokens.Http
 
         protected virtual Tuple<string, string> DecodeBasicAuthenticationHeader(string basicAuthToken)
         {
-            Encoding encoding = Encoding.GetEncoding("iso-8859-1");
+            Encoding encoding = Encoding.UTF8;
             string userPass = encoding.GetString(Convert.FromBase64String(basicAuthToken));
             int separator = userPass.IndexOf(':');
 
