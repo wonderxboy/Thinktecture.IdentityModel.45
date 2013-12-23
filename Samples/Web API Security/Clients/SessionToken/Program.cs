@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.IO;
 using System.Net.Http;
 using Thinktecture.IdentityModel.Extensions;
 using Thinktecture.Samples;
@@ -21,8 +22,9 @@ namespace SessionToken
         {
             "Requesting session token\n".ConsoleYellow();
 
-            var client = new HttpClient { BaseAddress = _baseAddress };
-            client.SetBasicAuthentication("bob", "bob");
+            var client = new HttpClient { BaseAddress = new Uri("http://localhost:7526/api/UserData/") };
+            //client.SetToken("FacebookToken", "CAAD4QWAiyZBoBAMhspvWnQl7gC33XtGmR7vljcyEKzjXMZAIZC7xv8FWHJS0vSPhVZC4TWd6BgV0OLLs4UXbf0nxmYfeH609Dc3AA1YDqNhj4cyqZChmZCtS3Gr7vUrbQLFm4kUVWOqSgUBMFdja5ZBeiGPfEyCmfZA558MGuYh4gdVRRbL532WodJkZCyhLqbHt3koHtgSUBsQZDZD");
+            client.SetBasicAuthentication("seandong1", "12345678");
 
             var response = client.GetAsync("token").Result;
             response.EnsureSuccessStatusCode();
@@ -44,7 +46,7 @@ namespace SessionToken
 
         private static void CallService(string token)
         {
-            var client = new HttpClient { BaseAddress = _baseAddress };
+            var client = new HttpClient { BaseAddress = new Uri("http://localhost:7526/api/") };
 
             client.SetToken("Session", token);
 
@@ -57,11 +59,13 @@ namespace SessionToken
 
                 Helper.Timer(() =>
                 {
-                    var response = client.GetAsync("identity").Result;
+                    var response = client.GetAsync("userdata").Result;
                     response.EnsureSuccessStatusCode();
 
-                    var claims = response.Content.ReadAsAsync<ViewClaims>().Result;
-                    Helper.ShowConsole(claims);
+                    //var claims = response.Content.ReadAsAsync<ViewClaims>().Result;
+                    //Helper.ShowConsole(claims);
+                    var re = response.Content.ReadAsStringAsync().Result;
+                    re.ConsoleGreen();
                 });
 
                 Console.ReadLine();
